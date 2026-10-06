@@ -116,6 +116,27 @@
 
 代价：失去列级类型约束。对策是 `lib/validators/settings.ts` 里用 Zod 为每个已知 key 定义 schema，读写时校验，既有灵活性又有类型安全。
 
+**典型受益案例：动效配置。** 动效系统需要一份 ~40 个字段的嵌套配置（背景类型、配色、速度、模糊、悬停效果、入场动画、六级降级参数…），见 [08-motion-system.md](08-motion-system.md)。如果用固定列：
+
+- 加一种背景动效类型 → 改表结构 + 发版 + 迁移
+- 加一个参数（如 `noiseOverlay`）→ 又一次迁移
+- 40 个 nullable 列，绝大多数时候是 NULL
+
+用 KV 存一条 `{ key: 'motion.config', group: 'motion', value: MotionConfigJSON }`，**动效系统后续怎么加参数都不需要动数据库**。这正是 §2.3 开头说的"零迁移扩展"最有价值的兑现场景。
+
+```jsonc
+// settings 表里的一行
+{
+  "key": "motion.config",
+  "group": "motion",
+  "value": { "version": 1, "preset": "breath", "intensity": "standard", "background": { /* … */ } },
+  "updatedAt": "2025-01-15T10:23:00.000Z",
+  "updatedBy": "clx..."
+}
+```
+
+> `Setting` 表已建 `@@index([group])`，后台设置页按 group 一次查出整组配置，无额外查询成本。
+
 ### 2.4 为什么用软删除（`deletedAt`）
 
 内容型数据被误删是高频事故。`deletedAt` 有值时：
@@ -294,7 +315,7 @@ model AuditLog {
 model Setting {
   key       String   @id            // 如 "site.name" / "seo.defaultTitle"
   value     Json
-  group     String   @default("general")  // general | theme | seo | social | footer | integration | feature
+  group     String   @default("general")  // general | theme | seo | social | footer | motion | integration | feature
   label     String?                 // 后台显示名
   updatedAt DateTime @updatedAt
   updatedBy String?
@@ -717,7 +738,7 @@ npx prisma studio
 ```
 1. 创建管理员用户（邮箱/密码从环境变量读，首次登录强制改密码）
 2. 插入 6 条 Module 记录（见 §4 表格）
-3. 插入默认 Setting（site.name、seo.*、theme.*、footer.*）
+3. 插入默认 Setting（site.name、seo.*、theme.*、footer.*、**motion.config** —— 动效默认用 `breath` 预设，见 [08-motion-system.md](08-motion-system.md)）
 4. 插入 Profile 单例行（占位文案）
 5. 插入示例 Category（技术 / 生活 / 随笔）
 6. 插入 2 条示例 Article + 3 条示例 Log + 2 条 Project + 3 条 TimelineItem

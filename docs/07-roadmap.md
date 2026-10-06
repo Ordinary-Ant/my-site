@@ -13,12 +13,15 @@
 | **M2** | 后台 CRUD 与模块开关中心 | 8 人天 | ⬜ 未开始 |
 | **M3** | 前台五大模块 | 10 人天 | ⬜ 未开始 |
 | **M4** | 媒体库 / 搜索 / SEO / 打磨 | 5 人天 | ⬜ 未开始 |
+| **M4.5** | 动效系统（可后台配置） | 3.5 人天 | ⬜ 未开始 |
 | **M5** | 上线与运维 | 2 人天 | ⬜ 未开始 |
-| | **合计** | **约 31 人天** | |
+| | **合计** | **约 34.5 人天** | |
 
-**时间换算**：全职 ≈ 6–7 周；业余每晚 3 小时 + 周末 ≈ 8–10 周。
+**时间换算**：全职 ≈ 7 周；业余每晚 3 小时 + 周末 ≈ 9–11 周。
 
-**关键路径**：`M0 → M1 → M2 → M3 → M4 → M5`，其中 **M2 的模块开关中心**是风险最高的环节（自定义交互多），建议预留 buffer。
+**关键路径**：`M0 → M1 → M2 → M3 → M4 → M4.5 → M5`，其中 **M2 的模块开关中心**与 **M4.5 的动效系统**是风险最高的两块（自定义交互多），建议各预留 buffer。
+
+> **为什么 M4.5 排在最后**：动效是**增强层**，它依赖前台的 DOM 结构与组件边界已经稳定。在 M3 之前做动效等于给流沙刷漆 —— 结构一变就要重做。而且 M4.5 可以随时砍掉（站点功能完整），排期风险最低。
 
 ---
 
@@ -263,7 +266,109 @@
 
 ---
 
-## 7. M5 · 上线与运维（2 人天）
+## 7. M4.5 · 动效系统（3.5 人天）
+
+完整设计见 [08-motion-system.md](08-motion-system.md)。**必须在 M3 前台结构稳定后开工**。
+
+### 7.1 基础设施（0.5 人天）
+
+- [ ] `lib/validators/motion.ts` — 完整 Zod schema + 交叉校验规则
+- [ ] `config/motion/` — `types.ts` / `defaults.ts` / `presets.ts`（8 个预设的完整参数）
+- [ ] `Setting` 表插入 `motion.config` 默认值（breath 预设）到 seed
+- [ ] `lib/services/motionService.ts` — 读写 + `unstable_cache` + `revalidateTag('setting')`
+- [ ] `lib/motion/inject.ts` — 配置 → `data-*` 属性 + CSS 变量
+- [ ] `_assets` → `styles/motion.css` — **全部纯 CSS 动效的唯一实现处**（按 `data-*` 选择器组织）
+- [ ] `styles/motion-reduced.css` — `prefers-reduced-motion` 兜底
+- [ ] 在 `(site)/layout.tsx` 注入属性与 CSS 变量
+- [ ] 在 `(site)/layout.tsx` 底部加 `MotionPreferenceToggle`（页脚三档开关）
+
+### 7.2 纯 CSS 动效（1 人天，零 JS）
+
+- [ ] 背景动效 5 种：`gradient-flow` / `aurora` / `blur-blob` / `grid` / `stars`
+- [ ] 悬停动效：卡片 4 种、按钮 4 种、链接 2 种、图片 2 种、导航指示 2 种
+- [ ] 入场动画 4 种：`fade` / `fade-up` / `scale` / `blur`
+- [ ] 入场交错：服务端写 `style="--i:n"`
+- [ ] 文字动效：`fade-words`（服务端拆 span）、`gradient-flow`、`typewriter`
+- [ ] 噪点叠加层（SVG `feTurbulence`）
+- [ ] 微交互：主题圆形扩散（View Transitions）、代码复制反馈、阅读进度条
+- [ ] **全部包在 `@media (hover: hover)` / `@supports` 能力查询里**
+
+### 7.3 JS 动效（1 人天，按需加载）
+
+- [ ] `lib/motion/capability.ts` — 设备能力检测（核数/内存/省流量）
+- [ ] `lib/motion/fpsGuard.ts` — FPS 守护 + 降级回调
+- [ ] `lib/motion/userPreference.ts` — localStorage 三档偏好
+- [ ] `Reveal.tsx` — `animation-timeline` 不支持时的 IO 降级
+- [ ] `CountUp.tsx` — 数字滚动
+- [ ] `CursorGlow.tsx` — 光标光晕（触屏禁用）
+- [ ] `Parallax.tsx` — 视差
+- [ ] `Magnetic.tsx` — 磁吸按钮
+- [ ] `Particles.tsx` — Canvas 粒子（**手写 2D，禁止引入 three.js**）
+- [ ] `MotionRuntime.tsx` — 调度器（默认不加载任何重动效）
+
+### 7.4 后台配置页（1 人天）
+
+- [ ] `GET/PATCH /api/v1/admin/settings/motion`（含 `presets` 与 `estimate`）
+- [ ] `PresetPicker.tsx` — 8 张预设卡片，点击即时套用到预览（不自动保存）
+- [ ] `MotionPreview.tsx` — 实时预览窗（迷你首页，可切 亮色/暗色 · PC/移动）
+- [ ] `PerfEstimate.tsx` — 性能预估（JS 体积 / 合成层 / LCP 影响 / 三级红黄绿）
+- [ ] `ParamSlider.tsx` / `ColorTriple.tsx` / 各折叠区块表单
+- [ ] `MotionWarningDialog.tsx` — 危险配置确认（列出后果，可"仍然保存"）
+- [ ] `respectReducedMotion` 的 🔒 锁定 UI + 说明
+- [ ] 未保存离开拦截
+- [ ] `/admin/settings/motion` 路由 + 侧边栏导航项
+
+### 验收
+
+**功能**
+- [ ] 8 个预设都能一键套用，预览窗实时反映
+- [ ] 拖滑块时预览即时更新，松手后保存才写库
+- [ ] 保存后前台 **5 秒内**生效
+- [ ] 页脚三档开关刷新后保持
+- [ ] 手动改任一项后 `preset` 自动变 `custom`
+
+**性能（硬性）**
+- [ ] `minimal` 与 `breath` 配置下，动效相关 JS **为 0 KB**
+- [ ] `particles` 配置下，动效 JS **≤ 25 KB（gzip）**
+- [ ] 移动端加载首页时**不下载** `Particles.tsx` chunk（DevTools Network 确认）
+- [ ] 开启背景动效后 LCP 变化 **≤ 0.1s**
+- [ ] 全动效开启时 Lighthouse Performance 移动端 **≥ 85**
+
+**降级（逐条实测）**
+- [ ] 系统「减弱动态效果」→ 动画停止且内容完整显示
+- [ ] DevTools 限速 4 核 CPU → 重动效不加载
+- [ ] 人为压低 FPS 到 30 → 2 秒内自动降级，后台预览窗显示「降级状态」
+- [ ] 切到其它标签页 → rAF 停止（Performance 面板确认无持续绘制）
+- [ ] **禁用 JavaScript → 站点完整可读可用，入场内容全部可见（不能是空白）**
+
+**可访问性**
+- [ ] `prefers-reduced-motion: reduce` 下背景动效层 `display: none`
+- [ ] 键盘 Tab 到卡片/按钮时，`:focus-visible` 呈现与 hover 等效反馈
+- [ ] 渐变文字对比度 ≥ 4.5:1
+- [ ] 装饰动效层带 `aria-hidden="true"`
+- [ ] 无任何 > 3Hz 的闪烁
+
+**边界**
+- [ ] 触屏设备上不出现"粘住的 hover 态"
+- [ ] 背景动效在 320px 窄屏下不产生横向滚动条
+- [ ] 亮色/暗色两套配色都能渲染
+- [ ] 背景层不遮挡任何可点击元素
+- [ ] `intensity` 设为 `off` 后子配置在 UI 上置灰但**不清空**
+
+### 风险
+| 风险 | 概率 | 影响 | 对策 |
+|---|---|---|---|
+| 动效 JS 体积失控 | 中 | 高 | 25KB 红线写进 CI：构建后校验 chunk 体积，超标即失败 |
+| 入场动画失败导致页面空白 | 中 | **致命** | `.reveal` 默认 `opacity:1`；`@media (scripting: none)` 兜底；验收项已含"禁用 JS 测试" |
+| 大面积 `filter: blur` 在低端安卓掉帧 | 高 | 中 | `blur > 120` 触发警告；FPS 守护自动降级；省电模式关闭 blur 类 |
+| 移动端误下载粒子 chunk | 中 | 中 | 能力判断放在 `useEffect`，首屏不加载；Network 面板验收 |
+| 预设套用后误以为已保存 | 中 | 低 | 顶部提示条「已套用…尚未保存」+ 撤销按钮；未保存离开拦截 |
+| 后台预览与真实访客所见不一致 | 中 | 中 | 预览窗如实按 `mobileIntensity` 渲染；降级时显示「降级状态」提示 |
+| 动效分散在组件里难以审计 | 中 | 低 | 铁律：**所有动画只在 `motion.css`**，组件不写动画 |
+
+---
+
+## 8. M5 · 上线与运维（2 人天）
 
 - [ ] 购买域名 + 配置 DNS
 - [ ] 部署到 Vercel，配置所有环境变量（`JWT_SECRET` 用 `openssl rand -base64 48` 生成）
@@ -304,6 +409,9 @@
 - [ ] Best Practices ≥ 95
 - [ ] SEO ≥ 95
 - [ ] 文章详情页首屏 JS ≤ 110KB（gzip）
+- [ ] 动效相关 JS ≤ 25KB（gzip），且默认配置（`breath`）下为 **0 KB**
+- [ ] 生产环境实测：系统「减弱动态效果」下站点正常且内容完整可见
+- [ ] 生产环境实测：移动端不下载粒子/光标相关 chunk
 - [ ] 图片均走 `next/image`，无原始大图直出
 
 **SEO**
@@ -328,7 +436,7 @@
 
 ---
 
-## 8. 风险登记册
+## 9. 风险登记册
 
 | # | 风险 | 概率 | 影响 | 对策 |
 |---|---|:--:|:--:|---|
@@ -342,10 +450,14 @@
 | R8 | Vercel 免费额度不够 | 低 | 低 | 有 Docker 自建方案作为 Plan B（[01 §12](01-architecture.md)） |
 | R9 | refresh token 实现有安全漏洞 | 低 | 高 | 严格按 [01 §6.2](01-architecture.md) 时序实现；M1 验收含重放检测 |
 | R10 | 内容写不出来（最真实的风险） | 中 | 高 | 先发 3 篇"存量内容"（把已有笔记整理成文章），不要等灵感 |
+| R11 | 动效 JS 体积失控，首屏变慢 | 中 | 高 | 25KB 红线写进 CI（构建后校验 chunk）；重动效延迟加载；M4.5 验收项 |
+| R12 | 入场动画失败导致页面空白 | 中 | **致命** | `.reveal` 默认 `opacity:1`（动效是增强而非前提）；`@media (scripting:none)` 兜底；验收含"禁用 JS 测试" |
+| R13 | `filter: blur` 大面积用在低端安卓掉帧 | 高 | 中 | `blur > 120` 触发警告；FPS 守护自动降级；省电模式关闭 blur 类 |
+| R14 | 动效配置项过多，后台变成"参数地狱" | 中 | 中 | 8 个预设承担 90% 场景，细调是少数派；预设一键套用 + 逐项微调 |
 
 ---
 
-## 9. M6 · 后续迭代 Backlog（一期不做）
+## 10. M6 · 后续迭代 Backlog（一期不做）
 
 | 优先级 | 功能 | 说明 |
 |:--:|---|---|
@@ -363,7 +475,7 @@
 
 ---
 
-## 10. 开发工作流约定
+## 11. 开发工作流约定
 
 ### 分支策略
 
@@ -402,7 +514,7 @@ chore(deps): 升级 prisma 到 6.x
 
 ---
 
-## 11. 下一步行动
+## 12. 下一步行动
 
 设计评审通过后，建议按这个顺序动手：
 

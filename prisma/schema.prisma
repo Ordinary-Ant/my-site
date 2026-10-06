@@ -1,0 +1,420 @@
+// ============================================================
+//  Personal Site · Prisma Schema
+//  Target: PostgreSQL 16
+//
+//  设计说明见 docs/02-data-model.md
+//  ⚠ 不要改用 SQLite：它不支持 enum 与标量数组，会导致 schema 分叉。
+//     见 docs/02-data-model.md §7
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+//  枚举
+// ============================================================
+
+/// 后台用户角色
+enum Role {
+  ADMIN // 全部权限，含模块开关与用户管理
+  EDITOR // 内容增删改与发布，不可改站点配置
+  VIEWER // 只读，可看仪表盘与审计日志
+}
+
+/// 内容发布状态（Article / Log / Project 共用）
+enum ContentStatus {
+  DRAFT // 草稿，仅后台可见
+  PUBLISHED // 已发布，前台可见
+  ARCHIVED // 已归档，前台隐藏但返回 410
+}
+
+/// 日志类型
+enum LogType {
+  DAILY // 每日随笔
+  EVENT // 大事件
+  SUMMARY // 阶段总结
+}
+
+/// 作品类型
+enum ProjectType {
+  GAME // 游戏
+  REPO // 代码库
+  SKILL // Skills / 技术能力展示
+  OTHER // 个人制作的其他东西
+}
+
+/// 时间戳条目类型
+enum TimelineType {
+  WORK // 工作经历
+  EDUCATION // 教育经历
+  PROJECT // 项目经历
+  AWARD // 荣誉奖项
+  MILESTONE // 个人里程碑
+}
+
+/// 媒体类型
+enum MediaKind {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  OTHER
+}
+
+// ============================================================
+//  认证与权限
+// ============================================================
+
+/// 后台用户
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  avatar       String?
+  role         Role      @default(EDITOR)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions  Session[]
+  auditLogs AuditLog[]
+  articles  Article[]  @relation("ArticleAuthor")
+  logs      Log[]      @relation("LogAuthor")
+
+  @@index([role, isActive])
+  @@map("users")
+}
+
+/// 刷新令牌会话（可撤销）
+model Session {
+  id          String    @id @default(cuid())
+  userId      String
+  refreshHash String    @unique // 只存哈希，明文永不落库
+  userAgent   String?
+  ip          String?
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  rotatedFrom String? // 轮转来源，用于重放检测
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+/// 后台操作审计日志
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String // create | update | delete | restore | publish | unpublish | login | logout | toggle | upload
+  resource   String // article | log | project | timeline | module | setting | media | user
+  resourceId String?
+  before     Json? // 变更前快照（仅存差异字段）
+  after      Json? // 变更后快照
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([resource, resourceId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+// ============================================================
+//  站点配置与模块开关  ★ 后台"开启关闭所有功能"的核心
+// ============================================================
+
+/// 站点配置（KV，按 group 分组渲染后台设置页）
+model Setting {
+  key       String   @id // 如 "site.name" / "seo.defaultTitle" / "motion.config"
+  value     Json
+  group     String   @default("general") // general | theme | seo | social | footer | motion | integration | feature
+  label     String? // 后台显示名
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@index([group])
+  @@map("settings")
+}
+
+/// 功能模块注册表 —— 决定前台哪些栏目存在
+model Module {
+  key         String   @id // home | log | portfolio | timeline | article | about
+  name        String // 中文名，可在后台改
+  description String?
+  enabled     Boolean  @default(true) // 总开关
+  navVisible  Boolean  @default(true) // 是否出现在导航
+  navLabel    String? // 导航文案，空则用 name
+  navOrder    Int      @default(0) // 导航排序
+  icon        String? // lucide 图标名
+  route       String // /logs（可在后台改）
+  config      Json? // 模块级配置，结构见 docs/01-architecture.md §7
+  isBuiltin   Boolean  @default(true) // 内置模块不可删除
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled, navOrder])
+  @@map("modules")
+}
+
+// ============================================================
+//  分类与标签
+// ============================================================
+
+/// 文章分类（支持树形）
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  parentId    String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+  articles Article[]
+
+  @@index([parentId, order])
+  @@map("categories")
+}
+
+/// 标签（文章 / 日志 / 作品共用）
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  color     String?
+  createdAt DateTime @default(now())
+
+  articles Article[] @relation("ArticleTags")
+  logs     Log[]     @relation("LogTags")
+  projects Project[] @relation("ProjectTags")
+
+  @@index([name])
+  @@map("tags")
+}
+
+// ============================================================
+//  内容实体
+// ============================================================
+
+/// 文章（正式对外发布的长文）
+model Article {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  summary        String? // 摘要，用于卡片与 SEO description
+  content        String        @db.Text // Markdown 正文
+  coverImage     String?
+  status         ContentStatus @default(DRAFT)
+  publishedAt    DateTime?
+  isTop          Boolean       @default(false)
+  allowComment   Boolean       @default(true) // 一期不实现评论，预留
+  readingTime    Int           @default(0) // 预计阅读分钟数
+  wordCount      Int           @default(0)
+  viewCount      Int           @default(0)
+  likeCount      Int           @default(0)
+  // SEO
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  ogImage        String?
+  // 关系
+  authorId       String?
+  categoryId     String?
+  // 时间戳
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  author   User?     @relation("ArticleAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags     Tag[]     @relation("ArticleTags")
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([status, isTop, publishedAt(sort: Desc)])
+  @@index([categoryId, status])
+  @@index([deletedAt])
+  @@map("articles")
+}
+
+/// 日志（每日随笔 / 大事件 / 总结）
+model Log {
+  id         String        @id @default(cuid())
+  title      String
+  summary    String?
+  content    String        @db.Text // Markdown
+  type       LogType       @default(DAILY)
+  logDate    DateTime      @db.Date // 记录的是哪一天
+  mood       String? // happy | excited | calm | tired | down | angry
+  weather    String? // sunny | cloudy | overcast | rain | snow | fog
+  location   String?
+  coverImage String?
+  images     String[]      @default([]) // 图集
+  status     ContentStatus @default(PUBLISHED) // 日志默认直接发布
+  isPinned   Boolean       @default(false)
+  viewCount  Int           @default(0)
+  authorId   String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  deletedAt  DateTime?
+
+  author User? @relation("LogAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  tags   Tag[] @relation("LogTags")
+
+  @@index([status, logDate(sort: Desc)])
+  @@index([type, status, logDate(sort: Desc)])
+  @@index([deletedAt])
+  @@map("logs")
+}
+
+/// 作品集（游戏 / 代码库 / Skills / 个人制作）
+model Project {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  subtitle    String?
+  description String        @db.Text // 卡片简介
+  content     String?       @db.Text // 详情页 Markdown（可选）
+  coverImage  String?
+  gallery     String[]      @default([])
+  type        ProjectType   @default(REPO)
+  techStack   String[]      @default([])
+  role        String? // 担任角色
+  highlights  String[]      @default([]) // 亮点 bullets
+  links       Json? // { github, demo, video, docs, article }
+  startDate   DateTime?
+  endDate     DateTime?
+  status      ContentStatus @default(PUBLISHED)
+  featured    Boolean       @default(false) // 首页精选
+  order       Int           @default(0)
+  viewCount   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+
+  tags Tag[] @relation("ProjectTags")
+
+  @@index([status, order])
+  @@index([type, status, order])
+  @@index([featured, status])
+  @@index([deletedAt])
+  @@map("projects")
+}
+
+/// 时间戳 / 经历（同时供「时间戳」页与「关于我」页使用）
+model TimelineItem {
+  id           String       @id @default(cuid())
+  title        String // 如 "高级前端工程师 @ 某公司"
+  subtitle     String? // 如 "核心业务组"
+  description  String?      @db.Text // Markdown
+  type         TimelineType
+  organization String?
+  location     String?
+  startDate    DateTime
+  endDate      DateTime? // null = 至今
+  isCurrent    Boolean      @default(false)
+  logo         String?
+  tags         String[]     @default([])
+  highlights   String[]     @default([]) // 关键成果 bullets
+  order        Int          @default(0)
+  visible      Boolean      @default(true) // 是否在「时间戳」页显示
+  showOnAbout  Boolean      @default(true) // 是否在「关于我」页显示
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([type, startDate(sort: Desc)])
+  @@index([visible, startDate(sort: Desc)])
+  @@map("timeline_items")
+}
+
+// ============================================================
+//  个人档案（单例）
+// ============================================================
+
+/// 关于我（全表仅一行，id 固定为 "default"）
+model Profile {
+  id             String    @id @default("default")
+  name           String
+  headline       String // 一句话定位，如 "5 年经验前端工程师"
+  avatar         String?
+  bio            String    @db.Text // Markdown 自我介绍
+  email          String?
+  phone          String?
+  location       String?
+  birthday       DateTime?
+  jobTitle       String?
+  company        String?
+  yearsOfExp     Int?
+  /// [{ platform, label, url, icon }]
+  socials        Json      @default("[]")
+  /// [{ title, description, icon }]  个人优势
+  advantages     Json      @default("[]")
+  /// [{ category, items: [{ name, level(1-5), years }] }]  技能矩阵
+  skills         Json      @default("[]")
+  /// [{ title, description, icon }]  我能提供什么
+  services       Json      @default("[]")
+  resumeUrl      String?
+  contactVisible Boolean   @default(true) // 是否公开联系方式
+  updatedAt      DateTime  @updatedAt
+
+  @@map("profiles")
+}
+
+// ============================================================
+//  媒体库
+// ============================================================
+
+model Media {
+  id           String    @id @default(cuid())
+  filename     String // 存储名（随机）
+  originalName String // 原始文件名
+  url          String
+  key          String    @unique // 存储驱动中的路径
+  kind         MediaKind @default(IMAGE)
+  mimeType     String
+  size         Int // 字节
+  width        Int?
+  height       Int?
+  alt          String?
+  folder       String    @default("/") // 逻辑目录
+  hash         String?   @unique // sha256，用于秒传与去重
+  uploadedBy   String?
+  createdAt    DateTime  @default(now())
+
+  @@index([folder, createdAt(sort: Desc)])
+  @@index([kind, createdAt(sort: Desc)])
+  @@map("media")
+}
+
+// ============================================================
+//  统计（二期）
+// ============================================================
+
+/// 页面访问按天聚合
+model DailyStat {
+  id      String   @id @default(cuid())
+  date    DateTime @db.Date
+  path    String
+  views   Int      @default(0)
+  uniques Int      @default(0)
+
+  @@unique([date, path])
+  @@index([date(sort: Desc)])
+  @@map("daily_stats")
+}

@@ -442,9 +442,12 @@ Content-Security-Policy: default-src 'self'; img-src 'self' data: https:; script
 | CLS | ≤ 0.05 | ≤ 0.05 |
 | 首屏 JS（文章详情） | ≤ 110KB gzip | 同 |
 | 首屏 JS（后台登录页） | ≤ 80KB gzip | 同 |
+| **动效相关 JS** | **≤ 25KB gzip**，默认配置下为 **0** | 同 |
 | 单页图片总重 | ≤ 800KB | ≤ 1.5MB |
 | Lighthouse Performance | ≥ 90 | ≥ 95 |
 | Lighthouse A11y / Best Practices / SEO | ≥ 95 | ≥ 100 |
+
+> **动效预算单列一行**，因为它最容易失控：一个"顺手引入 Framer Motion 全家桶"就能吃掉全部预算。约束方式见 [08-motion-system.md §6](08-motion-system.md) —— 90% 的动效走纯 CSS（0 KB），重动效延迟加载且移动端不下载。CI 中构建后校验 chunk 体积，超过 25KB 直接失败。
 
 落地手段：`next/image` 自动 AVIF/WebP + 响应式 `sizes`；`next/font` 自托管子集化字体（`display: swap`）；路由级 `dynamic(() => ..., { ssr: false })` 隔离重组件（编辑器、图表）；`(site)` 与 `(admin)` 各自独立 layout，后台代码不进前台 bundle。
 

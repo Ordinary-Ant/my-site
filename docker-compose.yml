@@ -1,0 +1,31 @@
+# 本地开发用 PostgreSQL
+# 说明：不用 SQLite，因为 SQLite 不支持 enum 与标量数组，
+#       会导致本地/生产 schema 分叉。见 docs/02-data-model.md §7 路线 A。
+#
+#   npm run db:up     启动
+#   npm run db:down   停止（数据保留在 volume 里）
+#   docker compose down -v   停止并删除数据
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: personal-site-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: personal_site
+      # 中文排序与比较
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=C'
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U dev -d personal_site']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

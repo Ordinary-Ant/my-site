@@ -168,6 +168,8 @@
 | PATCH ★ | `/api/v1/admin/modules/reorder` | 导航排序 |
 | GET | `/api/v1/admin/settings` | 全部设置（按 group 分组） |
 | PATCH ★ | `/api/v1/admin/settings/:group` | 批量更新某组设置 |
+| GET ★ | `/api/v1/admin/settings/motion` | **动效配置**：返回 config + 8 个预设 + 性能预估（见 §5.8） |
+| PATCH ★ | `/api/v1/admin/settings/motion` | 保存动效配置（Zod + 交叉规则，可能带 `warnings`） |
 | GET | `/api/v1/admin/media` | 媒体列表 |
 | POST | `/api/v1/admin/media/upload` | 上传 |
 | PATCH | `/api/v1/admin/media/:id` | 改 alt / folder |
@@ -774,6 +776,145 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial()
 }
 ```
 > 后台「模块开关」页下方直接内嵌这个接口的近期记录，形成"谁在什么时候关了哪个模块"的可追溯链路。
+
+---
+
+### 5.8 动效配置
+
+完整技术设计见 [08-motion-system.md](08-motion-system.md)。
+
+**`GET /api/v1/admin/settings/motion`** — 需 `setting:read`
+
+与其他设置组不同，这个接口不只返回配置：它还返回**预设库**和**性能预估**，因为后台要在一屏内完成"选预设 → 调参 → 看性能"。
+
+```jsonc
+{
+  "success": true,
+  "data": {
+    // 当前配置（结构见 08 文档 §3）
+    "config": {
+      "version": 1,
+      "preset": "breath",
+      "intensity": "standard",
+      "respectReducedMotion": true,
+      "mobileIntensity": "subtle",
+      "autoDegrade": true,
+      "background": {
+        "enabled": true, "type": "gradient-flow", "scope": "home",
+        "angle": 135, "speed": 24, "blur": 80, "opacity": 0.35,
+        "noiseOverlay": true, "parallax": true,
+        "light": { "colors": ["#6366F1", "#A855F7", "#EC4899"] },
+        "dark":  { "colors": ["#1E1B4B", "#4C1D95", "#0F172A"] }
+      },
+      "interaction": { "cardHover": "lift", "buttonHover": "shine", "linkHover": "underline",
+                       "imageHover": "zoom", "navIndicator": "slide", "cursor": "glow",
+                       "magneticButtons": false },
+      "reveal": { "enabled": true, "type": "fade-up", "range": 0.4,
+                  "duration": 600, "stagger": 80, "easing": "ease-out" },
+      "text": { "heroType": "fade-words", "countUp": true, "gradientHeadings": false },
+      "micro": { "themeTransition": "circle", "copyFeedback": "check",
+                 "pageTransition": "fade", "scrollProgress": true },
+      "performance": { "maxParticles": 60, "fpsGuard": true, "degradeBelowFps": 45,
+                       "pauseWhenHidden": true, "disableOnBattery": false }
+    },
+
+    // 8 个预设的完整参数，供后台一键套用（前端不硬编码）
+    "presets": {
+      "minimal":   { "name": "极简", "description": "纯静态，性能最优", "config": { /* … */ } },
+      "breath":    { "name": "呼吸渐变", "description": "克制且不廉价（推荐）", "config": { /* … */ } },
+      "aurora":    { "name": "极光",   "description": "视觉冲击强，建议仅首页", "config": { /* … */ } },
+      "mesh":      { "name": "光斑",   "description": "现代 SaaS 风", "config": { /* … */ } },
+      "grid":      { "name": "网格",   "description": "极客 / 工程感", "config": { /* … */ } },
+      "stars":     { "name": "星空",   "description": "暗色主题为主", "config": { /* … */ } },
+      "particles": { "name": "粒子",   "description": "炫技向，移动端自动降档", "config": { /* … */ } },
+      "custom":    { "name": "自定义", "description": "手动配置全部参数", "config": null }
+    },
+
+    // 当前配置的性能预估（与后台预览窗右上角显示的一致）
+    "estimate": {
+      "jsBytes": 0,
+      "jsBudget": 25600,
+      "compositeLayers": 1,
+      "lcpImpactMs": 0,
+      "mobileHeavyEffects": 0,
+      "level": "good",              // good | warning | danger
+      "notes": ["背景动效建议仅首页开启，可省约 40% 渲染开销"]
+    },
+
+    "updatedAt": "2025-01-15T10:23:00.000Z"
+  }
+}
+```
+
+**`PATCH /api/v1/admin/settings/motion`** — 需 `setting:write`（ADMIN）
+
+```jsonc
+// 请求：只传要改的字段（深合并，不是整体替换）
+{
+  "preset": "custom",
+  "background": { "type": "particles", "speed": 18 },
+  "performance": { "maxParticles": 150 }
+}
+```
+
+**响应 —— 有性能警告时返回 200 + `warnings`（而非报错）**
+
+```jsonc
+{
+  "success": true,
+  "data": {
+    "config": { /* 保存后的完整配置 */ },
+    "estimate": { "jsBytes": 12000, "compositeLayers": 1, "level": "warning", /* … */ },
+    "warnings": [
+      { "code": "MOBILE_HEAVY_EFFECT", "field": "background.type",
+        "message": "背景为「粒子」，但移动端强度为「标准」，中低端手机可能掉到 30fps 以下" },
+      { "code": "PARTICLES_OVER_LIMIT", "field": "performance.maxParticles",
+        "message": "最大粒子数 150 超过建议值 120" },
+      { "code": "TOO_MANY_HEAVY_EFFECTS", "field": "interaction",
+        "message": "同时启用了 5 项重动效，低端设备降级概率较高" }
+    ],
+    "blocking": [],                 // 阻断类问题（有值时返回 422 而非 200）
+    "cacheInvalidated": ["setting"]
+  }
+}
+```
+
+> **为什么警告用 200 而不是 4xx**：这些都是"合法但需要斟酌"的配置。返回 200 + `warnings` 让后台弹出确认框（「我知道，仍然保存」），而不是把用户堵死。真正的非法值（如颜色格式错误、粒子数超上限）才返回 `422 BUSINESS_RULE_VIOLATION`。
+
+**交叉校验规则**（完整表见 [08-motion-system.md §3](08-motion-system.md)）
+
+| 类型 | 例子 |
+|---|---|
+| 阻断（422） | 颜色数组为空、枚举值非法、`maxParticles` 超出 10–200 |
+| 警告（200 + warnings） | 粒子 + 移动端非关闭、粒子数 > 120、同时 ≥ 4 项重动效、`blur > 120` |
+| 强制（不可覆盖） | `respectReducedMotion` 必须为 `true`，传 `false` 直接 422 |
+
+**公开侧**：动效配置通过 [`GET /api/v1/site`](#31-get-apiv1site) 的 `data.motion` 字段下发（前台 RSC 也可以直接调 `settingService.getMotionConfig()`，走缓存不产生 HTTP 往返）。
+
+```jsonc
+// GET /api/v1/site 响应中新增
+{
+  "data": {
+    "site": { /* … */ },
+    "modules": [ /* … */ ],
+    "motion": {
+      "intensity": "standard",
+      "background": { "enabled": true, "type": "gradient-flow", "scope": "home",
+                      "speed": 24, "blur": 80, "opacity": 0.35, "angle": 135,
+                      "light": { "colors": ["#6366F1", "#A855F7", "#EC4899"] },
+                      "dark":  { "colors": ["#1E1B4B", "#4C1D95", "#0F172A"] } },
+      "interaction": { "cardHover": "lift", "buttonHover": "shine", "cursor": "glow" },
+      "reveal": { "type": "fade-up", "duration": 600, "stagger": 80 },
+      "text": { "heroType": "fade-words", "countUp": true },
+      "micro": { "themeTransition": "circle", "scrollProgress": true },
+      "mobileIntensity": "subtle",
+      "autoDegrade": true
+    }
+  }
+}
+```
+
+> **注意**：公开响应**只含渲染必需字段**，不含 `presets`、`estimate`、`performance` 细节 —— 那些是后台的配置工具，前台不需要知道，下发它们只会白白增加 HTML 体积。`performance` 的降级阈值在客户端有独立常量，不依赖配置下发。
 
 ---
 

@@ -1,0 +1,283 @@
+@import 'tailwindcss' source('../');
+@import 'tw-animate-css';
+@import '../styles/motion.css';
+
+@plugin '@tailwindcss/typography';
+
+/* 深色模式走 class（由 next-themes 切换 <html class="dark">） */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================================
+   设计令牌
+   与设计稿 design/_assets/mock.css 保持一一对应
+   见 docs/05-frontend-ia.md §7
+   ========================================================================== */
+
+:root {
+  /* ---- shadcn 基础令牌 ---- */
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+
+  --muted: #f4f4f5;
+  --muted-foreground: #52525b;
+
+  /* shadcn 的 accent 是"悬停底色"，不是品牌色 */
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #6366f1;
+
+  --radius: 12px;
+
+  /* ---- 项目扩展令牌 ---- */
+  --brand: #6366f1;
+  --brand-hover: #4f46e5;
+  --brand-soft: #eef2ff;
+  --brand-border: #c7d2fe;
+
+  --surface: #ffffff;
+  --surface-subtle: #fafafa;
+  --border-strong: #d4d4d8;
+  --fg-subtle: #a1a1aa;
+
+  /* 内容类型配色（时间戳 / 作品集 / 日志） */
+  --type-work: #3b82f6;
+  --type-education: #10b981;
+  --type-project: #8b5cf6;
+  --type-award: #f59e0b;
+  --type-milestone: #f97316;
+  --type-game: #8b5cf6;
+  --type-repo: #3b82f6;
+  --type-skill: #f59e0b;
+  --type-other: #f97316;
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+
+  --card: #121215;
+  --card-foreground: #fafafa;
+  --popover: #121215;
+  --popover-foreground: #fafafa;
+
+  --primary: #818cf8;
+  --primary-foreground: #0a0a0a;
+
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+
+  --accent: #18181b;
+  --accent-foreground: #fafafa;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #818cf8;
+
+  --brand: #818cf8;
+  --brand-hover: #a5b4fc;
+  --brand-soft: #1e1b4b;
+  --brand-border: #3730a3;
+
+  --surface: #121215;
+  --surface-subtle: #111113;
+  --border-strong: #3f3f46;
+  --fg-subtle: #71717a;
+}
+
+/* ============================================================================
+   把令牌暴露给 Tailwind（@theme inline 让它引用 var()，从而支持 .dark 覆盖）
+   ========================================================================== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-border: var(--brand-border);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-fg-subtle: var(--fg-subtle);
+
+  --color-type-work: var(--type-work);
+  --color-type-education: var(--type-education);
+  --color-type-project: var(--type-project);
+  --color-type-award: var(--type-award);
+  --color-type-milestone: var(--type-milestone);
+  --color-type-game: var(--type-game);
+  --color-type-repo: var(--type-repo);
+  --color-type-skill: var(--type-skill);
+  --color-type-other: var(--type-other);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* 三端断点：见 docs/05-frontend-ia.md §2 */
+  --breakpoint-xs: 380px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  --font-sans:
+    'Inter var', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'Cascadia Mono', SFMono-Regular, Consolas, 'Liberation Mono',
+    monospace;
+
+  --shadow-card: 0 1px 3px rgb(16 24 40 / 0.08), 0 1px 2px rgb(16 24 40 / 0.04);
+  --shadow-card-hover: 0 4px 12px rgb(16 24 40 / 0.08), 0 2px 4px rgb(16 24 40 / 0.04);
+  --shadow-pop: 0 12px 32px rgb(16 24 40 / 0.12), 0 4px 8px rgb(16 24 40 / 0.06);
+}
+
+/* ============================================================================
+   基础层
+   ========================================================================== */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+
+  /* 键盘可达性：焦点轮廓不可被移除 */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--brand-soft);
+    color: var(--brand-hover);
+  }
+
+  /* 滚动条（桌面端） */
+  @media (hover: hover) and (pointer: fine) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 999px;
+      border: 3px solid var(--background);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--fg-subtle);
+    }
+  }
+}
+
+/* ============================================================================
+   工具层：项目级复用类
+   ========================================================================== */
+
+@utility container-page {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 16px;
+
+  @media (width >= 768px) {
+    padding-inline: 24px;
+  }
+}
+
+@utility container-prose {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  padding-inline: 16px;
+
+  @media (width >= 768px) {
+    padding-inline: 24px;
+  }
+}
+
+/* 隐藏滚动条但保留滚动（移动端横向滑动区） */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* 刘海屏安全区 */
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}

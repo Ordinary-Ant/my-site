@@ -1,0 +1,21 @@
+node_modules
+.next
+out
+build
+dist
+coverage
+playwright-report
+test-results
+
+# 设计稿是独立静态资源，不参与格式化
+design
+
+# 自动生成的
+next-env.d.ts
+package-lock.json
+pnpm-lock.yaml
+prisma/migrations
+
+# 内容
+docs
+README.md

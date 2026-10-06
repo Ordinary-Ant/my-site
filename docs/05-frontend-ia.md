@@ -712,7 +712,15 @@ layout.tsx (site)
 ├── ReadingProgress
 ├── ShareButtons
 ├── PrevNextNav
-└── RelativeTime
+├── RelativeTime
+└── motion/                 ← 动效运行时（默认不加载任何重动效）
+    ├── MotionRuntime       ← 客户端调度器，按配置与设备能力决定加载什么
+    ├── Reveal              ← 入场动画降级实现（CSS animation-timeline 不支持时）
+    ├── Particles           ← Canvas 粒子（仅 particles/stars 预设 + 设备达标）
+    ├── CursorGlow          ← 光标光晕（触屏自动禁用）
+    ├── Parallax / Magnetic ← 视差 / 磁吸
+    ├── CountUp             ← 数字滚动
+    └── MotionPreferenceToggle  ← 页脚的三档访客开关
 
 模块组件 (components/site)
 ├── home/
@@ -805,6 +813,84 @@ layout.tsx (site)
 
 ---
 
+## 7.1 动效层（Motion Layer）
+
+动效是**跨所有页面的横切能力**，由后台 `Setting.motion.config` 配置，完整设计见 [08-motion-system.md](08-motion-system.md)。这里只说明它在前台信息架构中的位置。
+
+### 注入位置
+
+```tsx
+// app/(site)/layout.tsx  (Server Component)
+const motion = await settingService.getMotionConfig()
+
+return (
+  <html
+    lang="zh-CN"
+    data-motion={motion.intensity}
+    data-motion-bg={motion.background.enabled ? motion.background.type : 'none'}
+    data-motion-bg-scope={motion.background.scope}
+    data-motion-card={motion.interaction.cardHover}
+    data-motion-btn={motion.interaction.buttonHover}
+    data-motion-reveal={motion.reveal.enabled ? motion.reveal.type : 'none'}
+    data-motion-cursor={motion.interaction.cursor}
+    style={buildMotionCssVars(motion)}     // --motion-bg-speed / --motion-bg-c1 …
+  >
+    <body>
+      {children}
+      <MotionRuntime config={motion} />    {/* 默认不加载任何重动效 */}
+    </body>
+  </html>
+)
+```
+
+**要点**：动效在 **SSR 阶段**就确定并写进 HTML。首屏 HTML 一到，CSS 动画立即开始 —— 无 FOUC、无客户端配置请求、不依赖 hydration。
+
+### 背景动效层的作用范围
+
+| `scope` | 行为 |
+|---|---|
+| `home` | 只在 `/` 渲染背景动效层（**默认，最省性能**） |
+| `site` | 全站（含文章详情等长文页）都渲染 |
+| `none` | 不渲染 |
+
+背景层实现为 `position: fixed; inset: -20%; z-index: -1; pointer-events: none`，**不占文档流、不参与首屏关键路径、不遮挡任何可点击元素**。
+
+### 各页面对动效的响应
+
+| 页面 | 背景层 | 入场动画 | 悬停 | 备注 |
+|---|:--:|:--:|:--:|---|
+| 首页 | ✅（默认唯一开启处） | ✅ 区块级 stagger | ✅ 卡片 lift | 动效主舞台 |
+| 列表页（日志/文章/作品集） | 继承 `scope` 设置 | ✅ 列表项 stagger | ✅ 卡片 | |
+| 详情页（文章/日志/作品） | 继承 `scope` 设置 | ❌ **首屏正文不做入场**（保护 LCP 观感） | ✅ 图片 zoom | 正文可读性优先 |
+| 时间戳 | 继承 | ✅ 时间轴条目逐条浮现 | ✅ | 逐条浮现与"时间流动"语义契合 |
+| 关于我 | 继承 | ✅ 技能条进入视口时填充 | ✅ | 技能条动画属于内容本身，见 [06 §5.5](06-modules.md) |
+| 搜索 / 404 | 继承 | ❌ | ✅ | 结果页不做入场，避免闪烁 |
+| 登录页（后台） | ❌ 后台不加载任何站点动效 | ❌ | 最小 | 后台优先效率与稳定 |
+
+### 强制排除
+
+以下情况**无论后台怎么配都不生效**：
+
+1. `prefers-reduced-motion: reduce` → 全局关闭
+2. 移动端 `< 768px` → 降档到 `mobileIntensity`，重动效不加载
+3. 后台 `/admin/**` → 完全不加载（后台要的是效率，不是好看）
+4. 页面不在前台（`visibilitychange: hidden`）→ 暂停所有 rAF 与 Canvas 绘制
+5. 首屏 above-the-fold 内容 → 不做入场动画
+
+### 页脚的访客开关
+
+页脚放一个极小的图标按钮（`✨`），点击在三档间循环：**跟随系统 → 完整动效 → 关闭动效**，状态写 `localStorage`。
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│  © 2025 Puly · 京ICP备xxx号          GitHub · 掘金 · RSS  [✨] │
+└───────────────────────────────────────────────────────────────┘
+```
+
+这是给访客的最终兜底，也满足 WCAG 2.2.2（暂停/停止/隐藏）。默认「跟随系统」时按钮为半透明，用户主动选择后变为实心。
+
+---
+
 ## 8. 可访问性（A11y）
 
 | 项 | 要求 |
@@ -815,7 +901,7 @@ layout.tsx (site)
 | 图片 | `alt` 必填（装饰图用 `alt=""`）；上传时后台强制填 alt |
 | 色彩对比 | 正文对比度 ≥ 4.5:1，大字 ≥ 3:1（亮暗两套主题都要验） |
 | 图标 | 纯图标按钮必须有 `aria-label` |
-| 动效 | 尊重 `prefers-reduced-motion` |
+| 动效 | 强制尊重 `prefers-reduced-motion`（优先级高于后台配置）；闪烁 ≤ 3Hz；装饰层 `aria-hidden`；内容默认可见，不因动效失败而空白 —— 详见 [08-motion-system.md §7](08-motion-system.md) |
 | 表单 | 每个输入有 `<label>`；错误用 `aria-describedby` 关联；`aria-invalid` |
 | 弹窗/抽屉 | focus trap，`Esc` 关闭，关闭后焦点回到触发元素 |
 | 屏幕阅读器 | 列表用 `ul/li`；状态变化用 `aria-live="polite"` 播报 |

@@ -70,9 +70,11 @@ for (const file of codeFiles) {
     }
   }
 }
-console.log(`A. import 解析：${codeFiles.length} 个文件，${importCount} 条 import，无法解析 ${
-  problems.filter((p) => p.startsWith('[A]')).length
-} 条`)
+console.log(
+  `A. import 解析：${codeFiles.length} 个文件，${importCount} 条 import，无法解析 ${
+    problems.filter((p) => p.startsWith('[A]')).length
+  } 条`,
+)
 
 // ---------------------------------------------------------------- B. 依赖覆盖
 
@@ -82,8 +84,19 @@ const declared = new Set([
   ...Object.keys(pkgJson.devDependencies ?? {}),
 ])
 const NODE_BUILTINS = new Set([
-  'node:fs', 'node:path', 'node:url', 'node:process', 'fs', 'path', 'url', 'process',
-  'node:crypto', 'crypto', 'node:os', 'os', 'node:child_process',
+  'node:fs',
+  'node:path',
+  'node:url',
+  'node:process',
+  'fs',
+  'path',
+  'url',
+  'process',
+  'node:crypto',
+  'crypto',
+  'node:os',
+  'os',
+  'node:child_process',
   'server-only', // 在 deps 里，这里重复保险
 ])
 // 别名前缀（tsconfig paths）
@@ -104,11 +117,31 @@ for (const m of globalsCss.matchAll(/--shadow-([a-z0-9-]+)\s*:/g)) definedTokens
 
 // 自定义命名特征：这些前缀一定来自我们的 @theme，若未定义即为错误
 const CUSTOM_MARKERS = [
-  'brand', 'surface', 'border-strong', 'fg-subtle', 'primary-foreground',
-  'secondary-foreground', 'muted-foreground', 'card-foreground', 'popover-foreground',
-  'accent-foreground', 'destructive-foreground', 'type-work', 'type-education',
-  'type-project', 'type-award', 'type-milestone', 'type-game', 'type-repo',
-  'type-skill', 'type-other', 'success', 'warning', 'info', 'card-hover', 'card',
+  'brand',
+  'surface',
+  'border-strong',
+  'fg-subtle',
+  'primary-foreground',
+  'secondary-foreground',
+  'muted-foreground',
+  'card-foreground',
+  'popover-foreground',
+  'accent-foreground',
+  'destructive-foreground',
+  'type-work',
+  'type-education',
+  'type-project',
+  'type-award',
+  'type-milestone',
+  'type-game',
+  'type-repo',
+  'type-skill',
+  'type-other',
+  'success',
+  'warning',
+  'info',
+  'card-hover',
+  'card',
   'pop',
 ]
 
@@ -131,7 +164,9 @@ for (const file of codeFiles.filter((f) => extname(f) === '.tsx')) {
 const badTokens = []
 for (const c of usedClasses) {
   // 取出 "命名空间-后缀"，只关心颜色/阴影这类
-  const m = c.match(/^(?:bg|text|border|from|to|via|ring|fill|stroke|outline|shadow|divide|decoration|accent|caret)-(.+)$/)
+  const m = c.match(
+    /^(?:bg|text|border|from|to|via|ring|fill|stroke|outline|shadow|divide|decoration|accent|caret)-(.+)$/,
+  )
   if (!m) continue
   // 剥离透明度后缀：bg-brand-soft/40 → brand-soft
   const suffix = m[1].split('/')[0]
@@ -139,7 +174,9 @@ for (const c of usedClasses) {
   if (looksCustom && !definedTokens.has(suffix)) badTokens.push(c)
 }
 for (const c of [...new Set(badTokens)]) problems.push(`[C] 使用了未定义的设计令牌: ${c}`)
-console.log(`C. 自定义令牌：${definedTokens.size} 个已定义，${new Set(badTokens).size} 个类名找不到令牌`)
+console.log(
+  `C. 自定义令牌：${definedTokens.size} 个已定义，${new Set(badTokens).size} 个类名找不到令牌`,
+)
 
 // ---------------------------------------------------------------- D. Prisma 关系
 
@@ -180,7 +217,9 @@ if (existsSync(schemaPath)) {
       if (!target) continue // 标量类型
       const back = target.fields.some((f) => f.type === model.name)
       if (!back) {
-        relationIssues.push(`${model.name}.${field.name} → ${field.type}，但 ${field.type} 没有反向字段`)
+        relationIssues.push(
+          `${model.name}.${field.name} → ${field.type}，但 ${field.type} 没有反向字段`,
+        )
       }
     }
   }
@@ -206,9 +245,10 @@ const exampleTxt = existsSync(join(root, '.env.example'))
 const exampleKeys = new Set()
 for (const m of exampleTxt.matchAll(/^([A-Z][A-Z0-9_]*)=/gm)) exampleKeys.add(m[1])
 
-const localTxt = existsSync(join(root, '.env.local'))
-  ? readFileSync(join(root, '.env.local'), 'utf8')
-  : ''
+// 本地环境文件：Next.js 两者都读，Prisma CLI 只读 .env。
+// 本项目统一用 .env，但兼容 .env.local。
+const localEnvPath = ['.env', '.env.local'].map((n) => join(root, n)).find((p) => existsSync(p))
+const localTxt = localEnvPath ? readFileSync(localEnvPath, 'utf8') : ''
 const localKeys = new Set()
 for (const m of localTxt.matchAll(/^([A-Z][A-Z0-9_]*)=/gm)) localKeys.add(m[1])
 
@@ -220,11 +260,11 @@ for (const k of notInLocal) {
   // 只有带 .default() 或 .optional() 的才允许缺失
   const line = envTs.split('\n').find((l) => l.trim().startsWith(`${k}:`)) ?? ''
   const hasDefault = /\.default\(|\.optional\(/.test(line)
-  if (!hasDefault) problems.push(`[F] ${k} 是必填且没有默认值，但 .env.local 里缺失 → 启动即崩`)
+  if (!hasDefault) problems.push(`[F] ${k} 是必填且没有默认值，本地环境文件里缺失 → 启动即崩`)
 }
 console.log(
   `F. 环境变量：env.ts 要求 ${envKeys.size} 个，.env.example 覆盖 ${envKeys.size - notDocumented.length} 个，` +
-    `.env.local 提供 ${envKeys.size - notInLocal.length} 个`,
+    `${localEnvPath ? localEnvPath.slice(root.length + 1) : '(无本地环境文件)'} 提供 ${envKeys.size - notInLocal.length} 个`,
 )
 
 // ---------------------------------------------------------------- E. 类名清单

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
 
 /**
  * 全局错误边界
@@ -45,12 +46,12 @@ export default function GlobalError({
           >
             重试
           </button>
-          <a
+          <Link
             href="/"
             className="border-border-strong hover:bg-muted rounded-[10px] border px-5 py-2.5 text-sm font-medium transition-colors"
           >
             回首页
-          </a>
+          </Link>
         </div>
       </div>
     </div>

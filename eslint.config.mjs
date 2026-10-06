@@ -36,6 +36,14 @@ const eslintConfig = [
   },
 
   {
+    // CLI 工具与 seed 脚本：控制台输出是它们的正常职责
+    files: ['scripts/**/*.mjs', 'scripts/**/*.ts', 'prisma/seed.ts', 'prisma.config.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
+  {
     // 铁律：middleware 运行在 Edge Runtime，禁止引入 Prisma
     // 见 docs/01-architecture.md §6.3
     files: ['src/middleware.ts'],

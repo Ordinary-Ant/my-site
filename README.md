@@ -119,7 +119,7 @@ Markdown    react-markdown + remark-gfm + rehype-pretty-code(Shiki)
 
 | 阶段 | 目标 | 预估 | 交付 | 状态 |
 |---|---|---|---|---|
-| M0 | 项目初始化与骨架 | 2 人天 | 可跑的空白站 + CI | 🟡 文件已就位，待 `npm install` 验证 |
+| M0 | 项目初始化与骨架 | 2 人天 | 可跑的空白站 + CI | ✅ **已完成并验证** |
 | M1 | 数据层与鉴权 | 4 人天 | Schema 落库 + 可登录后台 | ⬜ |
 | M2 | 后台 CRUD 与开关中心 | 8 人天 | 五大模块内容可管理 | ⬜ |
 | M3 | 前台五大模块 | 10 人天 | 三端可用的完整前台 | ⬜ |
@@ -134,69 +134,80 @@ Markdown    react-markdown + remark-gfm + rehype-pretty-code(Shiki)
 
 ## 七、快速开始
 
-> ⚠ **本仓库的代码文件已全部就位，但 `node_modules` 尚未安装** —— 我构建时的沙箱环境拦截了 npm registry 的出站请求（TLS 证书校验失败）。请在**你自己的终端**里执行下面的命令。
-
 ```bash
-# 0. 确认 Node 版本 ≥ 20.9
+# 0. 确认 Node 版本 ≥ 20.12
 node -v
 
-# 1. 安装依赖（首次约 1–3 分钟）
+# 1. 安装依赖
 npm install
 
-# 2. 启动本地数据库（需要 Docker Desktop 已运行）
+# 2. 准备环境变量
+cp .env.example .env
+
+# 3. 启动本地数据库（需要 Docker Desktop 已运行）
 npm run db:up
 
-# 3. 建表
+# 4. 建表
 npm run db:migrate        # 首次会提示输入迁移名，填 init 即可
 
-# 4. 灌入种子数据（管理员 + 6 个模块 + 示例内容）
+# 5. 灌入种子数据（管理员 + 6 个模块 + 示例内容）
 npm run db:seed
 
-# 5. 起开发服务器
+# 6. 起开发服务器
 npm run dev
 ```
 
 打开 http://localhost:3000 —— 你会看到 M0 烟雾测试首页（用来验证设计令牌、主题切换、路径别名是否生效）。
+
+> **`node_modules` 已经装好了**（715 个包，Next 15.5.27 / React 19.3.0 / Tailwind 4.3.3 / Prisma 6.19.3）。
+> 如果 `npm js.org` 不可达，用国内镜像：`npm install --registry=https://registry.npmmirror.com`
 
 ### 常用命令
 
 | 命令 | 作用 |
 |---|---|
 | `npm run dev` | 开发服务器 |
-| `npm run build` | 生产构建（会先 `prisma generate`） |
+| `npm run build` | 生产构建（先 `prisma generate` 再 `next build`） |
+| `npm start` | 跑生产构建产物 |
 | `npm run check` | typecheck + lint |
+| **`npm run verify`** | **离线静态检查**（import 解析 / 依赖声明 / 设计令牌 / Prisma 关系 / 环境变量），可挂 CI |
 | `npm run db:studio` | 可视化查看数据库 |
 | `npm run db:up` / `db:down` | 启停本地 Postgres |
 | `npm run db:reset` | 重置数据库并重跑迁移 + 种子 |
 | `npm run format` | Prettier 格式化 |
 
-### 如果构建报错
+### 已验证状态
 
-按「最可能先出问题」排序：
+M0 的以下环节**已实际跑通**：
+
+```
+✓ prisma validate          schema 有效（14 models / 6 enums）
+✓ npm run build            Compiled successfully，4 个静态页生成，exit 0
+✓ npm run check            tsc --noEmit + eslint 全绿
+✓ npm run verify           5 项离线静态检查全部通过
+✓ npm start + HTTP 冒烟    / 返回 200；/不存在 返回 404
+✓ Tailwind 编译产物        22.6 KB，含 .container-page / .text-fg-subtle /
+                           .shadow-card / .dark 变体 / tw-animate 动画
+```
+
+### 如果构建报错
 
 | 现象 | 原因与处理 |
 |---|---|
-| `Failed to resolve @import "tw-animate-css"` | 该包只在 shadcn 组件（Dialog/Select/Tooltip）的进场动画里用到。**直接从 `src/app/globals.css` 顶部删掉那一行 `@import 'tw-animate-css';` 即可**，其余功能不受影响，只是弹窗没有淡入动画。之后想恢复就 `npm i tw-animate-css` |
-| `@source` / `source()` 报错 | 这一行 `@import 'tailwindcss' source('../');` 限制了 Tailwind 的扫描范围（避免把 `design/**/*.html` 里的同名 class 误当工具类）。若你的 Tailwind 版本不认识它，改成 `@import 'tailwindcss';` —— 构建能过，只是 CSS 会大一些 |
-| `Cannot find module '@prisma/client'` | 没跑 `prisma generate`。执行 `npm run db:generate` |
-| `DATABASE_URL 校验失败` | 没跑 `npm run db:up`，或 `.env.local` 缺失 |
-| `JWT_SECRET 至少 32 位` | `.env.local` 里的占位值被改短了。重新生成长随机串 |
-| `Environment variable not found: DATABASE_URL` | 在 `prisma` 命令下生效但 Next 读不到 → 确认文件名是 `.env.local`（不是 `.env.local.txt`） |
-| 端口 5432 被占用 | 本机已有 Postgres。改 `docker-compose.yml` 的宿主端口并同步 `.env.local` |
+| `Environment variable not found: DATABASE_URL` | 本地缺 `.env`。`cp .env.example .env`。注意：**存在 `prisma.config.ts` 后 Prisma 不再自动加载 `.env`**，已在该文件里用 `process.loadEnvFile()` 手动补上 |
+| `Failed to resolve @import "tw-animate-css"` | 该包只在 shadcn 组件（Dialog/Select）的进场动画里用到。删掉 `src/app/globals.css` 顶部那行 `@import 'tw-animate-css';` 即可，其余不受影响。已验证 `tw-animate-css@1.4.0` 正常 |
+| `npm error code ERR_TLS_CERT_ALTNAME_INVALID` | npm 官方源不可达。加 `--registry=https://registry.npmmirror.com` |
+| `npm warn allow-scripts ...` | npm 11 默认拦截 install script。Prisma 引擎与 esbuild 二进制依赖它。已批准并记录在 `package.json` 的 `allowScripts`；换机器后如再遇到，跑 `npm approve-scripts prisma @prisma/client @prisma/engines esbuild unrs-resolver` |
+| `Cannot find module '@prisma/client'` | 执行 `npm run db:generate` |
+| `JWT_SECRET 至少 32 位` | `.env` 里的占位值被改短了。重新生成长随机串 |
+| 端口 5432 被占用 | 本机已有 Postgres。改 `docker-compose.yml` 的宿主端口并同步 `.env` |
 | `Component ... cannot be a client component` | 把 `'use client'` 加到了含 `import { env } from '@/lib/env'` 的文件上。`env.ts` 带 `server-only`，只能服务端用 |
 
-### 关于「我无法验证构建」这件事
+### 还没验证的部分
 
-我写这套脚手架时，构建环境的出站 HTTPS 被拦截（`ERR_TLS_CERT_ALTNAME_INVALID`），`npm install` 与 `npm run build` 都跑不了。所以：
+`npm run db:migrate` 与 `npm run db:seed` **未跑过** —— 需要 Docker 起 Postgres，构建环境里没有。SQL 层第一次真正执行是在你本地跑第 3–5 步的时候。
 
-- ✅ **已做**：依赖声明完整性、import 路径解析、设计令牌引用、Prisma 关系反向字段、环境变量覆盖 —— 全部用离线脚本验证通过（0 问题）
-- ⚠️ **未做**：任何编译、类型检查、运行时验证
-
-为此我做了两处**主动降低风险**的取舍：
-1. `container-*` 等自定义类用标准 CSS 的 `@layer components` 实现，而不是 Tailwind v4 的 `@utility` 指令（避免把构建成败押在较新语法上）
-2. 依赖版本一律用 `^X.0.0` 下限（不指定具体小版本），因为我无法查 registry 确认哪个小版本存在
-
-首次构建大概率能过；如果不过，把完整错误贴给我。
+Prisma schema 本身已通过 `prisma validate`；`seed.ts` 已通过 `tsc` 类型检查（它在 `tsconfig.include` 范围内，`next build` 时会一起被检查）。
 
 ### 设计稿怎么看
 
@@ -256,15 +267,19 @@ personal-site/
 │  └─ middleware.ts             ⬜ M1
 │
 ├─ public/
+├─ scripts/
+│  └─ verify-scaffold.mjs       ✅ 离线静态检查器（npm run verify）
 ├─ docker-compose.yml           ✅ 本地 Postgres 16
-├─ package.json                 ✅ 依赖与脚本
+├─ package.json                 ✅ 依赖与脚本（含 allowScripts 白名单）
 ├─ tsconfig.json                ✅ strict + 路径别名 @/*
 ├─ next.config.ts               ✅ 安全响应头 + 图片配置
 ├─ postcss.config.mjs           ✅ Tailwind v4
+├─ prisma.config.ts             ✅ Prisma 配置（seed 命令 + 手动加载 .env）
 ├─ eslint.config.mjs            ✅ 含「middleware 禁止引入 Prisma」规则
 ├─ prettier 相关                 ✅ .prettierrc / .prettierignore
 ├─ husky + lint-staged + commitlint  ✅
-└─ .env.example / .env.local    ✅
+├─ .env.example                 ✅ 环境变量模板（本地 cp 成 .env）
+└─ .env                         ⛔ 本地私密文件，已 gitignore
 ```
 
 > **注意**：本仓库使用 Tailwind CSS v4（CSS-first 配置），**没有 `tailwind.config.ts`**。断点、颜色、圆角等全部定义在 `src/app/globals.css` 的 `@theme` 里。若你更习惯 v3 的 JS 配置，见 [07-roadmap.md §2 风险表](docs/07-roadmap.md)。

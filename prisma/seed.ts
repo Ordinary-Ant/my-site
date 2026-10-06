@@ -47,7 +47,14 @@ const MOTION_CONFIG: Prisma.InputJsonValue = {
     cursor: 'none',
     magneticButtons: false,
   },
-  reveal: { enabled: true, type: 'fade-up', range: 0.4, duration: 600, stagger: 80, easing: 'ease-out' },
+  reveal: {
+    enabled: true,
+    type: 'fade-up',
+    range: 0.4,
+    duration: 600,
+    stagger: 80,
+    easing: 'ease-out',
+  },
   text: { heroType: 'none', countUp: false, gradientHeadings: false },
   micro: {
     themeTransition: 'fade',
@@ -90,7 +97,12 @@ const SETTINGS: { key: string; value: Prisma.InputJsonValue; group: string; labe
     group: 'seo',
     label: 'SEO 默认描述',
   },
-  { key: 'seo.keywords', value: '前端,React,Next.js,TypeScript', group: 'seo', label: 'SEO 关键词' },
+  {
+    key: 'seo.keywords',
+    value: '前端,React,Next.js,TypeScript',
+    group: 'seo',
+    label: 'SEO 关键词',
+  },
 
   { key: 'social.github', value: 'https://github.com/', group: 'social', label: 'GitHub' },
   { key: 'social.email', value: 'hi@example.com', group: 'social', label: '邮箱' },
@@ -214,7 +226,11 @@ async function seedProfile() {
         },
       ],
       services: [
-        { title: '技术咨询', description: '前端架构选型、性能优化方案评审', icon: 'message-circle' },
+        {
+          title: '技术咨询',
+          description: '前端架构选型、性能优化方案评审',
+          icon: 'message-circle',
+        },
         { title: '合作机会', description: '接受远程 / 兼职的技术合作', icon: 'handshake' },
       ],
       contactVisible: true,
@@ -298,7 +314,8 @@ async function seedContent(authorId: string) {
     {
       title: '重构了首页的动画',
       summary: '把 Framer Motion 换成了纯 CSS，包体小了 40KB。',
-      content: '把 Framer Motion 换成了纯 CSS，包体小了 40KB。意外发现 scroll-driven animation 已经可以用了。',
+      content:
+        '把 Framer Motion 换成了纯 CSS，包体小了 40KB。意外发现 scroll-driven animation 已经可以用了。',
       type: 'DAILY' as const,
       logDate: new Date('2025-01-15T00:00:00Z'),
       mood: 'happy',
@@ -309,7 +326,8 @@ async function seedContent(authorId: string) {
     {
       title: '面试了一个候选人',
       summary: '聊到工程化的时候发现，很多人会用工具但说不清为什么用。',
-      content: '聊到工程化的时候发现，很多人会用工具但说不清为什么用。这大概就是"经验"和"年限"的区别。',
+      content:
+        '聊到工程化的时候发现，很多人会用工具但说不清为什么用。这大概就是"经验"和"年限"的区别。',
       type: 'DAILY' as const,
       logDate: new Date('2025-01-14T00:00:00Z'),
       mood: 'calm',
@@ -335,7 +353,7 @@ async function seedContent(authorId: string) {
     if (!exists) await prisma.log.create({ data: { ...l, authorId } })
   }
 
-  const projects = [
+  const projects: Prisma.ProjectCreateInput[] = [
     {
       slug: 'pixel-runner',
       title: 'Pixel Runner',
@@ -362,7 +380,8 @@ async function seedContent(authorId: string) {
       techStack: ['Figma', 'Design Tokens', 'React'],
       role: '主导',
       highlights: ['45 个组件', '200+ 页文档', '12 条业务线接入', '复用率 78%'],
-      links: null,
+      // JSON 字段留空即可（写入 SQL NULL）。Prisma 不接受裸 null，
+      // 显式置空需要 Prisma.DbNull —— 但那种情况这里用不到。
       featured: true,
       order: 2,
     },

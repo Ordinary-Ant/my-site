@@ -182,4 +182,4 @@ node _tools/build-index.mjs .
 |---|---|
 | 设计稿 | ✅ 24 个页面 / 36 张图，通过 lint 与布局自检 |
 | 评审 | ✅ 已确认 |
-| 实现 | ⬜ M0 待开工 —— 见 [07-roadmap.md](../docs/07-roadmap.md) |
+| 实现 | 🟡 M0 已完成并验证（`npm run build` 通过）—— 下一步 M1，见 [07-roadmap.md](../docs/07-roadmap.md) |

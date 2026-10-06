@@ -5,13 +5,13 @@
   "type": "module",
   "description": "个人网站 + 后台管理系统 · Next.js 15 单体全栈",
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=20.12.0"
   },
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -26,9 +26,6 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
     "prepare": "husky"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.0.0",
@@ -96,5 +93,12 @@
     "*.prisma": [
       "prisma format"
     ]
+  },
+  "allowScripts": {
+    "prisma@6.19.3": true,
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "esbuild@0.28.2": true,
+    "unrs-resolver@1.12.2": true
   }
 }

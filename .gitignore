@@ -1,0 +1,57 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+dist/
+next-env.d.ts
+
+# production
+*.tsbuildinfo
+
+# env —— 绝不提交
+.env
+.env.local
+.env*.local
+!.env.example
+
+# database
+*.db
+*.db-journal
+prisma/dev.db*
+prisma/*.db
+
+# uploads（本地存储驱动的落地目录）
+public/uploads/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# testing
+coverage/
+playwright-report/
+test-results/
+.nyc_output/
+
+# editors & OS
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# misc
+.vercel
+.turbo
+.eslintcache

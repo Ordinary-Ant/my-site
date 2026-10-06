@@ -1,9 +1,25 @@
 # 08 · 动效系统（Motion System）
 
-[← 上一篇：实施路线](07-roadmap.md) · [返回 README](../README.md)
+[← 上一篇：实施路线](07-roadmap.md) · [返回 README](../README.md) · [设计规范](设计规范.md)
 
 > **本文档解决的问题**：让站点"活起来"，同时**不让动效拖慢首屏、不破坏可访问性、不烧掉访客的手机电量**。
 > 核心原则一句话：**动效全部可在后台配置，但配置只在服务端注入属性，客户端零往返。**
+
+---
+
+> ## ⚠ v1.1 重要变更（2026-10）
+>
+> 本文档已按两条新设定修订，**旧版中与此冲突的内容一律以本节为准**：
+>
+> | # | 变更 | 影响 |
+> |---|---|---|
+> | 1 | **动效接入 [Anime.js](https://animejs.com/documentation) v4.5.0** | 分层策略从"CSS 优先 / 手写 JS"改为「**CSS + Anime.js 双层**」。删除手写 Canvas 粒子、手写 IntersectionObserver、手写数字滚动等 |
+> | 2 | **视觉与动效节奏参照 [Clay Showreel 2023](https://showreel.design/videos/clay-showreel-2023/) / [clay.global](https://clay.global/)**（风格标注：**Minimal / Clean**） | 动效方向从"炫技向"（极光、粒子、星空、光斑）转为"**编排向**"（逐行遮罩揭示、滚动叙事、克制交错）。粒子/星空/极光降级为**默认关闭**的可选项 |
+>
+> **规范值请以 [设计规范.md](设计规范.md) §3 为准** —— 缓动曲线、时长刻度、交错刻度、体积预算都在那里。本文档讲**怎么实现**，规范讲**用什么值**。
+>
+> 实测体积（animejs@4.5.0，esbuild `--minify`，tree-shaken）：
+> `animate`+`stagger` = 14.1 KB gzip · 加 `timeline`/`scope`/`onScroll` = 20.3 KB · **加 `splitText` = 22.8 KB** · 再加 `utils`/`createSpring` = 24.8 KB
 
 ---
 
@@ -11,54 +27,147 @@
 
 | 目标 | 说明 |
 |---|---|
-| 后台可配 | 背景渐变动画、交互动画等全部可在后台开关与调参，改完即时生效，无需发版 |
-| 零首屏成本 | 纯 CSS 能做的动效**绝不用 JS**；必须用 JS 的（粒子/光标/视差）延迟加载 |
+| 后台可配 | 动效强度、内容编排、可选装饰效果全部可在后台开关与调参，改完即时生效，无需发版 |
+| 首屏不依赖 JS | 首屏可见内容的动效必须用 CSS 实现（见 [设计规范 §1.3 P3](设计规范.md)） |
 | 不伤可访问性 | 强制尊重 `prefers-reduced-motion`，用户系统偏好优先级**高于**后台配置 |
 | 自动降级 | 低端设备、低帧率、省电模式、页面不可见时自动降档 |
 | 可预览 | 后台必须能实时看到效果，而不是"存了才知道长啥样" |
 
 ### 五条铁律
 
-1. **禁用 CSS 无法表达的动效才引入 JS**。悬停、入场、渐变流动、文字浮现全部纯 CSS。
-2. **只动 `transform` 与 `opacity`**，绝不动 `width/height/top/left`（避免 layout thrashing）。
-3. **JS 动效必须能"不存在"**。关掉 JS 后站点功能与可读性完全不受影响，只是不动的。
-4. **不阻塞 LCP**。背景动效层用 `position: fixed` + `z-index: -1`，不参与首屏渲染关键路径。
+1. **CSS 能做的绝不用 JS**。悬停、焦点、背景层、骨架屏、**首屏 Hero 的逐行揭示**全部纯 CSS。
+2. **只动 `transform` / `opacity` / `clip-path`**，绝不动 `width/height/top/left`。唯一例外是 `createLayout()` 的 FLIP。
+3. **JS 动效必须能"不存在"**。关掉 JS 后站点功能与可读性完全不受影响，只是不动的 —— 首屏尤其如此。
+4. **不阻塞 LCP**。装饰层用 `position: fixed` + `z-index: -1`；Anime.js 只接管滚动之后的部分。
 5. **任何动效都要有"关闭"路径**，且关闭路径不依赖动效本身。
 
 ---
 
 ## 2. 分层实现策略 ★ 架构核心
 
-这是整个系统最关键的设计。动效按"能不能用 CSS 表达"分三层，越往下成本越高、用得越克制。
+> **v1.1 已重写**。旧版是"CSS 优先 + 手写 JS"，现改为「**CSS + Anime.js 双层**」。
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │ 第 0 层 · 服务端注入（0 KB JS，无闪烁）                                │
 │   (site)/layout.tsx 读取 Setting.motion.config                        │
 │     ├─ 写 <html data-motion-*> 属性     → 供 CSS 选择器命中            │
-│     └─ 写内联 CSS 变量 --motion-*       → 供 CSS 取值                 │
+│     ├─ 写内联 CSS 变量 --motion-*       → 供 CSS 取缓动/时长值         │
+│     └─ 序列化配置给 <MotionRoot />      → 供 Anime.js 读编排参数        │
 │   收益：动效在 SSR 阶段就确定，无 FOUC、无客户端请求、无 hydration 依赖 │
 ├──────────────────────────────────────────────────────────────────────┤
-│ 第 1 层 · 纯 CSS 动效（0 KB JS）  ← 全站 90% 的动效在这里             │
-│   • 背景渐变流动 / 极光 / 光斑 / 网格 / 噪点                          │
-│   • 卡片、按钮、链接、图片的 hover 效果                                │
-│   • 滚动入场（animation-timeline: view()，现代浏览器原生）             │
-│   • 文字逐字浮现（服务端拆分 span + nth-child 延迟）                   │
-│   • 主题切换圆形扩散（View Transitions API）                          │
+│ 第 1 层 · CSS（0 KB）  ← 首屏与全部悬停态都在这里                       │
+│   • 首屏 Hero 逐行遮罩揭示（overflow:hidden + translateY(110%)）        │
+│   • 卡片/按钮/链接/图片的 hover 与 focus-visible 态                     │
+│   • 背景装饰层（若启用，默认关闭）                                      │
+│   • 骨架屏微光、焦点环、开关翻转                                        │
+│   • 表格行悬停、导航当前态                                              │
+│   → 判据：能靠"状态选择器 + transition/animation"表达的，一律 CSS        │
 ├──────────────────────────────────────────────────────────────────────┤
-│ 第 2 层 · 轻量 JS 动效（按需 dynamic import，≤ 8 KB）                 │
-│   • 数字滚动（IntersectionObserver + rAF）                            │
-│   • 光标光晕（pointermove + transform，节流到 rAF）                   │
-│   • 滚动视差（scroll + transform）                                    │
-│   • 磁吸按钮（pointermove + transform）                               │
-│   • 入场动画降级（浏览器不支持 animation-timeline 时的替补）           │
+│ 第 2 层 · Anime.js（≤ 24.8 KB gzip）  ← 需要"编排"与"滚动感知"的部分    │
+│   • 区块滚动入场编排（onScroll + createTimeline + stagger）             │
+│   • 文字逐行/逐词揭示（splitText + stagger）★ Clay 风格的核心           │
+│   • 数字滚动（计数动画）                                                │
+│   • 页面切换淡入、弹窗/抽屉进出                                         │
+│   • 列表重排 FLIP（createLayout）                                       │
+│   • SVG 对勾描边（svg.createDrawable）                                  │
+│   • 可选装饰：光标跟随、视差、磁吸、背景粒子（**默认全关**）             │
+│   → 判据：需要"按时间轴编排多条""感知滚动进度""拆分文本"的才用它         │
 ├──────────────────────────────────────────────────────────────────────┤
-│ 第 3 层 · 重型 JS 动效（仅显式开启时加载，≤ 15 KB）                   │
-│   • Canvas 粒子背景（手写 2D，**不用 three.js**）                     │
-│   • 星空 / 流星光效                                                   │
-│   → 加载条件：preset = particles/stars 且非移动端且非降级状态          │
+│ 第 3 层 · 已删除                                                        │
+│   旧版的手写 Canvas 粒子、手写 IntersectionObserver、手写 rAF 计数器      │
+│   → 前两者由 Anime.js 覆盖；粒子因与 Minimal/Clean 冲突而整体移除        │
 └──────────────────────────────────────────────────────────────────────┘
 ```
+
+### 为什么首屏 Hero 仍然用 CSS
+
+Clay 风格的签名动作是"标题逐行从小往上推出"。这个动效**首屏就要播**。
+
+如果交给 Anime.js：JS 下载 → 解析 → 执行 `splitText` → 才开始动。在慢网络下，用户会先看到静止标题，然后它突然跳一下重播 —— 这正是"FOUC 式的动效事故"。
+
+所以约定：**首屏 Hero 的逐行揭示用 CSS，服务端就写好 `--i` 序号**。
+
+```css
+/* 服务端渲染时直接输出 <span class="line-mask" style="--i:0"><span>第一行</span></span> */
+.line-mask { display: block; overflow: hidden; }
+.line-mask > span {
+  display: block;
+  transform: translate3d(0, 110%, 0);
+  animation: line-up var(--duration-reveal) var(--ease-enter) forwards;
+  animation-delay: calc(var(--i) * var(--stagger-loose));
+}
+@keyframes line-up { to { transform: none; } }
+```
+
+Anime.js 的 `splitText` 用在**滚动之后的内容**（文章正文小节、作品亮点列表等），那里没有首屏压力，且需要处理动态换行。
+
+### Anime.js 在 React 里的接入范式
+
+Anime.js v4 的 `createScope()` 是官方推荐的 React 用法，它解决两件事：**清理**与**响应式**。
+
+```tsx
+// components/site/motion/MotionRoot.tsx
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { createScope, animate, createTimeline, stagger, onScroll } from 'animejs'
+import type { MotionConfig } from '@/config/motion/types'
+
+export function MotionRoot({ config }: { config: MotionConfig }) {
+  const root = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!root.current) return
+    // 尊重系统偏好 —— 最高优先级，直接不初始化
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const scope = createScope({
+      root: root.current,
+      // 响应式：不同断点给不同编排
+      mediaQueries: {
+        isMobile: '(max-width: 767px)',
+        isDesktop: '(min-width: 1024px)',
+      },
+    }).add((self) => {
+      const { isMobile } = self.matches
+
+      // ① 滚动入场
+      onScroll({
+        target: '.motion-section',
+        threshold: 0.2,
+        onEnter: (el) => {
+          animate(el.querySelectorAll('.reveal'), {
+            opacity: [0, 1],
+            y: isMobile ? [10, 0] : [20, 0],
+            duration: config.reveal.duration,
+            delay: stagger(config.reveal.stagger),
+            ease: config.reveal.easing,   // 规范值：'outExpo'
+          })
+        },
+      })
+
+      // ② 时间轴编排的区块
+      createTimeline({ defaults: { ease: 'outExpo' } })
+        .add('.hero-sub', { opacity: [0, 1], y: [12, 0], duration: 480 }, 420)
+        .add('.hero-cta', { opacity: [0, 1], y: [10, 0], duration: 400, delay: stagger(80) }, 560)
+    })
+
+    return () => scope.revert()   // 卸载时干净回滚，避免残留内联样式
+  }, [config])
+
+  return <div ref={root}>{/* children */}</div>
+}
+```
+
+**三个关键点**：
+
+| 点 | 说明 |
+|---|---|
+| `scope.revert()` | 必写。Anime.js 会写内联 `style`，不 revert 会在路由切换后留下脏样式 |
+| `mediaQueries` | 用它做响应式编排，**不要**在 JS 里手动监听 `resize` |
+| 依赖数组含 `config` | 后台改配置 → `revalidateTag` → 页面重新渲染 → scope 重建，动效随之更新 |
+
 
 ### 为什么"服务端注入属性"是关键
 
@@ -440,47 +549,105 @@ export const MotionConfigSchema = z.object({
 
 ## 5. 预设方案
 
-后台提供 8 个预设，一键套用，套用后仍可逐项微调（微调后 `preset` 自动变为 `custom`）。
+> **v1.1 已重排**。预设的主轴从"背景有多花"改为"**编排有多丰富**" —— 这是 Minimal/Clean 方向的必然结果。
+> 背景装饰类预设（极光/光斑/星空/粒子）**保留但全部降为"装饰"分组**，默认不选，且不与编排预设互斥。
 
-| 预设 | 强度 | 背景 | 卡片 hover | 入场 | 文字 | 微交互 | 重动效 | 适用 |
-|---|---|---|---|---|---|---|---|---|
-| `minimal` **极简** | off | none | color | none | none | fade | 无 | 追求极致性能；面试官只看内容 |
-| `breath` **呼吸渐变** | subtle | gradient-flow (36s) | lift | fade | none | fade | 无 | **默认推荐**，克制且不廉价 |
-| `aurora` **极光** | standard | aurora | lift | fade-up | gradient-flow | circle | 视差 | 首页限，视觉冲击强 |
-| `mesh` **光斑** | standard | blur-blob | scale | fade-up + stagger | fade-words | circle | 视差 | 现代 SaaS 风 |
-| `grid` **网格** | standard | grid | glow | fade-up | none | fade | 无 | 极客 / 工程感 |
-| `stars` **星空** | rich | stars | tilt | fade-up + stagger | fade-words | circle + 页面 | 视差 | 暗色主题为主 |
-| `particles` **粒子** | rich | particles | tilt + 磁吸 | fade-up + stagger | typewriter | 全套 | 粒子 + 视差 + 光标 | 炫技向，**移动端自动降档** |
-| `custom` **自定义** | — | — | — | — | — | — | — | 手动配置 |
+### 5.1 编排预设（主轴，决定"页面怎么动"）
 
-**预设的具体参数**（`presets.ts`）：
+| 预设 | 强度 | 入场编排 | 文字揭示 | 悬停 | 背景 | 适用 |
+|---|---|---|---|---|---|---|
+| `static` **静态** | off | 无 | 无 | 仅颜色变化 | 纯色 | 追求极致性能；无障碍优先 |
+| **`editorial` 编辑风** ★ | subtle | 区块淡入 + 轻微上移（480ms） | Hero 逐行遮罩（CSS） | 上浮 4px | 纯色 | **默认推荐** —— Clay 风格基线 |
+| `narrative` **叙事** | standard | 时间轴多段编排 + 列表交错 | Hero 逐行 + 小节逐词 | 上浮 + 图片缩放 | 纯色 | 有故事要讲的页面：首页、关于我 |
+| `kinetic` **动感** | rich | 全套编排 + FLIP + 数字滚动 | 逐行 + 逐词 + 渐变 | 上浮 + 倾斜 | 可叠加装饰 | 作品集、案例页 |
+
+### 5.2 装饰预设（可选叠加层，默认全部关闭）
+
+| 预设 | 内容 | 与风格的关系 |
+|---|---|---|
+| `none` **无装饰** ★ | 纯色背景 | **默认** |
+| `tint` **淡色底** | 单层极淡渐变（无动画） | 可接受，静止的 |
+| `flow` **流动渐变** | 缓慢流动的渐变层（24–36s） | ⚠ 与 Minimal 有张力，仅在首页考虑 |
+| `aurora` **极光** | 多层光晕飘动 | ⚠ 属于 Motion Graphics 风格 |
+| `blob` **光斑** | 模糊色斑漂移 | ⚠ 同上 |
+| `grid` **网格** | 网格缓慢漂移 | ⚠ 偏极客风 |
+| `stars` **星空** | 点阵闪烁 | ⚠ 暗色主题限定 |
+| `particles` **粒子** | Canvas 点阵连线 | ❌ **与 Clean 方向冲突，不建议** |
+
+> **为什么保留冲突项**：这是你的个人站，选择权在你。规范给出**推荐值**，但不剥夺可能性。后台会在选中 ⚠ / ❌ 项时给出风格提示（见 §8 危险配置确认）。
+
+### 5.3 预设参数
 
 ```ts
+// config/motion/presets.ts
 export const MOTION_PRESETS: Record<PresetKey, Partial<MotionConfig>> = {
-  minimal: {
+  // ── 默认推荐：Clay 风格基线 ─────────────────
+  editorial: {
+    intensity: 'subtle',
+    background: { enabled: false, type: 'none', scope: 'none' },
+    interaction: {
+      cardHover: 'lift',      // translateY(-4px)
+      buttonHover: 'color',
+      linkHover: 'underline',
+      imageHover: 'zoom',
+      navIndicator: 'slide',
+      cursor: 'none',
+      magneticButtons: false,
+    },
+    reveal: {
+      enabled: true,
+      type: 'fade-up',        // y:+20px, opacity 0→1
+      range: 0.2,
+      duration: 480,          // 规范值 duration-slow
+      stagger: 80,            // 规范值 stagger-base
+      easing: 'outExpo',      // 规范值 ease-enter
+    },
+    text: {
+      heroType: 'mask-lines', // CSS 逐行遮罩（首屏，0 KB）
+      sectionType: 'none',    // 滚动后的小节不做文字动效
+      countUp: false,
+      gradientHeadings: false,
+    },
+    micro: {
+      themeTransition: 'fade',
+      copyFeedback: 'check',
+      pageTransition: 'fade', // 280ms
+      scrollProgress: true,
+    },
+  },
+
+  // ── 叙事：多段编排 ──────────────────────────
+  narrative: {
+    intensity: 'standard',
+    interaction: { /* 同 editorial */ },
+    reveal: { enabled: true, type: 'fade-up', range: 0.2, duration: 600, stagger: 80, easing: 'outExpo' },
+    text: { heroType: 'mask-lines', sectionType: 'mask-words', countUp: false, gradientHeadings: false },
+    micro: { themeTransition: 'fade', copyFeedback: 'check', pageTransition: 'fade', scrollProgress: true },
+  },
+
+  // ── 动感：全套 ──────────────────────────────
+  kinetic: {
+    intensity: 'rich',
+    interaction: { cardHover: 'tilt', imageHover: 'zoom', cursor: 'none', magneticButtons: true, /* … */ },
+    reveal: { enabled: true, type: 'fade-up', range: 0.2, duration: 600, stagger: 60, easing: 'outExpo' },
+    text: { heroType: 'mask-lines', sectionType: 'mask-words', countUp: true, gradientHeadings: false },
+    micro: { themeTransition: 'circle', pageTransition: 'fade', scrollProgress: true, /* … */ },
+    layout: { flip: true },   // createLayout 列表重排
+  },
+
+  static: {
     intensity: 'off',
-    background: { enabled: false, type: 'none', /* … */ },
+    background: { enabled: false, type: 'none', scope: 'none' },
     interaction: { cardHover: 'color', buttonHover: 'color', linkHover: 'color',
                    imageHover: 'none', navIndicator: 'none', cursor: 'none', magneticButtons: false },
     reveal: { enabled: false, type: 'none', /* … */ },
-    text: { heroType: 'none', countUp: false, gradientHeadings: false },
-    micro: { themeTransition: 'fade', copyFeedback: 'check', pageTransition: 'none', scrollProgress: true },
+    text: { heroType: 'none', sectionType: 'none', countUp: false, gradientHeadings: false },
+    micro: { themeTransition: 'none', copyFeedback: 'check', pageTransition: 'none', scrollProgress: true },
   },
-  breath: {
-    intensity: 'subtle',
-    background: { enabled: true, type: 'gradient-flow', scope: 'home', speed: 36,
-                  blur: 90, opacity: 0.3, noiseOverlay: true, parallax: false, /* … */ },
-    interaction: { cardHover: 'lift', buttonHover: 'color', linkHover: 'underline',
-                   imageHover: 'zoom', navIndicator: 'slide', cursor: 'none', magneticButtons: false },
-    reveal: { enabled: true, type: 'fade', range: 0.4, duration: 500, stagger: 60, easing: 'ease-out' },
-    text: { heroType: 'none', countUp: false, gradientHeadings: false },
-    micro: { themeTransition: 'fade', copyFeedback: 'check', pageTransition: 'fade', scrollProgress: true },
-  },
-  // aurora / mesh / grid / stars / particles 同理，完整值见实现
 }
 ```
 
-**切换预设的交互**：点预设卡 → 右侧预览窗立即套用 → 但不自动保存，需点「保存」；顶部提示条显示「已套用『极光』，尚未保存」+ [撤销] [保存]。
+**切换预设的交互**：点预设卡 → 右侧预览窗立即套用 → 但不自动保存，需点「保存」；顶部提示条显示「已套用『叙事』，尚未保存」+ [撤销] [保存]。
 
 ---
 
@@ -488,23 +655,56 @@ export const MOTION_PRESETS: Record<PresetKey, Partial<MotionConfig>> = {
 
 ### 6.1 体积预算
 
-| 动效 | 实现 | JS (gzip) | 合成层 | 对 LCP 影响 |
-|---|---|---|---|---|
-| 背景渐变流动 / 极光 / 光斑 / 网格 | 纯 CSS | **0** | 1–3 | 无 |
-| 星空 | 纯 CSS `box-shadow` 点阵 | **0** | 1 | 无 |
-| 卡片 / 按钮 / 链接 / 图片 hover | 纯 CSS | **0** | 按需 | 无 |
-| 滚动入场（主路径） | CSS `animation-timeline` | **0** | — | 无 |
-| 滚动入场（降级） | `IntersectionObserver` | 1.5 KB | — | 无 |
-| 文字逐字浮现 | 纯 CSS（服务端拆 span） | **0** | — | 无 |
-| 数字滚动 | rAF | 1.2 KB | — | 无 |
-| 光标光晕 | rAF + transform | 2.5 KB | 1 | 无 |
-| 滚动视差 | scroll + transform | 1.8 KB | 按需 | 无 |
-| 磁吸按钮 | pointermove | 1.5 KB | — | 无 |
-| 主题圆形扩散 | View Transitions API | **0**（降级 2 KB） | — | — |
-| 粒子背景 | Canvas 2D 手写 | 12 KB（延迟） | 1 | 无 |
-| **全开合计** | | **≤ 22 KB** | | |
+> **v1.1 已按实测重写**。旧版是"手写 JS、逐项估算、合计 22 KB"；现在是"**一个库 + 分层裁剪**"。
+> 实测环境：animejs@4.5.0 · esbuild 0.28.2 · `--bundle --minify --format=esm` · GZip Optimal。
 
-**硬性红线**：动效相关 JS 总量 ≤ 25 KB（gzip）。超出则必须砍功能，不允许放宽。
+#### Anime.js 按导入组合实测
+
+| 导入组合 | min | **gzip** | 说明 |
+|---|---|---|---|
+| `animate` + `stagger` | 35.3 KB | **14.1 KB** | 只能做简单补间，做不了编排 |
+| + `createTimeline` `createScope` `onScroll` | 54.4 KB | **20.3 KB** | 能做滚动入场，**做不了逐行文字揭示** |
+| **+ `splitText`** | 60.8 KB | **22.8 KB** | **推荐基线** —— Clay 风格的核心能力 |
+| + `utils` `createSpring` | 65.9 KB | **24.8 KB** | 完整能力（弹簧、工具函数） |
+| 全部走窄子路径 `animejs/text` 等 | 60.9 KB | **22.8 KB** | **与主入口完全相同**，没有收益 |
+
+> **实测结论**：窄子路径导入**零收益**（22.8 = 22.8）。统一 `from 'animejs'` 导入，代码更干净。
+
+#### 分层预算
+
+| 层 | 实现 | JS (gzip) | 合成层 | 对 LCP 影响 |
+|---|---|---|---|---|
+| **CSS 层**（首屏 + 全部悬停态） | 纯 CSS transition/animation | **0** | 按需 | 无 |
+| ├ Hero 逐行遮罩揭示 | CSS `overflow:hidden` + `translateY` | 0 | 按需 | **无（关键）** |
+| ├ 卡片/按钮/链接/图片 hover | CSS `:hover` / `:focus-visible` | 0 | 按需 | 无 |
+| ├ 背景装饰层（默认关闭） | CSS `::before` + transform | 0 | 1–3 | 无 |
+| └ 骨架屏、焦点环、开关 | CSS | 0 | — | 无 |
+| **Anime.js 层** | `animejs`（含 splitText/utils/spring） | **24.8** | 按需 | 无（滚动后才执行） |
+| ├ 滚动入场编排 | `onScroll` + `animate` + `stagger` | ↑ 已含 | — | 无 |
+| ├ 文字逐行/逐词揭示 | `splitText` + `stagger` | ↑ 已含 | — | 无 |
+| ├ 数字滚动 / 页面切换 / FLIP | `animate` / `createLayout` | ↑ 已含 | 按需 | 无 |
+| └ 可选装饰（光标/视差/磁吸/粒子） | `animate` + rAF | ↑ 已含 | 按需 | 无（默认全关） |
+| **自研运行时** | 能力检测 / FPS 守护 / 偏好存储 | **~2** | — | 无 |
+| **合计** | | **≈ 27 KB** | | |
+
+**硬性红线：动效相关 JS 总量 ≤ 28 KB（gzip）。**
+
+#### 预算为何放宽（25 → 28 KB）
+
+旧红线是按"手写 JS、逐项累加"定的。换成 Anime.js 后有两个必然变化：
+
+1. **Anime.js 无法按需裁剪到任意子集** —— `splitText` 是 Clay 风格的必要能力，一旦引入就是 22.8 KB 起
+2. **旧方案里的手写 Canvas 粒子（12 KB）被删除** —— Minimal/Clean 方向不需要它
+
+净变化：`-12 KB（粒子）+ 24.8 KB（Anime.js）+ 2 KB（自研）= +14.8 KB`，总预算从 25 → 28 KB，同时首屏 JS 预算从 110 → **135 KB**。
+
+**用三条措施换回成本**：
+
+| 措施 | 收益 |
+|---|---|
+| **后台完全不加载 Anime.js** | 后台仍是纯 CSS 过渡，首屏 JS 维持 ≤ 80 KB |
+| **首屏 Hero 用 CSS** | Anime.js 只接管滚动之后的部分，不进入 LCP 关键路径 |
+| **删除 Canvas 粒子** | −12 KB，且与风格方向一致 |
 
 ### 6.2 六级降级链（按优先级）
 

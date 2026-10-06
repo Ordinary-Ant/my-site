@@ -37,7 +37,8 @@
 | 5 | [05-frontend-ia.md](docs/05-frontend-ia.md) | 前台信息架构、路由表、三端断点与布局、页面 ASCII 线框、组件树 | 前端 |
 | 6 | [06-modules.md](docs/06-modules.md) | 五大模块（日志/作品集/时间戳/文章/关于我）逐一详细设计 | 前端 |
 | 7 | [07-roadmap.md](docs/07-roadmap.md) | 里程碑拆解、工期估算、风险对策、上线检查清单 | 项目管理 |
-| 8 | [08-motion-system.md](docs/08-motion-system.md) | **动效系统**：三层实现策略、配置结构、8 个预设、六级降级链、性能预算、可访问性、后台配置界面 | 前端 / 全栈 |
+| 8 | [08-motion-system.md](docs/08-motion-system.md) | **动效系统**：Anime.js 接入、双层策略、配置结构、两级预设、六级降级链、性能预算、后台配置界面 | 前端 / 全栈 |
+| 📐 | [设计规范.md](docs/设计规范.md) | **设计规范（唯一权威）**：风格基准、色彩/排版/间距令牌、缓动与时长规范值、组件与布局规范、可访问性、性能预算、扩展指引 | 所有人 |
 | 🎨 | [design/README.md](design/README.md) | **UI 设计稿**：45 张设计图 / 32 个页面，含「设计图 ↔ 文档章节」对应表与三端覆盖说明 | 前端 |
 | 🖥 | [design/index.html](design/index.html) | 设计稿评审看板（用浏览器打开） | 所有人 |
 
@@ -64,9 +65,12 @@
 | D13 | 样式与组件 | Tailwind CSS v4 + shadcn/ui (Radix) + `next-themes` | 无运行时样式开销、组件源码可控、无障碍由 Radix 兜底、暗色模式开箱 | MUI、Ant Design、CSS Modules |
 | D14 | 编辑器 | Tiptap（Markdown 进出） | React 原生、扩展性强、所见即所得同时不锁数据格式 | MDXEditor、milkdown、纯 textarea |
 | D15 | 部署 | **Vercel + Neon Postgres + Cloudflare R2**（备选 Docker + VPS） | 个人站免费额度充足，CI/CD 零配置，全球 CDN | 自建 VPS + Nginx + Docker |
-| D16 | 动效架构 | **服务端注入 `data-*` 属性 + CSS 变量；CSS 优先、JS 按需** | 90% 动效零 JS、无 FOUC、无客户端配置请求；重动效（粒子/光标/视差）延迟加载且移动端不下载；全套动效 JS ≤ 25KB | 全站 Framer Motion（首屏 JS 失控）、纯 CSS 硬编码（后台无法配置） |
-| D17 | 动效可配范围 | **8 类 + 8 个预设 + 逐项微调**，存在 `Setting` 表的 `motion` group | KV + Zod 校验实现「零迁移扩展」；预设降低配置成本，微调保留自由度 | 单独建表（过度设计）、只给开关不给参数（不够用） |
-| D18 | 动效降级 | **六级降级链**，`prefers-reduced-motion` 优先级高于后台配置 | 用户系统偏好不可被站点覆盖（无障碍要求）；移动端/FPS/省电模式自动降档，访客无感 | 只做一个总开关（会伤低端设备与无障碍用户） |
+| D16 | 动效架构 | **CSS + Anime.js 双层**：首屏与悬停态用 CSS（0 KB），编排类动效用 Anime.js v4.5 | 首屏不依赖 JS（Hero 逐行揭示用 CSS，避免慢网络下动效事故）；Anime.js 的 `createTimeline`/`splitText`/`onScroll`/`createScope` 是"编排型"动效的成熟方案 | 全手写 JS（重复造轮子）、Framer Motion（React-only，体积更大） |
+| D17 | 动效风格基准 | 参照 **[Clay Showreel 2023](https://showreel.design/videos/clay-showreel-2023/) / [clay.global](https://clay.global/)**，风格标注 **Minimal / Clean** | 从"炫技向"（极光/粒子/星空）转向"**编排向**"（逐行遮罩揭示、滚动叙事、克制交错）。粒子类降为默认关闭的可选项 | 保持原炫技向方案（与参考作品方向相反） |
+| D18 | 动效可配范围 | 两级：**编排预设**（static / editorial / narrative / kinetic）+ **装饰预设**（可叠加，默认全关） | 主轴变成"页面怎么动"而非"背景有多花"，与 Minimal/Clean 一致 | 8 个平铺预设（背景与编排混在一起，无法表达"编排强度"） |
+| D19 | 动效降级 | **六级降级链**，`prefers-reduced-motion` 优先级高于后台配置 | 用户系统偏好不可被站点覆盖（无障碍要求）；移动端/FPS/省电模式自动降档，访客无感 | 只做一个总开关（会伤低端设备与无障碍用户） |
+| D20 | 动效体积 | 动效 JS **≤ 28 KB** gzip；首屏 JS ≤ **135 KB** | 实测：Anime.js 含 `splitText` 22.8 KB、完整能力 24.8 KB，加自研运行时约 27 KB。旧红线 25 KB 已不成立，如实放宽并说明理由 | 硬守 25 KB 而砍掉文字揭示（丢掉风格核心能力） |
+| D21 | 设计规范 | 单独立一份 [设计规范.md](docs/设计规范.md) 作为**视觉与动效的唯一权威** | 设计图是"长什么样"、文档是"为什么"、规范是"**用什么值**"。避免三个月后没人知道为什么是 280ms | 把规范值散落在各文档里（必然漂移） |
 
 ---
 

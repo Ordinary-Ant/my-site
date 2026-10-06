@@ -13,8 +13,9 @@
   <b>后台 · 动效配置</b>
   <span class="spec-tag">/admin/settings/motion</span>
   <span class="spec-tag amber">仅 ADMIN</span>
-  <span class="spec-tag blue">PATCH /api/v1/admin/settings/motion</span>
-  <span class="spacer">后台唯一带实时预览的配置页 · 8 个预设 + 逐项微调 · 改动即时生效</span>
+  <span class="spec-tag blue">Anime.js v4.5.0</span>
+  <span class="spec-tag violet">预设已改为两级：编排 + 装饰</span>
+  <span class="spacer">后台唯一带实时预览的配置页 · 规范值见 docs/设计规范.md §3</span>
 </div>
 
 <div class="admin-shell">
@@ -45,6 +46,7 @@
       <a><span class="icon">👥</span>用户管理</a>
       <a><span class="icon">📋</span>审计日志</a>
       <a><span class="icon">💾</span>数据导入 / 导出</a>
+      <a><span class="icon">👤</span>个人设置</a>
     </nav>
   </aside>
 
@@ -53,7 +55,7 @@
       <span class="icon" style="font-size:17px">✨</span>
       <div class="text-sm text-muted">站点设置 / <span class="bold" style="color:var(--fg)">动效</span></div>
       <div class="ml-auto row gap-12">
-        <span class="text-xs text-subtle">未保存的改动将丢失</span>
+        <span class="text-xs text-subtle">风格基准：Clay Showreel 2023 · Minimal / Clean</span>
         <div class="divider-v"></div>
         <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
       </div>
@@ -64,7 +66,7 @@
       <div class="page-head">
         <div>
           <h1>动效</h1>
-          <div class="sub">让站点活起来，但别拖慢它。改动会立即影响前台访客。</div>
+          <div class="sub">编排决定"页面怎么动"，装饰决定"背景长什么样"。前者是主轴，后者默认关闭。</div>
         </div>
         <div class="btn-row">
           <a class="btn btn-ghost">预览前台 ↗</a>
@@ -73,117 +75,141 @@
         </div>
       </div>
 
-      <!-- ============ 已套用未保存提示 ============ -->
       <div class="notice mb-16">
         <span class="icon">ⓘ</span>
         <div class="row between grow gap-16 wrap">
-          <span>已套用预设「极光」，<b>尚未保存</b>。前台访客目前看到的仍是「呼吸渐变」。</span>
+          <span>当前配置与默认「编辑风 + 无装饰」一致，<b>没有未保存的改动</b>。</span>
           <span class="row gap-8">
-            <a class="btn btn-sm">撤销</a>
-            <a class="btn btn-sm btn-primary">保存并生效</a>
+            <span class="badge badge-green">Anime.js 24.8 KB</span>
+            <span class="badge badge-gray">后台不加载</span>
           </span>
         </div>
       </div>
 
-      <!-- ============ 全局强度 + 预设 ============ -->
+      <!-- ============ ① 编排预设（主轴） ============ -->
       <div class="panel mb-16">
         <div class="panel-head">
-          <span class="bold text-sm">⚡ 全局强度</span>
-          <span class="text-xs text-subtle">总闸 —— 关闭时所有子项随之停用（配置保留，不会清空）</span>
-        </div>
-        <div class="panel-body">
-          <div class="intensity-row">
-            <div class="intensity-card">
-              <div class="bars"><i style="height:6px"></i></div>
-              <div class="nm">关闭</div>
-              <div class="ds">纯静态 · 0 KB JS</div>
-            </div>
-            <div class="intensity-card">
-              <div class="bars"><i style="height:6px"></i><i style="height:11px"></i></div>
-              <div class="nm">轻微</div>
-              <div class="ds">只保留必要的过渡</div>
-            </div>
-            <div class="intensity-card active">
-              <div class="bars"><i style="height:6px"></i><i style="height:11px"></i><i style="height:14px"></i></div>
-              <div class="nm">标准</div>
-              <div class="ds">推荐 · 兼顾观感与性能</div>
-            </div>
-            <div class="intensity-card">
-              <div class="bars"><i style="height:6px"></i><i style="height:11px"></i><i style="height:14px"></i><i style="height:14px"></i></div>
-              <div class="nm">丰富</div>
-              <div class="ds">含重动效 · 移动端降档</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============ 预设选择器 ============ -->
-      <div class="panel mb-16">
-        <div class="panel-head">
-          <span class="bold text-sm">🎛 预设方案</span>
-          <span class="text-xs text-subtle">点一下立即套用到右侧预览（不会自动保存）· 套用后可继续逐项微调</span>
+          <span class="bold text-sm">① 编排预设 <span class="badge badge-accent" style="margin-left:6px">主轴</span></span>
+          <span class="text-xs text-subtle">决定页面怎么动 —— 入场、揭示、交错、编排密度</span>
         </div>
         <div class="panel-body">
           <div class="preset-grid">
 
             <div class="preset-card">
-              <div class="thumb" style="background:#fafafa"></div>
-              <div class="nm">极简</div>
-              <div class="ds">纯静态<br>0 KB JS</div>
-            </div>
-
-            <div class="preset-card">
-              <div class="thumb">
-                <div class="blob demo-flow" style="background:linear-gradient(135deg,#6366F1,#A855F7)"></div>
+              <div class="thumb" style="background:var(--bg-subtle);position:relative">
+                <div style="position:absolute;left:8px;right:8px;top:16px;height:3px;background:var(--border-strong);border-radius:2px"></div>
               </div>
-              <div class="nm">呼吸渐变</div>
-              <div class="ds">克制不廉价<br>推荐</div>
+              <div class="nm">静态</div>
+              <div class="ds">无入场<br>仅颜色变化</div>
             </div>
 
             <div class="preset-card active">
-              <div class="thumb">
-                <div class="blob demo-aurora" style="background:radial-gradient(circle at 30% 40%,#A855F7,transparent 60%),radial-gradient(circle at 70% 60%,#06B6D4,transparent 60%)"></div>
+              <div class="thumb" style="background:var(--bg-subtle);position:relative">
+                <div style="position:absolute;left:8px;width:52%;top:11px;height:3px;background:var(--accent);border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:60%;top:20px;height:3px;background:var(--accent);opacity:.6;border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:34%;top:29px;height:3px;background:var(--accent);opacity:.3;border-radius:2px"></div>
               </div>
+              <div class="nm">编辑风 ★</div>
+              <div class="ds">区块淡入<br>Hero 逐行揭示</div>
+            </div>
+
+            <div class="preset-card">
+              <div class="thumb" style="background:var(--bg-subtle);position:relative">
+                <div style="position:absolute;left:8px;width:40%;top:9px;height:3px;background:var(--accent);border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:66%;top:18px;height:3px;background:var(--accent);opacity:.8;border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:52%;top:27px;height:3px;background:var(--accent);opacity:.55;border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:28%;top:36px;height:3px;background:var(--accent);opacity:.3;border-radius:2px"></div>
+              </div>
+              <div class="nm">叙事</div>
+              <div class="ds">时间轴多段<br>小节逐词揭示</div>
+            </div>
+
+            <div class="preset-card">
+              <div class="thumb" style="background:var(--bg-subtle);position:relative">
+                <div style="position:absolute;left:8px;width:30%;top:6px;height:3px;background:var(--accent);border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:58%;top:14px;height:3px;background:var(--accent);opacity:.85;border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:44%;top:22px;height:3px;background:var(--accent);opacity:.65;border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:70%;top:30px;height:3px;background:var(--accent);opacity:.45;border-radius:2px"></div>
+                <div style="position:absolute;left:8px;width:36%;top:38px;height:3px;background:var(--accent);opacity:.25;border-radius:2px"></div>
+              </div>
+              <div class="nm">动感</div>
+              <div class="ds">全套 + FLIP<br>数字滚动</div>
+            </div>
+
+          </div>
+
+          <div class="stage-note" style="margin-top:16px">
+            <b>为什么这是主轴</b>：Clay 那类作品的观感来自"<b>多条动画排成序列</b>"，而不是背景有多花。
+            缩略图里的横条长度代表编排密度 —— 静态没有条，动感有 5 条。
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ② 装饰预设（可叠加，默认关闭） ============ -->
+      <div class="panel mb-16">
+        <div class="panel-head">
+          <span class="bold text-sm">② 装饰预设 <span class="badge badge-gray" style="margin-left:6px">可叠加 · 默认关闭</span></span>
+          <span class="text-xs text-subtle">决定背景长什么样 —— 与 Minimal/Clean 方向有张力的项会标注</span>
+        </div>
+        <div class="panel-body">
+          <div class="preset-grid" style="grid-template-columns:repeat(4,1fr)">
+
+            <div class="preset-card active">
+              <div class="thumb" style="background:var(--bg)"></div>
+              <div class="nm">无装饰 ★</div>
+              <div class="ds"><span class="badge badge-green">默认</span></div>
+            </div>
+
+            <div class="preset-card">
+              <div class="thumb" style="background:linear-gradient(135deg,#eef2ff,#fdf4ff)"></div>
+              <div class="nm">淡色底</div>
+              <div class="ds"><span class="badge badge-green">推荐</span> 静止渐变</div>
+            </div>
+
+            <div class="preset-card">
+              <div class="thumb"><div class="blob demo-flow" style="background:linear-gradient(135deg,#6366F1,#A855F7,#EC4899)"></div></div>
+              <div class="nm">流动渐变</div>
+              <div class="ds"><span class="badge badge-amber">谨慎</span> 一直在动</div>
+            </div>
+
+            <div class="preset-card">
+              <div class="thumb" style="background:#18181b"><div class="blob demo-aurora" style="background:radial-gradient(circle at 30% 40%,#A855F7,transparent 60%),radial-gradient(circle at 70% 60%,#06B6D4,transparent 60%)"></div></div>
               <div class="nm">极光</div>
-              <div class="ds">视觉冲击强<br>建议仅首页</div>
+              <div class="ds"><span class="badge badge-amber">谨慎</span> Motion Graphics 风</div>
             </div>
 
             <div class="preset-card">
-              <div class="thumb">
-                <div class="blob demo-blob" style="background:radial-gradient(circle at 25% 35%,#EC4899,transparent 55%),radial-gradient(circle at 75% 65%,#3B82F6,transparent 55%)"></div>
-              </div>
+              <div class="thumb"><div class="blob demo-blob" style="background:radial-gradient(circle at 25% 35%,#EC4899,transparent 55%),radial-gradient(circle at 75% 65%,#3B82F6,transparent 55%)"></div></div>
               <div class="nm">光斑</div>
-              <div class="ds">现代 SaaS 风</div>
+              <div class="ds"><span class="badge badge-amber">谨慎</span></div>
             </div>
 
             <div class="preset-card">
-              <div class="thumb" style="background-color:#fafafa;background-image:linear-gradient(#e4e4e7 1px,transparent 1px),linear-gradient(90deg,#e4e4e7 1px,transparent 1px);background-size:11px 11px"></div>
+              <div class="thumb" style="background-color:var(--bg-subtle);background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:11px 11px"></div>
               <div class="nm">网格</div>
-              <div class="ds">极客 / 工程感</div>
+              <div class="ds"><span class="badge badge-amber">谨慎</span> 偏极客风</div>
             </div>
 
             <div class="preset-card">
-              <div class="thumb" style="background:#18181b">
-                <div class="blob demo-twinkle" style="background:radial-gradient(circle at 20% 30%,#fff 0 1px,transparent 2px),radial-gradient(circle at 60% 60%,#fff 0 1px,transparent 2px),radial-gradient(circle at 82% 22%,#fff 0 1px,transparent 2px),radial-gradient(circle at 40% 80%,#fff 0 1px,transparent 2px);filter:none;inset:0"></div>
-              </div>
+              <div class="thumb" style="background:#18181b"><div class="blob demo-twinkle" style="background:radial-gradient(circle at 20% 30%,#fff 0 1px,transparent 2px),radial-gradient(circle at 60% 60%,#fff 0 1px,transparent 2px),radial-gradient(circle at 82% 22%,#fff 0 1px,transparent 2px);filter:none;inset:0"></div></div>
               <div class="nm">星空</div>
-              <div class="ds">暗色主题为主</div>
+              <div class="ds"><span class="badge badge-amber">谨慎</span> 暗色限定</div>
             </div>
 
             <div class="preset-card">
-              <div class="thumb" style="background:#18181b">
-                <div class="blob demo-aurora" style="background:radial-gradient(circle at 40% 40%,#818CF8,transparent 55%),radial-gradient(circle at 70% 70%,#22D3EE,transparent 55%)"></div>
-              </div>
+              <div class="thumb" style="background:#0b1020;display:flex;align-items:center;justify-content:center;color:#818CF8;font-size:16px">•••</div>
               <div class="nm">粒子</div>
-              <div class="ds">炫技向<br>+12 KB JS</div>
+              <div class="ds"><span class="badge badge-red">不建议</span></div>
             </div>
 
-            <div class="preset-card">
-              <div class="thumb" style="background:var(--bg-muted);display:flex;align-items:center;justify-content:center;color:var(--fg-subtle);font-size:18px">⚙</div>
-              <div class="nm">自定义</div>
-              <div class="ds">手动配置全部参数</div>
-            </div>
+          </div>
 
+          <div class="notice notice-warn" style="margin-top:16px;font-size:12.5px">
+            <span class="icon">⚠</span>
+            <div>
+              <b>「谨慎」与「不建议」是风格提示，不是技术限制</b> —— 选中后仍可保存，但会弹一次确认（见下方状态稿）。
+              判断依据：它们都在<b>持续运动</b>或<b>持续占用合成层</b>，与 Minimal/Clean 的「默认静音」原则冲突。
+            </div>
           </div>
         </div>
       </div>
@@ -203,12 +229,40 @@
             <div class="panel-body stack gap-16">
 
               <div class="field">
+                <label>动效强度</label>
+                <div class="intensity-row">
+                  <div class="intensity-card">
+                    <div class="bars"><i style="height:6px"></i></div>
+                    <div class="nm">关闭</div>
+                    <div class="ds">等同静态预设</div>
+                  </div>
+                  <div class="intensity-card">
+                    <div class="bars"><i style="height:6px"></i><i style="height:11px"></i></div>
+                    <div class="nm">轻微</div>
+                    <div class="ds">仅 fade</div>
+                  </div>
+                  <div class="intensity-card active">
+                    <div class="bars"><i style="height:6px"></i><i style="height:11px"></i><i style="height:14px"></i></div>
+                    <div class="nm">标准</div>
+                    <div class="ds">推荐</div>
+                  </div>
+                  <div class="intensity-card">
+                    <div class="bars"><i style="height:6px"></i><i style="height:11px"></i><i style="height:14px"></i><i style="height:14px"></i></div>
+                    <div class="nm">丰富</div>
+                    <div class="ds">含重动效</div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="divider">
+
+              <div class="field">
                 <div class="row between">
                   <label>尊重系统「减弱动态效果」偏好</label>
                   <span class="locked-pill">🔒 已锁定</span>
                 </div>
                 <div class="row between">
-                  <span class="text-xs text-subtle">访客在系统里开启该选项时，全站动效将自动关闭。这是无障碍要求，<b>优先级高于本站配置</b>，不可关闭。</span>
+                  <span class="text-xs text-subtle">开启该偏好的访客，<b>Anime.js 直接不初始化</b>。这是无障碍要求，优先级高于本站所有配置，不可关闭。</span>
                   <span class="switch on"></span>
                 </div>
               </div>
@@ -218,13 +272,13 @@
               <div class="field">
                 <label>移动端强度</label>
                 <div class="select" style="width:100%">轻微（推荐）</div>
-                <div class="hint">手机屏幕小、电量和性能更敏感。重动效（粒子 / 光标 / 视差 / 磁吸）在任何强度下都不会在移动端加载。</div>
+                <div class="hint">逐行揭示降级为整块淡入；位移减半；关闭光标 / 视差 / 磁吸。用 <span class="mono">createScope</span> 的 <span class="mono">mediaQueries</span> 表达，不手写 resize 监听。</div>
               </div>
 
               <div class="field">
                 <label>低端设备自动降级</label>
                 <div class="row between">
-                  <span class="text-xs text-subtle">检测到 CPU 核数 ≤ 4、内存 ≤ 4GB、省流量模式或帧率低于 45fps 时自动降档，访客无感。</span>
+                  <span class="text-xs text-subtle">CPU ≤ 4 核 / 内存 ≤ 4GB / 省流量 → <b>完全不加载 Anime.js 层</b>，只保留 CSS。FPS 连续 2 秒低于 45 也触发。</span>
                   <span class="switch on"></span>
                 </div>
               </div>
@@ -232,139 +286,145 @@
             </div>
           </div>
 
-          <!-- 背景动效 -->
+          <!-- 编排 -->
           <div class="panel">
             <div class="panel-head" style="cursor:pointer">
-              <span class="bold text-sm">▼ 背景动效</span>
-              <span class="text-xs text-subtle">11 项 · 当前：流动渐变</span>
+              <span class="bold text-sm">▼ 编排</span>
+              <span class="text-xs text-subtle">Anime.js 层 · 6 项</span>
+            </div>
+            <div class="panel-body stack gap-16">
+
+              <div class="notice" style="font-size:12.5px">
+                <span class="icon">ⓘ</span>
+                <span>这一组全部由 <b>Anime.js</b> 实现（<span class="mono">onScroll</span> + <span class="mono">createTimeline</span> + <span class="mono">splitText</span>）。首屏 Hero 不在此列 —— 它是纯 CSS，不受这里影响。</span>
+              </div>
+
+              <div class="field">
+                <label>区块入场</label>
+                <div class="field-row">
+                  <div class="select" style="width:100%">淡入上移（fade-up）</div>
+                  <div class="select" style="width:100%">480ms</div>
+                </div>
+                <div class="hint">其它类型：无 / 纯淡入 / 缩放。位移固定 +20px，移动端自动减半为 +10px。</div>
+              </div>
+
+              <div class="field">
+                <label>交错延迟</label>
+                <div class="slider">
+                  <div class="track"><i style="width:20%"></i><b style="left:20%"></b></div>
+                  <span class="val">40ms</span>
+                </div>
+                <div class="hint">规范三档：40ms（密集列表）/ 80ms（卡片网格）/ 120ms（Hero 逐行）。<b>项数 × 交错 不应超过 600ms。</b></div>
+              </div>
+
+              <div class="field">
+                <label>触发阈值</label>
+                <div class="slider">
+                  <div class="track"><i style="width:20%"></i><b style="left:20%"></b></div>
+                  <span class="val">0.2</span>
+                </div>
+                <div class="hint">元素进入视口多少比例时触发。数值越大越晚触发。<b>每个区块一个独立观察器</b>，保证"一次只动一件事"。</div>
+              </div>
+
+              <hr class="divider">
+
+              <div class="field">
+                <label>文字揭示</label>
+                <div class="row between">
+                  <span class="text-xs text-subtle">首屏 Hero</span>
+                  <span class="badge badge-green">逐行遮罩 · 纯 CSS</span>
+                </div>
+                <div class="row between" style="margin-top:8px">
+                  <span class="text-xs text-subtle">滚动后的小节</span>
+                  <div class="select" style="width:190px">逐词揭示（splitText）</div>
+                </div>
+                <div class="hint">Hero 用 CSS 是因为它必须在 JS 就绪前就播完 —— 否则慢网络下会"先静止、再跳一下重播"。小节用 <span class="mono">splitText</span> 是因为它能处理动态换行。</div>
+              </div>
+
+              <div class="field">
+                <label>数字滚动</label>
+                <div class="row between">
+                  <span class="text-xs text-subtle">统计数字从 0 滚到目标值（900ms · outExpo）</span>
+                  <span class="switch on"></span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>列表重排 FLIP</label>
+                <div class="row between">
+                  <span class="text-xs text-subtle"><span class="mono">createLayout()</span> —— 唯一允许动布局属性的场景（320ms · ease-standard）</span>
+                  <span class="switch"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 交互动画 -->
+          <div class="panel">
+            <div class="panel-head" style="cursor:pointer">
+              <span class="bold text-sm">▶ 交互动画</span>
+              <span class="text-xs text-subtle">CSS 层 · 7 项 · 0 KB</span>
+            </div>
+          </div>
+
+          <!-- 装饰 -->
+          <div class="panel">
+            <div class="panel-head" style="cursor:pointer">
+              <span class="bold text-sm">▼ 装饰</span>
+              <span class="text-xs text-subtle">当前：无装饰 · 8 项</span>
             </div>
             <div class="panel-body stack gap-16">
 
               <div class="field">
                 <div class="row between">
-                  <label>启用背景动效</label>
-                  <span class="switch on"></span>
+                  <label>启用装饰层</label>
+                  <span class="switch"></span>
                 </div>
+                <div class="hint">关闭时不渲染任何背景层，页面为纯色底。这是默认状态，也是与 Minimal/Clean 最一致的状态。</div>
               </div>
 
-              <div class="field">
+              <div class="field" style="opacity:.5">
                 <label>类型</label>
                 <div class="chip-row">
-                  <span class="chip chip-sm">无</span>
-                  <span class="chip chip-sm">静态渐变</span>
-                  <span class="chip chip-sm chip-active">流动渐变</span>
+                  <span class="chip chip-sm chip-active">无</span>
+                  <span class="chip chip-sm">淡色底</span>
+                  <span class="chip chip-sm">流动渐变</span>
                   <span class="chip chip-sm">极光</span>
                   <span class="chip chip-sm">光斑</span>
                   <span class="chip chip-sm">网格</span>
                   <span class="chip chip-sm">星空</span>
-                  <span class="chip chip-sm">粒子 <span class="text-xs">+12KB</span></span>
+                  <span class="chip chip-sm">粒子</span>
                 </div>
+                <div class="hint">启用装饰层后这一行才会变为可操作。</div>
               </div>
 
-              <div class="field">
-                <label>作用范围</label>
-                <div class="row gap-24 wrap">
-                  <div class="cbx-row"><span class="radio"></span>全站（含文章详情）</div>
-                  <div class="cbx-row"><span class="radio on"></span>仅首页 <span class="badge badge-green">推荐 · 省约 40% 渲染</span></div>
-                </div>
-              </div>
-
-              <hr class="divider">
-
-              <div class="field">
-                <label>亮色主题配色</label>
+              <div class="field" style="opacity:.5">
+                <label>亮色 / 暗色配色</label>
                 <div class="color-triple">
-                  <div class="color-chip" style="background:#6366F1"></div><span class="color-hex">#6366F1</span>
-                  <div class="color-chip" style="background:#A855F7"></div><span class="color-hex">#A855F7</span>
-                  <div class="color-chip" style="background:#EC4899"></div><span class="color-hex">#EC4899</span>
-                  <a class="btn btn-sm btn-ghost">+ 加一色</a>
+                  <div class="color-chip" style="background:#6366F1"></div>
+                  <div class="color-chip" style="background:#A855F7"></div>
+                  <div class="color-chip" style="background:#EC4899"></div>
+                  <span class="text-xs text-subtle" style="margin-left:8px">/</span>
+                  <div class="color-chip" style="background:#1E1B4B"></div>
+                  <div class="color-chip" style="background:#4C1D95"></div>
+                  <div class="color-chip" style="background:#0F172A"></div>
                 </div>
               </div>
 
-              <div class="field">
-                <label>暗色主题配色</label>
-                <div class="color-triple">
-                  <div class="color-chip" style="background:#1E1B4B"></div><span class="color-hex">#1E1B4B</span>
-                  <div class="color-chip" style="background:#4C1D95"></div><span class="color-hex">#4C1D95</span>
-                  <div class="color-chip" style="background:#0F172A"></div><span class="color-hex">#0F172A</span>
-                </div>
-              </div>
-
-              <hr class="divider">
-
-              <div class="field">
+              <div class="field" style="opacity:.5">
                 <label>流动速度</label>
                 <div class="slider">
                   <div class="track"><i style="width:17%"></i><b style="left:17%"></b></div>
-                  <span class="val">24s</span>
+                  <span class="val">36s</span>
                 </div>
-                <div class="hint">数值越大越慢。低于 10s 会显得躁动，建议 20–40s。</div>
-              </div>
-
-              <div class="field">
-                <label>模糊半径</label>
-                <div class="slider">
-                  <div class="track"><i style="width:40%"></i><b style="left:40%"></b></div>
-                  <span class="val">80px</span>
-                </div>
-                <div class="hint">越大越柔和，但 <span class="mono">&gt; 120px</span> 在部分安卓机上会明显掉帧。</div>
-              </div>
-
-              <div class="field">
-                <label>不透明度</label>
-                <div class="slider">
-                  <div class="track"><i style="width:35%"></i><b style="left:35%"></b></div>
-                  <span class="val">35%</span>
-                </div>
-              </div>
-
-              <div class="field">
-                <label>渐变角度</label>
-                <div class="slider">
-                  <div class="track"><i style="width:37%"></i><b style="left:37%"></b></div>
-                  <span class="val">135°</span>
-                </div>
-              </div>
-
-              <hr class="divider">
-
-              <div class="row gap-24 wrap">
-                <div class="cbx-row"><span class="ck on">✓</span>噪点叠加 <span class="text-xs text-subtle">消除渐变色带</span></div>
-                <div class="cbx-row"><span class="ck"></span>鼠标视差 <span class="text-xs text-subtle">+1.8 KB</span></div>
+                <div class="hint">规范建议 20–40s。低于 10s 会显得躁动，与 Clean 方向冲突。</div>
               </div>
 
             </div>
           </div>
 
-          <!-- 折叠项 -->
-          <div class="panel">
-            <div class="panel-head" style="cursor:pointer">
-              <span class="bold text-sm">▶ 交互动画</span>
-              <span class="text-xs text-subtle">7 项 · 卡片 lift · 按钮 shine · 光标关闭</span>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head" style="cursor:pointer">
-              <span class="bold text-sm">▶ 入场动画</span>
-              <span class="text-xs text-subtle">5 项 · fade-up · 600ms · 交错 80ms</span>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head" style="cursor:pointer">
-              <span class="bold text-sm">▶ 文字动效</span>
-              <span class="text-xs text-subtle">3 项 · 逐词浮现 · 数字滚动开</span>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head" style="cursor:pointer">
-              <span class="bold text-sm">▶ 微交互</span>
-              <span class="text-xs text-subtle">4 项 · 主题圆形扩散 · 阅读进度条</span>
-            </div>
-          </div>
-
+          <!-- 性能与降级 -->
           <div class="panel">
             <div class="panel-head" style="cursor:pointer">
               <span class="bold text-sm">▶ 性能与降级</span>
@@ -374,7 +434,7 @@
 
         </div>
 
-        <!-- ---------- 右：实时预览（sticky） ---------- -->
+        <!-- ---------- 右：实时预览 ---------- -->
         <div class="stack gap-16 motion-preview">
 
           <div class="panel">
@@ -393,17 +453,19 @@
                 <div class="preview-bar">
                   <i></i><i></i><i></i>
                   <span class="url">puly.dev</span>
-                  <span class="ml-auto">极光 · 仅首页</span>
+                  <span class="ml-auto">编辑风 + 无装饰</span>
                 </div>
                 <div class="preview-body demo-stage" style="padding:0">
-                  <div class="demo-bg-layer demo-aurora"
-                       style="background:radial-gradient(circle at 30% 35%,#A855F7,transparent 58%),radial-gradient(circle at 72% 62%,#06B6D4,transparent 58%),radial-gradient(circle at 50% 85%,#EC4899,transparent 55%)"></div>
                   <div class="demo-content" style="padding:22px">
                     <div class="preview-mini-nav">
                       <span class="bold" style="color:var(--fg)">Puly</span>
-                      <span class="active">首页</span><span>日志</span><span>作品集</span><span>时间戳</span><span>文章</span><span>关于我</span>
+                      <span class="active">首页</span><span>日志</span><span>作品集</span><span>时间戳</span><span>文章</span>
                     </div>
-                    <div class="preview-h1">用工程化的方式，<br>把想法变成能用的东西。</div>
+                    <div class="preview-h1" style="font-size:20px;line-height:1.35">
+                      <span style="display:block;overflow:hidden"><span style="display:block">用工程化的方式，</span></span>
+                      <span style="display:block;overflow:hidden"><span style="display:block">把想法变成</span></span>
+                      <span style="display:block;overflow:hidden"><span style="display:block">能用的东西。</span></span>
+                    </div>
                     <div class="preview-sub">5 年经验前端工程师 · 写代码也写字</div>
                     <div class="row gap-8 mt-16">
                       <span class="btn btn-sm btn-primary demo-shine">看看我的作品</span>
@@ -423,7 +485,48 @@
                 </div>
               </div>
               <div class="text-xs text-subtle mt-12" style="text-align:center">
-                这个预览是真实渲染的 —— 动效会在这里真实播放
+                纯色底 + 编排动效 —— 动效会在这里真实播放
+              </div>
+            </div>
+          </div>
+
+          <!-- 编排时间轴 -->
+          <div class="panel">
+            <div class="panel-head">
+              <span class="bold text-sm">编排时间轴</span>
+              <span class="text-xs text-subtle">1.6s 总长</span>
+            </div>
+            <div class="panel-body stack gap-8">
+              <div class="row gap-8" style="align-items:center">
+                <span class="text-xs text-subtle" style="width:78px">标题 ×3</span>
+                <div style="flex:1;height:9px;background:var(--bg-muted);border-radius:3px;position:relative;min-width:60px">
+                  <div style="position:absolute;left:0;width:50%;top:0;bottom:0;background:var(--green);border-radius:3px"></div>
+                </div>
+                <span class="badge badge-green" style="font-size:9.5px">CSS</span>
+              </div>
+              <div class="row gap-8" style="align-items:center">
+                <span class="text-xs text-subtle" style="width:78px">副标题</span>
+                <div style="flex:1;height:9px;background:var(--bg-muted);border-radius:3px;position:relative;min-width:60px">
+                  <div style="position:absolute;left:23%;width:27%;top:0;bottom:0;background:var(--accent);border-radius:3px"></div>
+                </div>
+                <span class="badge badge-accent" style="font-size:9.5px">JS</span>
+              </div>
+              <div class="row gap-8" style="align-items:center">
+                <span class="text-xs text-subtle" style="width:78px">CTA</span>
+                <div style="flex:1;height:9px;background:var(--bg-muted);border-radius:3px;position:relative;min-width:60px">
+                  <div style="position:absolute;left:31%;width:22%;top:0;bottom:0;background:var(--accent);border-radius:3px"></div>
+                </div>
+                <span class="badge badge-accent" style="font-size:9.5px">JS</span>
+              </div>
+              <div class="row gap-8" style="align-items:center">
+                <span class="text-xs text-subtle" style="width:78px">社交</span>
+                <div style="flex:1;height:9px;background:var(--bg-muted);border-radius:3px;position:relative;min-width:60px">
+                  <div style="position:absolute;left:42%;width:14%;top:0;bottom:0;background:var(--accent);border-radius:3px"></div>
+                </div>
+                <span class="badge badge-accent" style="font-size:9.5px">JS</span>
+              </div>
+              <div class="text-xs text-subtle mt-4" style="line-height:1.6">
+                绿色 = 首屏关键内容（纯 CSS，JS 未就绪也已播完）　蓝色 = Anime.js 编排
               </div>
             </div>
           </div>
@@ -436,38 +539,43 @@
             </div>
             <div class="panel-body">
               <div class="perf-row">
-                <span class="k">动效 JS 体积</span>
-                <span class="v perf-ok">+0 KB &nbsp;✅</span>
+                <span class="k">CSS 层</span>
+                <span class="v perf-ok">0 KB &nbsp;✅</span>
               </div>
               <div class="perf-row">
-                <span class="k">合成层数量</span>
-                <span class="v perf-ok">3 层 &nbsp;✅</span>
+                <span class="k">Anime.js（含 splitText）</span>
+                <span class="v">22.8 KB</span>
               </div>
               <div class="perf-row">
-                <span class="k">对 LCP 影响</span>
-                <span class="v perf-ok">无影响 &nbsp;✅</span>
+                <span class="k">+ utils / createSpring</span>
+                <span class="v perf-warn">+2.0 KB</span>
               </div>
               <div class="perf-row">
-                <span class="k">移动端重动效</span>
-                <span class="v perf-ok">0 项 &nbsp;✅</span>
+                <span class="k">自研运行时</span>
+                <span class="v">+2.0 KB</span>
               </div>
               <div class="perf-row">
-                <span class="k">预算占用</span>
-                <span class="v perf-ok">0 / 25 KB</span>
+                <span class="k bold">合计</span>
+                <span class="v bold">26.8 KB / 红线 28 KB</span>
+              </div>
+              <div class="perf-row">
+                <span class="k">后台</span>
+                <span class="v perf-ok">不加载 Anime.js &nbsp;✅</span>
               </div>
               <div class="mt-12">
                 <div style="height:7px;background:var(--bg-muted);border-radius:999px;overflow:hidden">
-                  <div style="width:2%;height:100%;background:var(--green);border-radius:999px"></div>
+                  <div style="width:96%;height:100%;background:var(--amber);border-radius:999px"></div>
                 </div>
+                <div class="text-xs text-subtle mt-8">预算占用 96% —— 几乎没有余量，新增动效前先确认是否值得</div>
               </div>
               <div class="notice mt-16" style="font-size:12.5px">
                 <span class="icon">💡</span>
-                <span>建议保持「仅首页」范围，可省约 40% 渲染开销。文章详情页开了会让长文滚动时略微发涩。</span>
+                <span>窄子路径导入（<span class="mono">animejs/text</span> 等）实测与主入口<b>完全相同</b>，不需要为了省体积写深层导入。</span>
               </div>
             </div>
           </div>
 
-          <!-- 降级状态提示 -->
+          <!-- 降级状态 -->
           <div class="panel">
             <div class="panel-head"><span class="bold text-sm">降级状态</span></div>
             <div class="panel-body stack gap-10">
@@ -480,15 +588,15 @@
                 <span class="perf-warn">已生效（轻微）</span>
               </div>
               <div class="row between text-xs">
+                <span class="text-muted">设备能力检测</span>
+                <span class="perf-ok">达标</span>
+              </div>
+              <div class="row between text-xs">
                 <span class="text-muted">FPS 守护（&lt; 45fps）</span>
                 <span class="perf-ok">未触发</span>
               </div>
-              <div class="row between text-xs">
-                <span class="text-muted">省电模式</span>
-                <span class="perf-ok">未触发</span>
-              </div>
               <div class="text-xs text-subtle mt-8" style="line-height:1.6">
-                ⓘ 预览窗降级时会在这里如实标注 —— 让你知道<b>真实访客看到的是什么</b>，而不是只在你的高配机器上好看。
+                ⓘ 预览窗降级时会在这里如实标注 —— 让你知道<b>真实访客看到的是什么</b>。
               </div>
             </div>
           </div>
@@ -508,15 +616,15 @@
 
         <div class="grid-2" style="align-items:start;gap:24px">
 
-          <!-- 危险配置确认 -->
+          <!-- 风格偏离提示 -->
           <div>
-            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 性能红线确认（不阻止保存，但必须让你知道后果）</div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 选「谨慎 / 不建议」装饰时的风格提示（不阻止保存）</div>
             <div class="overlay" style="border-radius:var(--radius);padding:20px">
               <div class="modal">
                 <div class="modal-head">
                   <div>
-                    <h3>⚠ 这个配置可能影响性能</h3>
-                    <div class="text-xs text-subtle mt-4">检测到 3 项需要注意，保存后仍可随时调整</div>
+                    <h3>⚠ 这个选择偏离了既定风格</h3>
+                    <div class="text-xs text-subtle mt-4">风格基准：Minimal / Clean（Clay Showreel 2023）</div>
                   </div>
                   <button class="icon-btn">✕</button>
                 </div>
@@ -524,40 +632,33 @@
                   <div class="notice notice-warn">
                     <span class="icon">⚠</span>
                     <div>
-                      <div class="bold text-sm">背景为「粒子」，但移动端强度为「标准」</div>
-                      <div class="text-xs mt-4">粒子在中低端手机上可能掉到 30fps 以下，并明显增加耗电。</div>
+                      <div class="bold text-sm">「极光」属于 Motion Graphics 风格</div>
+                      <div class="text-xs mt-4">它在背景里<b>持续运动</b>，与 Minimal/Clean 的「默认静音」原则冲突。视觉上会更"热闹"，但也更容易显得廉价。</div>
                     </div>
                   </div>
                   <div class="notice notice-warn">
                     <span class="icon">⚠</span>
                     <div>
-                      <div class="bold text-sm">最大粒子数 150，超过建议值 120</div>
-                      <div class="text-xs mt-4">低端设备更容易触发自动降级，访客会突然失去动效。</div>
+                      <div class="bold text-sm">会持续占用合成层</div>
+                      <div class="text-xs mt-4">多层 <span class="mono">radial-gradient</span> + <span class="mono">blur</span> 会常驻 GPU，低端设备耗电明显。</div>
                     </div>
                   </div>
-                  <div class="notice notice-warn">
-                    <span class="icon">⚠</span>
-                    <div>
-                      <div class="bold text-sm">同时启用了 5 项重动效</div>
-                      <div class="text-xs mt-4">粒子 + 星空 + 光标光晕 + 视差 + 磁吸，组合开销会叠加。</div>
-                    </div>
-                  </div>
-                  <div class="text-xs bold text-subtle" style="letter-spacing:.06em">前置条件（已满足）</div>
+                  <div class="text-xs bold text-subtle" style="letter-spacing:.06em">不受影响的部分</div>
                   <div class="stack gap-6 text-xs">
-                    <div class="row gap-8"><span style="color:var(--green)">✓</span>已开启低端设备自动降级</div>
-                    <div class="row gap-8"><span style="color:var(--green)">✓</span>已开启 FPS 守护（低于 45fps 自动关闭重动效）</div>
-                    <div class="row gap-8"><span style="color:var(--green)">✓</span>已强制尊重系统「减弱动态效果」偏好</div>
+                    <div class="row gap-8"><span style="color:var(--green)">✓</span>编排预设仍是「编辑风」，入场与文字揭示不变</div>
+                    <div class="row gap-8"><span style="color:var(--green)">✓</span>体积预算不会增加（装饰层是纯 CSS）</div>
+                    <div class="row gap-8"><span style="color:var(--green)">✓</span>移动端仍会自动降档</div>
                   </div>
                 </div>
                 <div class="modal-foot">
-                  <a class="btn">返回调整</a>
-                  <a class="btn btn-primary">我知道，仍然保存</a>
+                  <a class="btn">换一个</a>
+                  <a class="btn btn-primary">我知道，仍然使用</a>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 未保存离开 + toast + 折叠项 -->
+          <!-- 未保存离开 + toast -->
           <div>
             <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 未保存离开确认</div>
             <div class="overlay" style="border-radius:var(--radius);padding:20px">
@@ -566,7 +667,7 @@
                   <h3>有未保存的动效配置</h3>
                 </div>
                 <div class="modal-body">
-                  <p class="text-sm text-muted">离开将丢失这些改动，前台仍保持原来的「呼吸渐变」。</p>
+                  <p class="text-sm text-muted">离开将丢失这些改动，前台仍保持原来的「编辑风 + 无装饰」。</p>
                 </div>
                 <div class="modal-foot">
                   <a class="btn">继续编辑</a>
@@ -584,12 +685,12 @@
               </div>
               <div class="toast">
                 <span class="icon" style="color:var(--accent)">ⓘ</span>
-                <span>已套用「极光」预设，尚未保存</span>
+                <span>已套用「叙事」编排，尚未保存</span>
                 <a class="undo">撤销</a>
               </div>
               <div class="toast" style="border-color:var(--red)">
                 <span class="icon" style="color:var(--red)">!</span>
-                <span>保存失败：亮色配色不能为空</span>
+                <span>保存失败：流动速度不能低于 4s</span>
                 <a class="undo">重试</a>
               </div>
             </div>
@@ -597,31 +698,32 @@
 
         </div>
 
-        <!-- 展开的交互动画区块（示范折叠区块的内部形态） -->
+        <!-- 展开的交互动画区块 -->
         <div class="mt-32">
-          <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">④ 折叠区块展开后的形态（以「交互动画」为例）</div>
+          <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">④ 折叠区块展开后的形态（以「交互动画」为例 —— 全部 CSS，0 KB）</div>
           <div class="panel">
             <div class="panel-head">
               <span class="bold text-sm">▼ 交互动画</span>
-              <span class="text-xs text-subtle">7 项</span>
+              <span class="text-xs text-subtle">7 项 · 全部由 CSS 实现</span>
             </div>
             <div class="panel-body" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
               <div class="field">
                 <label>卡片悬停</label>
-                <div class="select" style="width:100%">上浮（lift）</div>
-                <div class="hint">其它选项：无 / 放大 / 3D 倾斜 / 发光。仅在有鼠标的设备上生效。</div>
+                <div class="select" style="width:100%">上浮（translateY -4px）</div>
+                <div class="hint">280ms · ease-soft · 阴影 → shadow-md。仅在有鼠标的设备上生效。</div>
               </div>
               <div class="field">
                 <label>按钮悬停</label>
-                <div class="select" style="width:100%">光扫（shine）</div>
+                <div class="select" style="width:100%">颜色变化（180ms）</div>
+                <div class="hint">按下态 scale(0.98) 80ms。</div>
               </div>
               <div class="field">
                 <label>链接悬停</label>
-                <div class="select" style="width:100%">下划线展开</div>
+                <div class="select" style="width:100%">下划线展开（280ms）</div>
               </div>
               <div class="field">
                 <label>图片悬停</label>
-                <div class="select" style="width:100%">缩放（zoom）</div>
+                <div class="select" style="width:100%">缩放 scale(1.05)（380ms）</div>
               </div>
               <div class="field">
                 <label>导航指示条</label>
@@ -629,51 +731,22 @@
               </div>
               <div class="field">
                 <label>光标效果</label>
-                <div class="select" style="width:100%">关闭</div>
-                <div class="hint">光晕效果需要 +2.5 KB JS，且触屏设备自动禁用。</div>
+                <div class="select" style="width:100%">关闭 ★ 推荐</div>
+                <div class="hint">光晕属于炫技向，与 Clean 方向有张力。触屏设备自动禁用。</div>
               </div>
               <div class="field" style="grid-column:1 / -1">
                 <div class="row between">
                   <div>
                     <label>磁吸按钮</label>
-                    <div class="hint">按钮跟随指针偏移，趣味性强但属于重动效（+1.5 KB）。</div>
+                    <div class="hint">按钮跟随指针偏移。同样是炫技向，默认关闭。</div>
                   </div>
                   <span class="switch"></span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 悬停效果可视化对照 -->
-        <div class="mt-32">
-          <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">⑤ 悬停效果对照（把鼠标移上去可看真实效果）</div>
-          <div class="grid-4">
-            <div>
-              <div class="text-xs text-subtle mb-8">卡片 · 上浮 lift</div>
-              <div class="card demo-hover-lift" style="padding:12px">
-                <div class="cover cover-16x9" style="font-size:10px">封面</div>
-                <div class="text-xs bold mt-8">Pixel Runner</div>
+              <div class="stage-note" style="grid-column:1 / -1">
+                <b>为什么这组全是 CSS</b>：悬停/焦点是"状态 → 样式"的映射，CSS 伪类天然表达，浏览器直接走合成层、不经过 JS 主线程。
+                用 Anime.js 做悬停反而会增加 INP 风险。<b>键盘焦点复用同一套样式</b>，且焦点环立即显示、不参与动效。
               </div>
-            </div>
-            <div>
-              <div class="text-xs text-subtle mb-8">卡片 · 3D 倾斜 tilt</div>
-              <div class="card demo-tilt" style="padding:12px">
-                <div class="cover cover-16x9" style="font-size:10px">封面</div>
-                <div class="text-xs bold mt-8">组件库</div>
-              </div>
-            </div>
-            <div>
-              <div class="text-xs text-subtle mb-8">按钮 · 光扫 shine</div>
-              <span class="btn btn-primary demo-shine btn-block">看看我的作品</span>
-              <div class="text-xs text-subtle mt-8">按钮 · 位移 shift</div>
-              <span class="btn btn-outline btn-block" style="margin-top:6px">读读我的文章</span>
-            </div>
-            <div>
-              <div class="text-xs text-subtle mb-8">图片 · 缩放 zoom</div>
-              <div class="cover cover-16x9 demo-hover-zoom" style="font-size:10px">封面</div>
-              <div class="text-xs text-subtle mt-8">链接 · 下划线展开</div>
-              <a class="text-sm text-accent demo-underline" style="display:inline-block;margin-top:4px">我为什么选择 Next.js</a>
             </div>
           </div>
         </div>

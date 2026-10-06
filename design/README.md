@@ -96,7 +96,7 @@ design/
 | `21a` | [admin-settings.html](admin-settings.html) | PC | [04 §9 站点设置](../docs/04-admin-console.md) · [03 §5.4](../docs/03-api-spec.md) |
 | `22a` | [admin-users.html](admin-users.html) | PC | [04 §10](../docs/04-admin-console.md) · [01 §6.4 权限矩阵](../docs/01-architecture.md) |
 | `23a` | [admin-audit.html](admin-audit.html) | PC | [04 §10 审计日志](../docs/04-admin-console.md) · [03 §5.7](../docs/03-api-spec.md) |
-| `25a/b` | [admin-motion.html](admin-motion.html) | PC / 平板 | **[08 动效系统](../docs/08-motion-system.md)** · [04 §15](../docs/04-admin-console.md) · [03 §5.8](../docs/03-api-spec.md) |
+| `25a/b` | [admin-motion.html](admin-motion.html) | PC / 平板 | **[08 动效系统](../docs/08-motion-system.md)** · **[设计规范.md §3](../docs/设计规范.md)** · [04 §15](../docs/04-admin-console.md) · [03 §5.8](../docs/03-api-spec.md) |
 | `30a` | [admin-categories.html](admin-categories.html) | PC | [04 §2 信息架构](../docs/04-admin-console.md) · [02 `Category` 树形设计](../docs/02-data-model.md) |
 | `31a` | [admin-tags.html](admin-tags.html) | PC | [04 §2 信息架构](../docs/04-admin-console.md) · [02 `Tag` 多对多设计](../docs/02-data-model.md) |
 | `32a` | [admin-data.html](admin-data.html) | PC | [02 §8 导出与备份](../docs/02-data-model.md) · [03 `admin/export` / `import`](../docs/03-api-spec.md) |
@@ -106,7 +106,7 @@ design/
 
 | 设计图 | 文件 | 规模 | 对应文档章节 |
 |---|---|:--:|---|
-| `24a` | [design-system.html](design-system.html) | PC | [05 §7 主题与视觉令牌](../docs/05-frontend-ia.md) · [01 §2 分层架构](../docs/01-architecture.md) · [README ADR D13](../README.md) |
+| `24a` | [design-system.html](design-system.html) | PC | **[设计规范.md](../docs/设计规范.md)**（§2 令牌 / §3.4 缓动 / §3.5–3.6 时长与交错 / §4 组件 / §5 布局）· [05 §7](../docs/05-frontend-ia.md) |
 | `26a` | [motion-storyboard.html](motion-storyboard.html) | PC | **[设计规范.md §3](../docs/设计规范.md)** · [08 动效系统](../docs/08-motion-system.md)（缓动曲线 / 编排时间轴 / 实测体积 / 降级链） |
 
 ---

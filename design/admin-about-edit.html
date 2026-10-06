@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 关于我</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 关于我 ★</b>
+  <span class="spec-tag">/admin/profile</span>
+  <span class="spec-tag amber">单例 · 工作经历与时间戳模块共用数据</span>
+  <span class="spacer">整站唯一的转化页 · 分区块折叠 · 共用数据只读并给出跳转</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a class="active"><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">👤</span>
+      <div class="text-sm text-muted">内容管理 / <span class="bold" style="color:var(--fg)">关于我</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">最后保存于 2025-01-13 21:07</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="page-head">
+        <div>
+          <h1>关于我</h1>
+          <div class="sub">整站唯一的转化页</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn">👁 预览</a>
+          <a class="btn btn-primary">保存</a>
+        </div>
+      </div>
+
+      <div class="stack gap-16">
+
+        <!-- ============ ① 基本信息 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="row gap-8">
+              <span class="text-subtle">▼</span>
+              <span class="bold">基本信息</span>
+            </div>
+            <span class="text-xs text-subtle">收起</span>
+          </div>
+          <div class="panel-body stack gap-16">
+
+            <div class="field-row">
+              <div class="field">
+                <label>姓名</label>
+                <div class="control">Puly</div>
+              </div>
+              <div class="field">
+                <label>一句话定位</label>
+                <div class="control">5 年经验的前端工程师，专注性能与工程化</div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>头像</label>
+                <div class="row gap-12">
+                  <div class="avatar avatar-lg">P</div>
+                  <div class="stack gap-8">
+                    <a class="btn btn-sm">选择</a>
+                    <a class="btn btn-sm btn-ghost" style="padding:0">移除</a>
+                    <div class="hint">建议 512×512 PNG</div>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label>职位</label>
+                <div class="control">高级前端工程师</div>
+                <div class="hint">会显示在首页 Hero 与关于我页标题下</div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>公司</label>
+                <div class="control">某科技</div>
+              </div>
+              <div class="field">
+                <label>城市</label>
+                <div class="control">上海</div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>工作年限</label>
+                <div class="control">5 年</div>
+                <div class="hint">前台写作「5 年经验」，不显示具体起算时间</div>
+              </div>
+              <div class="field">
+                <label>生日</label>
+                <div class="control mono" style="font-size:13px">1998-06-12</div>
+                <div class="hint">仅用于计算年龄，前台不展示</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ============ ② 自我介绍（收起） ============ -->
+        <div class="panel">
+          <div class="panel-head" style="background:var(--bg-subtle)">
+            <div class="row gap-8">
+              <span class="text-subtle">▶</span>
+              <span class="bold text-muted">自我介绍</span>
+            </div>
+            <span class="text-xs text-accent">展开</span>
+          </div>
+        </div>
+
+        <!-- ============ ③ 个人优势 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="row gap-8">
+              <span class="text-subtle">▲</span>
+              <span class="bold">个人优势</span>
+            </div>
+            <div class="row gap-8">
+              <span class="text-xs text-subtle">4 项 · 拖拽排序</span>
+              <span class="text-xs text-subtle">收起</span>
+            </div>
+          </div>
+          <div class="panel-body stack gap-12">
+
+            <div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--card)">
+              <div class="row gap-12" style="align-items:flex-start">
+                <span class="drag-handle" style="padding-top:10px;cursor:grab">⋮⋮</span>
+                <div class="icon-box">🔧</div>
+                <div class="grow stack gap-8">
+                  <div class="control" style="font-weight:600">工程化落地能力</div>
+                  <div class="control" style="font-size:13.5px;color:var(--fg-muted)">能把一套规范从文档推到 7 条业务线，落地的比说出来的多。</div>
+                </div>
+                <a class="btn btn-sm btn-ghost">✕</a>
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--card)">
+              <div class="row gap-12" style="align-items:flex-start">
+                <span class="drag-handle" style="padding-top:10px;cursor:grab">⋮⋮</span>
+                <div class="icon-box">⚡</div>
+                <div class="grow stack gap-8">
+                  <div class="control" style="font-weight:600">性能优化</div>
+                  <div class="control" style="font-size:13.5px;color:var(--fg-muted)">习惯先量后改，首屏 LCP 从 3.2s 压到 1.1s 是真做过的事。</div>
+                </div>
+                <a class="btn btn-sm btn-ghost">✕</a>
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--card)">
+              <div class="row gap-12" style="align-items:flex-start">
+                <span class="drag-handle" style="padding-top:10px;cursor:grab">⋮⋮</span>
+                <div class="icon-box">🎨</div>
+                <div class="grow stack gap-8">
+                  <div class="control" style="font-weight:600">交互与体验</div>
+                  <div class="control" style="font-size:13.5px;color:var(--fg-muted)">对 100ms 的延迟和 4px 的错位有生理性不适，会自己动手改设计稿。</div>
+                </div>
+                <a class="btn btn-sm btn-ghost">✕</a>
+              </div>
+            </div>
+
+            <div style="border:1.5px dashed var(--border-strong);border-radius:10px;padding:13px;text-align:center;color:var(--accent);font-size:13.5px">+ 添加优势</div>
+
+          </div>
+        </div>
+
+        <!-- ============ ④ 技能矩阵（收起） ============ -->
+        <div class="panel">
+          <div class="panel-head" style="background:var(--bg-subtle)">
+            <div class="row gap-8">
+              <span class="text-subtle">▶</span>
+              <span class="bold text-muted">技能矩阵</span>
+            </div>
+            <div class="row gap-8">
+              <span class="text-xs text-subtle">5 组</span>
+              <span class="text-xs text-accent">展开</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ⑤ 社交链接（收起） ============ -->
+        <div class="panel">
+          <div class="panel-head" style="background:var(--bg-subtle)">
+            <div class="row gap-8">
+              <span class="text-subtle">▶</span>
+              <span class="bold text-muted">社交链接</span>
+            </div>
+            <div class="row gap-8">
+              <span class="text-xs text-subtle">3 项</span>
+              <span class="text-xs text-accent">展开</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ⑥ 我能提供（收起） ============ -->
+        <div class="panel">
+          <div class="panel-head" style="background:var(--bg-subtle)">
+            <div class="row gap-8">
+              <span class="text-subtle">▶</span>
+              <span class="bold text-muted">我能提供</span>
+            </div>
+            <div class="row gap-8">
+              <span class="text-xs text-subtle">3 项</span>
+              <span class="text-xs text-accent">展开</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ⑦ 工作经历（只读 · 共用数据） ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="row gap-8">
+              <span class="text-subtle">▼</span>
+              <span class="bold">工作经历</span>
+              <span class="badge badge-blue">来自时间戳模块 · 3 条</span>
+            </div>
+            <a class="btn btn-sm">去管理 →</a>
+          </div>
+          <div class="panel-body stack gap-12">
+
+            <div class="notice">
+              <span class="icon">ⓘ</span>
+              <div>
+                此处数据与「时间戳」模块共用，请在时间戳中编辑。在这里所做的修改不会生效。
+              </div>
+            </div>
+
+            <div style="background:var(--bg-muted);border:1px solid var(--border);border-radius:10px;padding:14px">
+              <div class="row between gap-12">
+                <div style="min-width:0">
+                  <div class="row gap-8">
+                    <span class="bold" style="font-size:14.5px">高级前端工程师</span>
+                    <span class="badge badge-green">进行中</span>
+                  </div>
+                  <div class="cell-sub">某科技 · 上海 · 前端架构组</div>
+                </div>
+                <span class="mono text-xs text-subtle nowrap">2023.03 — 至今</span>
+              </div>
+            </div>
+
+            <div style="background:var(--bg-muted);border:1px solid var(--border);border-radius:10px;padding:14px">
+              <div class="row between gap-12">
+                <div style="min-width:0">
+                  <div class="bold" style="font-size:14.5px">前端工程师</div>
+                  <div class="cell-sub">某公司 · 杭州 · 中台业务</div>
+                </div>
+                <span class="mono text-xs text-subtle nowrap">2021.06 — 2023.02</span>
+              </div>
+            </div>
+
+            <div style="background:var(--bg-muted);border:1px solid var(--border);border-radius:10px;padding:14px">
+              <div class="row between gap-12">
+                <div style="min-width:0">
+                  <div class="bold" style="font-size:14.5px">前端实习</div>
+                  <div class="cell-sub">某创业公司 · 杭州 · 8 人团队</div>
+                </div>
+                <span class="mono text-xs text-subtle nowrap">2020.09 — 2021.05</span>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle">只读展示 —— 想调整顺序或增删，请到「时间戳」模块操作，前台两处会同步更新。</div>
+
+          </div>
+        </div>
+
+        <!-- ============ ⑧ 联系方式（收起） ============ -->
+        <div class="panel">
+          <div class="panel-head" style="background:var(--bg-subtle)">
+            <div class="row gap-8">
+              <span class="text-subtle">▶</span>
+              <span class="bold text-muted">联系方式</span>
+            </div>
+            <span class="text-xs text-accent">展开</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================
+           以下为弹窗 / 状态稿（同一页面内的设计状态展示）
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- 离开未保存确认 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 离开未保存确认弹窗（切换到别的模块 / 关闭标签页时）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="modal">
+                <div class="modal-head">
+                  <div>
+                    <h3>有未保存的修改</h3>
+                    <div class="text-xs text-subtle mt-4">个人优势、基本信息已改动</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body">
+                  <div class="text-sm text-muted mb-16">离开将丢失这些改动。</div>
+                  <div class="diff" style="background:var(--bg-muted)">
+                    <div class="del">- 一句话定位：前端工程师，喜欢折腾</div>
+                    <div class="add">+ 一句话定位：5 年经验的前端工程师，专注性能与工程化</div>
+                    <div class="del">- 个人优势：共 3 项</div>
+                    <div class="add">+ 个人优势：共 4 项（新增「交互与体验」）</div>
+                  </div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">继续编辑</a>
+                  <a class="btn btn-danger">放弃修改</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">② 保存结果提示</div>
+            <div class="stack gap-16">
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>关于我页已更新</span>
+                <a class="undo">查看前台</a>
+              </div>
+              <div class="toast" style="border-color:var(--amber)">
+                <span class="icon" style="color:var(--amber)">!</span>
+                <span>工作经历来自时间戳模块，本次未做修改</span>
+                <a class="undo">去管理</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 图标选择器 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">③ 图标选择器（个人优势 / 我能提供 的图标字段共用）</div>
+            <div class="panel">
+              <div class="panel-head">
+                <div class="bold text-sm">选择图标</div>
+                <button class="icon-btn">✕</button>
+              </div>
+              <div class="panel-body stack gap-12">
+
+                <div class="input input-search" style="max-width:none;width:100%">
+                  <span>🔍</span>
+                  <span class="ph">搜索图标名称，如「性能」「代码」…</span>
+                </div>
+
+                <div class="row between text-xs text-subtle">
+                  <span>常用（40 个）</span>
+                  <span>当前：⚡ 性能优化</span>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:8px">
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🏠</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📄</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📁</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📊</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📈</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">💼</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🎯</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🚀</div>
+
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1.5px solid var(--accent);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:17px">⚡</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🔧</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🎨</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🧩</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🧱</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🛠</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🔍</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🔗</div>
+
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">✅</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">☑</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📌</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📎</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📝</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">✏️</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🖊</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🖼</div>
+
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">💬</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📮</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📧</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">☎</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📱</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🌐</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🗺</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📍</div>
+
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">⭐</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">❤</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">👍</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🔖</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🏆</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🎓</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">🕐</div>
+                  <div style="aspect-ratio:1/1;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px">📅</div>
+                </div>
+
+                <div class="row between">
+                  <span class="text-xs text-subtle">图标以 SVG 内联渲染，不请求外部资源</span>
+                  <a class="btn btn-sm btn-primary">使用此图标</a>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

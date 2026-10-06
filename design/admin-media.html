@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 媒体库</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 媒体库</b>
+  <span class="spec-tag">/admin/media</span>
+  <span class="spec-tag blue">sha256 秒传 · 引用追踪</span>
+  <span class="spacer">上传即算 sha256，重复文件直接秒传 · 每张图可反查引用它的文章与作品</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a class="active"><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">🖼</span>
+      <div class="text-sm text-muted">系统 / <span class="bold" style="color:var(--fg)">媒体库</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">上次扫描 3 分钟前 · 无孤儿文件</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>系统</span><span>/</span><span style="color:var(--fg-muted)">媒体库</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>媒体库</h1>
+          <div class="sub">214 个文件 · 510 MB</div>
+        </div>
+        <div class="btn-row">
+          <div class="input input-search" style="height:38px;max-width:240px"><span>🔍</span><span>搜索文件名…</span></div>
+          <a class="btn btn-primary">↑ 上传</a>
+          <a class="btn">新建目录</a>
+        </div>
+      </div>
+
+      <div class="panel">
+
+        <div class="row" style="align-items:stretch">
+
+          <!-- ---------- 左侧：目录树 / 类型 / 容量 ---------- -->
+          <div class="media-side">
+            <div class="text-xs bold text-subtle mb-8" style="letter-spacing:.06em">目录</div>
+            <div class="stack gap-4">
+              <a>全部 <span class="text-xs text-subtle">214</span></a>
+              <a>/ <span class="text-xs text-subtle">152</span></a>
+              <a class="active">/covers <span class="text-xs">28</span></a>
+              <a>/logs <span class="text-xs text-subtle">21</span></a>
+              <a>/projects <span class="text-xs text-subtle">13</span></a>
+            </div>
+
+            <hr class="divider mt-16">
+
+            <div class="text-xs bold text-subtle mt-16 mb-8" style="letter-spacing:.06em">类型</div>
+            <div class="stack gap-8">
+              <div class="cbx-row"><span class="ck on">✓</span>图片 <span class="text-xs text-subtle">186</span></div>
+              <div class="cbx-row"><span class="ck"></span>视频 <span class="text-xs text-subtle">7</span></div>
+              <div class="cbx-row"><span class="ck"></span>文档 <span class="text-xs text-subtle">21</span></div>
+            </div>
+
+            <hr class="divider mt-16">
+
+            <div class="text-xs bold text-subtle mt-16 mb-8" style="letter-spacing:.06em">存储占用</div>
+            <div class="row between text-xs">
+              <span class="bold" style="color:var(--fg)">510 MB</span>
+              <span class="text-subtle">/ 10 GB</span>
+            </div>
+            <div style="height:6px;border-radius:999px;background:var(--bg-muted);margin-top:7px;overflow:hidden">
+              <div style="height:100%;width:5.1%;background:var(--accent)"></div>
+            </div>
+            <div class="text-xs text-subtle mt-4">已用 5.1%</div>
+          </div>
+
+          <!-- ---------- 右侧：文件网格 ---------- -->
+          <div class="grow" style="padding:16px">
+            <div class="row between mb-12">
+              <span class="text-sm"><span class="bold">28</span> 个文件 · <span class="mono text-xs">/covers</span></span>
+              <span class="row gap-8 text-xs text-subtle">
+                <span>按上传时间 ↓</span><span>·</span><span>6 列视图</span>
+              </span>
+            </div>
+
+            <div class="media-grid">
+              <div class="media-cell sel">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">screenshot-home.webp</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">banner-nextjs.png</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">avatar.webp</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">pixel-runner-1.webp</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1">🎞</div>
+                <div class="nm truncate">demo.gif</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1">📄</div>
+                <div class="nm truncate">resume.pdf</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">cover-article-dark.webp</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1">🅟</div>
+                <div class="nm truncate">logo-mark.svg</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">hero-portrait.webp</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">dashboard-shot.png</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">todo-pwa-icon.png</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">og-default.png</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">favicon-32.png</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">timeline-2024.webp</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">code-snippet-dark.png</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1">📄</div>
+                <div class="nm truncate">meeting-notes.pdf</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">poster-indie-game.jpg</div>
+              </div>
+              <div class="media-cell">
+                <div class="cover cover-1x1"></div>
+                <div class="nm truncate">icon-set-16.png</div>
+              </div>
+            </div>
+
+            <div class="row between mt-16 text-xs text-subtle">
+              <span>已选中 1 个文件</span>
+              <span class="mono">第 1 / 2 页</span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- ---------- 底部：选中项详情 ---------- -->
+        <div class="panel-body row gap-20" style="align-items:flex-start;background:var(--bg-subtle)">
+          <div class="cover cover-16x9" style="width:220px;flex:none">1920 × 1080</div>
+
+          <div class="grow">
+            <div class="row between gap-16">
+              <div>
+                <div class="bold" style="font-size:15px">screenshot-home.webp</div>
+                <div class="text-xs text-subtle mono mt-4">1920×1080 · 204 KB · image/webp · 2025-01-15 10:20</div>
+              </div>
+              <div class="btn-row">
+                <a class="btn btn-sm">复制 URL</a>
+                <a class="btn btn-sm btn-danger">删除</a>
+              </div>
+            </div>
+
+            <div class="field mt-16" style="max-width:520px">
+              <label>Alt 文本</label>
+              <div class="control">首页截图</div>
+              <div class="hint">用于图片加载失败与屏幕阅读器，SEO 与无障碍都会读它</div>
+            </div>
+
+            <div class="notice mt-16" style="max-width:520px">
+              <span class="icon">🔗</span>
+              <div>
+                已引用：文章「我为什么选择 Next.js」、作品「个人博客系统」
+                <div class="text-xs mt-4" style="opacity:.85">共 2 处 · 删除前请先替换引用</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle">
+        <span>相同 sha256 的文件自动复用，不重复占用空间</span><span>·</span>
+        <span>支持 ⌘/Ctrl 多选、Shift 连选</span><span>·</span>
+        <span>拖入文件夹可直接移动</span>
+      </div>
+
+      <!-- ================================================================
+           以下为状态与弹窗稿
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- ① 上传进度 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 上传进度（多文件并排，单个失败不影响其它）</div>
+            <div class="panel">
+              <div class="panel-body stack gap-16">
+
+                <div class="row gap-12">
+                  <div class="grow">
+                    <div class="row between text-xs mb-4">
+                      <span class="mono truncate">screenshot-home.webp</span>
+                      <span style="color:var(--green)">✓ 已完成 · 204 KB</span>
+                    </div>
+                    <div style="height:6px;border-radius:999px;background:var(--bg-muted);overflow:hidden">
+                      <div style="height:100%;width:100%;background:var(--green)"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row gap-12">
+                  <div class="grow">
+                    <div class="row between text-xs mb-4">
+                      <span class="mono truncate">pixel-runner-1.webp</span>
+                      <span class="text-muted">上传中 62% · 剩余约 3 秒</span>
+                    </div>
+                    <div style="height:6px;border-radius:999px;background:var(--bg-muted);overflow:hidden">
+                      <div style="height:100%;width:62%;background:var(--accent)"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row gap-12">
+                  <div class="grow">
+                    <div class="row between text-xs mb-4">
+                      <span class="mono truncate">hero-portrait.webp</span>
+                      <span style="color:var(--red)">✗ 上传失败 · 网络中断</span>
+                    </div>
+                    <div style="height:6px;border-radius:999px;background:var(--bg-muted);overflow:hidden">
+                      <div style="height:100%;width:31%;background:var(--red)"></div>
+                    </div>
+                  </div>
+                  <a class="btn btn-sm" style="flex:none">重试</a>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- ② 拖拽上传区 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 拖拽上传区（拖入高亮，粘贴截图直接入库）</div>
+            <div style="border:2px dashed var(--border-strong);border-radius:var(--radius);padding:42px 20px;text-align:center;background:var(--bg-subtle)">
+              <div style="font-size:30px;line-height:1">⬆️</div>
+              <div class="bold mt-12">拖拽文件到此处上传，或 ⌘V 直接粘贴截图</div>
+              <div class="text-xs text-subtle mt-8">图片 ≤ 10MB · 视频 ≤ 50MB · 文档 ≤ 20MB</div>
+              <div class="mt-16">
+                <a class="btn btn-sm">选择文件</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ③ 删除确认弹窗 -->
+        <div class="mt-32">
+          <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">③ 删除确认（先讲清引用后果，再让用户决定）</div>
+          <div class="overlay" style="border-radius:var(--radius);padding:28px">
+            <div class="modal">
+              <div class="modal-head">
+                <div>
+                  <h3>删除这张图片？</h3>
+                  <div class="text-xs text-subtle mono mt-4">screenshot-home.webp · 204 KB</div>
+                </div>
+                <button class="icon-btn">✕</button>
+              </div>
+              <div class="modal-body">
+                <div class="row gap-16 mb-16">
+                  <div class="cover cover-16x9" style="width:150px;flex:none">1920 × 1080</div>
+                  <div class="text-sm text-muted">
+                    文件将从存储与媒体库中移除，<span class="bold" style="color:var(--fg)">不可恢复</span>。
+                  </div>
+                </div>
+                <div class="notice notice-warn">
+                  <span class="icon">⚠️</span>
+                  <div>该图片被 2 篇文章引用，删除后这些文章中的图片会失效。</div>
+                </div>
+              </div>
+              <div class="modal-foot">
+                <a class="btn">取消</a>
+                <a class="btn btn-danger">仍然删除</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

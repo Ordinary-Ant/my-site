@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>关于我 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 关于我</b>
+  <span class="spec-tag">/about</span>
+  <span class="spec-tag blue">模块 about</span>
+  <span class="spec-tag violet">ISR 3600s</span>
+  <span class="spec-tag amber">6 个区块可独立开关</span>
+  <span class="spacer">区块顺序与开关在后台配置 · 技能条为自评熟练度 · 简历为 PDF 下载</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a class="active" href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ Hero ============ -->
+  <section class="hero">
+    <div class="container-narrow" style="text-align:center">
+      <div class="avatar avatar-xl" style="margin:0 auto">P</div>
+      <h1 class="mt-24">Puly</h1>
+      <div class="headline">高级前端工程师 @ 某科技有限公司 · 杭州 · 5 年经验</div>
+      <div class="btn-row center mt-32">
+        <a class="btn btn-primary btn-lg">↓ 下载简历</a>
+        <a class="btn btn-outline btn-lg">✉ 联系我</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 关于我 ============ -->
+  <section class="section">
+    <div class="container-narrow">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">About</div>
+          <h2>🧑‍💻 关于我</h2>
+        </div>
+      </div>
+      <div class="prose">
+        <p>我是 Puly，一名在杭州工作的前端工程师，到现在写了 5 年前端。目前在一家科技公司做商业化中台，日常和 React、TypeScript、Node.js 打交道，也顺手写点构建工具和脚手架。</p>
+        <p>我擅长的事情是<strong>把一团乱麻理成一套能长期维护的东西</strong>：从 0 搭设计系统与组件库，把构建和发布流程自动化，把首屏从 3 秒压到 1 秒出头。比起写一个新页面，我更喜欢让整个团队的开发体验变好一点。工作之外我在这里写文章和日志，记录踩过的坑和想明白的事。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 个人优势 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Strengths</div>
+          <h2>🛠 个人优势</h2>
+        </div>
+      </div>
+      <div class="grid-3">
+
+        <div class="card">
+          <div class="icon-box">🔧</div>
+          <h3 class="mt-16">工程化落地能力</h3>
+          <p class="text-sm text-muted mt-8">从 0 搭建设计系统、CI/CD 与代码规范体系。</p>
+        </div>
+
+        <div class="card">
+          <div class="icon-box">⚡</div>
+          <h3 class="mt-16">性能优化</h3>
+          <p class="text-sm text-muted mt-8">首屏优化、包体治理、监控体系建设。</p>
+        </div>
+
+        <div class="card">
+          <div class="icon-box">🎨</div>
+          <h3 class="mt-16">交互与体验</h3>
+          <p class="text-sm text-muted mt-8">手感、动效、可访问性。</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 技能 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Skills</div>
+          <h2>📊 技能</h2>
+        </div>
+        <span class="text-sm text-subtle">进度条按熟练度自评 × 年限</span>
+      </div>
+
+      <div class="grid-2">
+
+        <div class="card">
+          <div class="section-eyebrow">前端框架</div>
+          <div class="stack gap-16 mt-8">
+            <div class="row gap-16">
+              <span style="width:88px;flex:none;font-size:14px;font-weight:550">React</span>
+              <div style="flex:1;height:8px;background:var(--bg-muted);border-radius:999px;overflow:hidden"><div style="width:100%;height:100%;background:var(--accent);border-radius:999px"></div></div>
+              <span class="text-xs text-subtle nowrap" style="width:48px;text-align:right">5 年</span>
+            </div>
+            <div class="row gap-16">
+              <span style="width:88px;flex:none;font-size:14px;font-weight:550">Vue</span>
+              <div style="flex:1;height:8px;background:var(--bg-muted);border-radius:999px;overflow:hidden"><div style="width:60%;height:100%;background:var(--accent);border-radius:999px"></div></div>
+              <span class="text-xs text-subtle nowrap" style="width:48px;text-align:right">2 年</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-eyebrow">工程化</div>
+          <div class="stack gap-16 mt-8">
+            <div class="row gap-16">
+              <span style="width:88px;flex:none;font-size:14px;font-weight:550">Vite</span>
+              <div style="flex:1;height:8px;background:var(--bg-muted);border-radius:999px;overflow:hidden"><div style="width:80%;height:100%;background:var(--accent);border-radius:999px"></div></div>
+              <span class="text-xs text-subtle nowrap" style="width:48px;text-align:right">4 年</span>
+            </div>
+            <div class="row gap-16">
+              <span style="width:88px;flex:none;font-size:14px;font-weight:550">Webpack</span>
+              <div style="flex:1;height:8px;background:var(--bg-muted);border-radius:999px;overflow:hidden"><div style="width:60%;height:100%;background:var(--accent);border-radius:999px"></div></div>
+              <span class="text-xs text-subtle nowrap" style="width:48px;text-align:right">3 年</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-eyebrow">后端</div>
+          <div class="stack gap-16 mt-8">
+            <div class="row gap-16">
+              <span style="width:88px;flex:none;font-size:14px;font-weight:550">Node.js</span>
+              <div style="flex:1;height:8px;background:var(--bg-muted);border-radius:999px;overflow:hidden"><div style="width:60%;height:100%;background:var(--accent);border-radius:999px"></div></div>
+              <span class="text-xs text-subtle nowrap" style="width:48px;text-align:right">3 年</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-eyebrow">语言</div>
+          <div class="stack gap-16 mt-8">
+            <div class="row gap-16">
+              <span style="width:88px;flex:none;font-size:14px;font-weight:550">TypeScript</span>
+              <div style="flex:1;height:8px;background:var(--bg-muted);border-radius:999px;overflow:hidden"><div style="width:100%;height:100%;background:var(--accent);border-radius:999px"></div></div>
+              <span class="text-xs text-subtle nowrap" style="width:48px;text-align:right">5 年</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 工作经历 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Experience</div>
+          <h2>💼 工作经历</h2>
+        </div>
+        <a class="more">查看完整时间轴 →</a>
+      </div>
+
+      <div class="stack gap-16">
+
+        <div class="card">
+          <div class="row between wrap gap-8">
+            <div>
+              <h3>高级前端工程师</h3>
+              <div class="text-sm text-muted mt-4">某科技有限公司 · 商业化中台组 · 杭州</div>
+            </div>
+            <span class="badge badge-blue">2023.03 — 至今</span>
+          </div>
+          <ul class="tl-highlights">
+            <li>搭建公司级组件库，覆盖 12 条业务线，复用率 78%</li>
+            <li>首屏 LCP 从 3.2s 优化到 1.1s；推动前端监控覆盖率达 95%</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="row between wrap gap-8">
+            <div>
+              <h3>前端工程师</h3>
+              <div class="text-sm text-muted mt-4">某公司 · 北京</div>
+            </div>
+            <span class="badge badge-gray">2021.06 — 2023.02</span>
+          </div>
+          <ul class="tl-highlights">
+            <li>沉淀 6 套活动页模板，单次活动交付周期从 5 天压缩到 1.5 天</li>
+            <li>把 Webpack 构建从 96s 降到 31s，CI 每日节省约 1.5 小时</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 我能提供 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Services</div>
+          <h2>🤝 我能提供</h2>
+        </div>
+      </div>
+      <div class="grid-2">
+
+        <div class="card">
+          <div class="row gap-12">
+            <div class="icon-box">💬</div>
+            <h3>技术咨询</h3>
+          </div>
+          <p class="text-sm text-muted mt-12">前端架构选型、性能问题排查、工程化改造方案。可以是一次一小时的语音，也可以是一份书面评审意见。</p>
+          <div class="chip-row mt-16" style="gap:8px">
+            <span class="badge badge-gray">架构选型</span>
+            <span class="badge badge-gray">性能诊断</span>
+            <span class="badge badge-gray">代码评审</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row gap-12">
+            <div class="icon-box">🤝</div>
+            <h3>合作机会</h3>
+          </div>
+          <p class="text-sm text-muted mt-12">接受远程兼职与长期合作，方向是前端项目从 0 到 1、设计系统落地、性能专项攻坚。也欢迎靠谱的团队来聊全职机会。</p>
+          <div class="chip-row mt-16" style="gap:8px">
+            <span class="badge badge-gray">远程兼职</span>
+            <span class="badge badge-gray">设计系统</span>
+            <span class="badge badge-gray">性能专项</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 联系我 ============ -->
+  <section class="section">
+    <div class="container-narrow">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Contact</div>
+          <h2>✉ 联系我</h2>
+        </div>
+      </div>
+      <div class="chip-row">
+        <a class="chip">✉ hi@example.com</a>
+        <a class="chip">📍 杭州</a>
+        <a class="chip">GitHub</a>
+        <a class="chip">掘金</a>
+        <a class="chip">RSS</a>
+      </div>
+      <p class="text-sm text-subtle mt-16">一般 24 小时内回复。聊技术、聊合作、聊职业选择都可以，来信请简单说明来意。</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>浙ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a><span class="icon">🕐</span>时间戳</a>
+  <a class="active"><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

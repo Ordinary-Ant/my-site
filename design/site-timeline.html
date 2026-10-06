@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>时间戳 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 时间戳</b>
+  <span class="spec-tag">/timeline</span>
+  <span class="spec-tag blue">模块 timeline</span>
+  <span class="spec-tag violet">ISR 3600s</span>
+  <span class="spacer">按年份倒序分组 · 桌面左右交替 / &lt;1024px 自动切左线右排 · 类型 chips 为前端筛选</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a href="#">作品集</a>
+      <a class="active" href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Timeline</div>
+          <h1 style="font-size:32px;letter-spacing:-.025em">🕐 时间戳</h1>
+          <p class="section-intro">从大学到现在，我走过的每一步</p>
+        </div>
+        <a class="more">订阅 RSS →</a>
+      </div>
+
+      <!-- 类型筛选 -->
+      <div class="filter-bar">
+        <a class="chip chip-active">全部</a>
+        <a class="chip">工作</a>
+        <a class="chip">教育</a>
+        <a class="chip">项目</a>
+        <a class="chip">荣誉</a>
+        <a class="chip">里程碑</a>
+      </div>
+
+      <div class="timeline mt-24">
+
+        <!-- ================= 2023 ================= -->
+        <div class="tl-year"><span>2023</span></div>
+
+        <div class="tl-row right">
+          <span class="tl-dot current"></span>
+          <div class="tl-logo">🏢</div>
+          <div class="tl-card">
+            <div class="row gap-8 wrap">
+              <h3>高级前端工程师</h3>
+              <span class="badge badge-blue">进行中</span>
+            </div>
+            <div class="org">某科技有限公司 · 商业化中台组 · 杭州</div>
+            <div class="period">2023.03 — 至今</div>
+            <p class="text-sm text-muted mt-12">负责商业化中台的架构演进与性能治理，主导技术方案评审、构建链路升级与代码规范落地，同时带教 2 名应届生。</p>
+            <ul class="tl-highlights">
+              <li>搭建公司级组件库，覆盖 12 条业务线，复用率 78%</li>
+              <li>首屏 LCP 从 3.2s 优化到 1.1s，长任务耗时下降 62%</li>
+              <li>推动前端监控覆盖率达 95%，线上问题平均定位时间从 2h 缩短到 20min</li>
+            </ul>
+            <div class="chip-row mt-12" style="gap:12px">
+              <span class="tag">React</span>
+              <span class="tag">Node.js</span>
+              <span class="tag">性能优化</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= 2021 ================= -->
+        <div class="tl-year"><span>2021</span></div>
+
+        <div class="tl-row left">
+          <span class="tl-dot work"></span>
+          <div class="tl-logo">🏢</div>
+          <div class="tl-card">
+            <h3>前端工程师</h3>
+            <div class="org">某公司 · 北京</div>
+            <div class="period">2021.06 — 2023.02</div>
+            <p class="text-sm text-muted mt-12">在增长团队负责活动投放页与数据看板的开发，从需求评审一路跟到上线复盘。</p>
+            <ul class="tl-highlights">
+              <li>沉淀 6 套活动页模板，单次活动交付周期从 5 天压缩到 1.5 天</li>
+              <li>把 Webpack 构建从 96s 降到 31s，CI 每日节省约 1.5 小时</li>
+            </ul>
+            <div class="chip-row mt-12" style="gap:12px">
+              <span class="tag">Vue</span>
+              <span class="tag">Webpack</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row right">
+          <span class="tl-dot" style="border-color:var(--violet)"></span>
+          <div class="tl-logo">🚀</div>
+          <div class="tl-card">
+            <h3>开源项目维护者</h3>
+            <div class="org">vue-hooks-plus</div>
+            <div class="period">2021.03 — 2022.08</div>
+            <p class="text-sm text-muted mt-12">利用业余时间参与 Vue 生态工具库的维护，负责文档站、类型定义与 issue 分流。</p>
+            <ul class="tl-highlights">
+              <li>补齐 40+ 个 Hook 的中文文档与在线示例，Star 从 300 涨到 1.2k</li>
+              <li>整理类型定义与构建产物，修复 20+ 个类型错误，发布 8 个 minor 版本</li>
+            </ul>
+            <div class="chip-row mt-12" style="gap:12px">
+              <span class="tag">Vue</span>
+              <span class="tag">TypeScript</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= 2020 ================= -->
+        <div class="tl-year"><span>2020</span></div>
+
+        <div class="tl-row left">
+          <span class="tl-dot edu"></span>
+          <div class="tl-logo">🏢</div>
+          <div class="tl-card">
+            <h3>前端实习</h3>
+            <div class="org">某创业公司 · 杭州</div>
+            <div class="period">2020.09 — 2021.05</div>
+            <p class="text-sm text-muted mt-12">第一次在真实业务里写前端，从切图仔做到了能独立负责一个小模块。</p>
+            <ul class="tl-highlights">
+              <li>独立完成小程序商城首页与商品详情，上线后转化率提升 14%</li>
+            </ul>
+            <div class="chip-row mt-12" style="gap:12px">
+              <span class="tag">JavaScript</span>
+              <span class="tag">小程序</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= 2019 ================= -->
+        <div class="tl-year"><span>2019</span></div>
+
+        <div class="tl-row right">
+          <span class="tl-dot award"></span>
+          <div class="tl-logo">🏆</div>
+          <div class="tl-card">
+            <h3>全国大学生程序设计竞赛 · 银奖</h3>
+            <div class="org">中国大学生计算机设计大赛组委会</div>
+            <div class="period">2019.11</div>
+            <p class="text-sm text-muted mt-12">和队友用 4 个月做了一个校园二手交易平台，我负责前端与部署。答辩那天第一次意识到，把东西真正跑起来比写完代码难得多。</p>
+            <div class="chip-row mt-12" style="gap:12px">
+              <span class="tag">竞赛</span>
+              <span class="tag">团队协作</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= 2016 ================= -->
+        <div class="tl-year"><span>2016</span></div>
+
+        <div class="tl-row left">
+          <span class="tl-dot edu"></span>
+          <div class="tl-logo">🎓</div>
+          <div class="tl-card">
+            <h3>计算机科学与技术 · 本科</h3>
+            <div class="org">某大学</div>
+            <div class="period">2016.09 — 2020.06</div>
+            <p class="text-sm text-muted mt-12">四年里把大部分时间花在了图书馆和机房，课程之外自学了前端。</p>
+            <ul class="tl-highlights">
+              <li>GPA 3.7 / 4.0，连续三年获得校级奖学金</li>
+              <li>ACM 校队成员，负责图论与数据结构方向的赛题训练</li>
+            </ul>
+            <div class="chip-row mt-12" style="gap:12px">
+              <span class="tag">计算机基础</span>
+              <span class="tag">ACM</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>浙ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a class="active"><span class="icon">🕐</span>时间戳</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

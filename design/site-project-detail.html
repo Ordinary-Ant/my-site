@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel Runner · 作品集 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 作品详情</b>
+  <span class="spec-tag">/portfolio/:slug</span>
+  <span class="spec-tag blue">模块 portfolio</span>
+  <span class="spec-tag amber">双栏 1fr + 300px</span>
+  <span class="spacer">左侧图集 + 正文，右侧信息栏 · 图集缩略图切换不刷新页面 · 外链统一新窗口打开</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a class="active" href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="section">
+    <div class="container">
+
+      <a class="text-sm text-muted" href="#">← 返回作品集</a>
+
+      <div class="grid-2-1 mt-24">
+
+        <!-- ============ 左：图集 + 正文 ============ -->
+        <div>
+
+          <div class="cover cover-16x9">游戏主视觉 16:9</div>
+
+          <div class="grid-4 mt-12" style="grid-template-columns:repeat(4,1fr);gap:12px">
+            <div class="cover cover-4x3" style="border:2px solid var(--accent)">截图 1</div>
+            <div class="cover cover-4x3">截图 2</div>
+            <div class="cover cover-4x3">截图 3</div>
+            <div class="cover cover-4x3">截图 4</div>
+          </div>
+
+          <!-- 项目亮点 -->
+          <h2 class="mt-48" style="font-size:24px;letter-spacing:-.02em">项目亮点</h2>
+          <ul class="tl-highlights mt-12">
+            <li>60fps 稳定运行，粒子与敌人全部用对象池管理，每分钟 GC 停顿从 12 次降到 0 次</li>
+            <li>手写 AABB 与胶囊体碰撞检测，无任何第三方物理库，整包 gzip 后仅 34KB</li>
+            <li>12 个关卡全部由 JSON 配置，策划可独立编辑并在编辑器里即时预览</li>
+            <li>渲染与关卡数据完全解耦，新增一种敌人只需 40 行配置加一张精灵图</li>
+          </ul>
+
+          <!-- 技术实现 -->
+          <h2 class="mt-48" style="font-size:24px;letter-spacing:-.02em">技术实现</h2>
+          <div class="prose mt-12">
+            <p>整个游戏跑在一个 <code>requestAnimationFrame</code> 循环里，逻辑固定按 60Hz 步进，渲染则跟随屏幕刷新率。这样在 144Hz 的显示器上画面更顺，同时物理表现和 60Hz 设备完全一致，不会出现高刷设备跳得更高的问题。</p>
+
+            <p>碰撞是所有平台跳跃游戏最容易写歪的地方。我没有引入物理引擎，而是把地形切成瓦片，玩家用一个胶囊体近似：<strong>先用 AABB 做一次粗筛，只有真正重叠的瓦片才会进入精测分支</strong>，再按最小重叠轴把玩家推出去。</p>
+
+            <div class="code-head"><span>typescript</span><span>复制</span></div>
+            <pre><code><span class="tok-key">type</span> AABB = { x: <span class="tok-key">number</span>; y: <span class="tok-key">number</span>; w: <span class="tok-key">number</span>; h: <span class="tok-key">number</span> };
+
+<span class="tok-com">/** 轴对齐包围盒相交检测：比逐像素检测快两个数量级 */</span>
+<span class="tok-key">function</span> <span class="tok-fn">intersects</span>(a: AABB, b: AABB): <span class="tok-key">boolean</span> {
+  <span class="tok-key">return</span> a.x &lt; b.x + b.w &amp;&amp; a.x + a.w &gt; b.x &amp;&amp;
+         a.y &lt; b.y + b.h &amp;&amp; a.y + a.h &gt; b.y;
+}
+
+<span class="tok-com">/** 圆角矩形玩家：先粗筛，再按最小重叠轴推出 */</span>
+<span class="tok-key">function</span> <span class="tok-fn">resolve</span>(p: Body, tiles: AABB[]) {
+  <span class="tok-key">for</span> (<span class="tok-key">const</span> t <span class="tok-key">of</span> tiles) {
+    <span class="tok-key">if</span> (!<span class="tok-fn">intersects</span>(p.box, t)) <span class="tok-key">continue</span>;  <span class="tok-com">// 99% 的瓦片在这里被排除</span>
+    <span class="tok-key">const</span> overlapX = Math.<span class="tok-fn">min</span>(p.box.x + p.box.w - t.x, t.x + t.w - p.box.x);
+    <span class="tok-key">const</span> overlapY = Math.<span class="tok-fn">min</span>(p.box.y + p.box.h - t.y, t.y + t.h - p.box.y);
+    <span class="tok-key">if</span> (overlapY &lt; overlapX) { p.vy = <span class="tok-str">0</span>; p.box.y -= overlapY; }
+    <span class="tok-key">else</span> { p.vx = <span class="tok-str">0</span>; p.box.x -= overlapX; }
+  }
+}</code></pre>
+
+            <p>这套写法在实测里能稳定跑满 60fps，最坏情况（满屏弹幕）下每帧的碰撞检测也不到 0.4ms。真正的开销反而在精灵图绘制上，所以后来我又加了一层脏矩形，只重绘发生变化的区域。</p>
+          </div>
+
+          <!-- 截图 -->
+          <h2 class="mt-48" style="font-size:24px;letter-spacing:-.02em">截图</h2>
+          <div class="grid-3 mt-12">
+            <div class="cover cover-4x3">关卡编辑 4:3</div>
+            <div class="cover cover-4x3">Boss 战 4:3</div>
+            <div class="cover cover-4x3">性能面板 4:3</div>
+          </div>
+
+          <!-- 上一篇 / 下一篇 -->
+          <div class="prevnext mt-48">
+            <a href="#">
+              <span class="lbl">← 上一个作品</span>
+              <span class="ttl">CLI 脚手架</span>
+            </a>
+            <a href="#">
+              <span class="lbl">下一个作品 →</span>
+              <span class="ttl">公司级组件库</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- ============ 右：信息栏 ============ -->
+        <div class="card">
+          <span class="badge badge-violet">🎮 游戏</span>
+          <h1 class="mt-12" style="font-size:26px;letter-spacing:-.025em">Pixel Runner</h1>
+          <p class="text-sm text-muted mt-8">用 Canvas 写的横版跑酷</p>
+
+          <hr class="divider mt-16">
+
+          <div class="stack gap-12 mt-16">
+            <div class="row between gap-12">
+              <span class="text-sm text-subtle">周期</span>
+              <span class="text-sm mono">2024.09 — 2024.12</span>
+            </div>
+            <div class="row between gap-12">
+              <span class="text-sm text-subtle">角色</span>
+              <span class="text-sm">独立开发</span>
+            </div>
+            <div class="row between gap-12">
+              <span class="text-sm text-subtle">状态</span>
+              <span class="badge badge-green">已发布</span>
+            </div>
+          </div>
+
+          <hr class="divider mt-16">
+
+          <div class="text-xs text-subtle mt-16 mb-8" style="font-weight:650">技术栈</div>
+          <div class="chip-row" style="gap:6px">
+            <span class="badge badge-gray">TypeScript</span>
+            <span class="badge badge-gray">Canvas</span>
+            <span class="badge badge-gray">Vite</span>
+            <span class="badge badge-gray">Web Audio</span>
+          </div>
+
+          <div class="stack gap-8 mt-24">
+            <a class="btn btn-primary btn-block">↗ 在线试玩</a>
+            <a class="btn btn-outline btn-block">↗ GitHub 源码</a>
+            <a class="btn btn-outline btn-block">▶ 演示视频</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a class="active"><span class="icon">💼</span>作品</a>
+  <a><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日志 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 日志列表</b>
+  <span class="spec-tag">/logs</span>
+  <span class="spec-tag blue">模块 log</span>
+  <span class="spec-tag violet">ISR 600s</span>
+  <span class="spacer">类型筛选与年月分组来自 URL 查询参数 · 日历视图复用同一份数据 · 每页 8 条</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a class="active" href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ 标题区 ============ -->
+  <section class="section" style="padding-bottom:0">
+    <div class="container">
+      <h1 style="font-size:32px;letter-spacing:-.025em">📓 日志</h1>
+      <p class="section-intro">记录每天发生的事，以及偶尔的顿悟</p>
+    </div>
+  </section>
+
+  <!-- ============ 筛选条 ============ -->
+  <div class="container">
+    <div class="filter-bar">
+      <div class="chip-row">
+        <span class="chip chip-active">全部</span>
+        <span class="chip">每日随笔</span>
+        <span class="chip">大事件</span>
+        <span class="chip">总结</span>
+      </div>
+      <div class="row gap-8 ml-auto">
+        <span class="select">2025 年</span>
+        <div class="chip-row">
+          <span class="chip chip-active">列表</span>
+          <span class="chip">日历</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 日志列表 ============ -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+
+      <div class="log-group-label">2025 年 1 月</div>
+
+      <div class="log-item" style="border-left:3px solid var(--accent)">
+        <div class="log-date"><div class="d">15</div><div class="w">周三</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <span class="badge badge-accent">📌 置顶</span>
+            <h3>重构了首页的动画</h3>
+            <span class="mood">😊 开心 · ☀️ 晴 · 📍 杭州</span>
+          </div>
+          <p class="summary clamp-2">把 Framer Motion 换成了纯 CSS，包体小了 40KB。scroll-driven animation 已经可以在生产里用了，只是要注意 Safari 的降级写法。顺手把入场动画全做成了 120ms 的错峰延迟，观感比之前自然很多。</p>
+          <div class="cover cover-16x9 mt-12" style="width:200px">封面 16:9</div>
+          <div class="chip-row mt-12" style="gap:14px">
+            <span class="tag">重构</span><span class="tag">性能</span><span class="tag">CSS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">14</div><div class="w">周二</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>面试了一个候选人</h3>
+            <span class="mood">😐 平静 · ☁️ 多云 · 📍 杭州</span>
+          </div>
+          <p class="summary clamp-2">聊到工程化的时候发现，很多人会用工具但说不清为什么用。问「为什么选 Vite」得到的答案大多是「快」，再往下问就没了。这大概就是经验年限和真实经验的区别。</p>
+          <div class="chip-row mt-12" style="gap:14px">
+            <span class="tag">工作</span><span class="tag">面试</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">12</div><div class="w">周日</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>读完《重构》第二遍</h3>
+            <span class="mood">😄 兴奋 · 🌧️ 雨 · 📍 杭州</span>
+          </div>
+          <p class="summary clamp-2">第二遍读感受完全不同。这次手里开着真实项目的代码，几乎每一章都能对上号——上周刚写的那段三百行的 useEffect，就是书里说的「过长函数」。</p>
+          <div class="chip-row mt-12" style="gap:14px">
+            <span class="tag">读书</span><span class="tag">重构</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">08</div><div class="w">周三</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>暗色模式上线了</h3>
+            <span class="mood">🙂 满足 · ⛅ 阴 · 📍 公司</span>
+          </div>
+          <p class="summary clamp-2">设计令牌全部改成 CSS 变量，一套代码切主题。踩的坑是第三方组件的硬编码颜色，最后用一层 color-mix 兜住了。</p>
+          <div class="chip-row mt-12" style="gap:14px">
+            <span class="tag">上线</span><span class="tag">设计系统</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-group-label">2024 年 12 月</div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">31</div><div class="w">周二</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>年度复盘：2024 我做了些什么</h3>
+            <span class="mood">😌 平静 · 🌙 晴 · 📍 家</span>
+          </div>
+          <p class="summary clamp-2">写了 46 篇日志、12 篇文章，重构了两个老项目，组件库落地到 12 条业务线。也承认有三件事没做完，明年不打算硬撑了。</p>
+          <div class="chip-row mt-12" style="gap:14px">
+            <span class="tag">年度总结</span><span class="tag">复盘</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">27</div><div class="w">周五</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>修了一个诡异的时区 bug</h3>
+            <span class="mood">😤 崩溃 · 🌧️ 雨 · 📍 公司</span>
+          </div>
+          <p class="summary clamp-2">凌晨两点定闹钟的提醒，跨月的时候会少响一次。问题出在把本地时间字符串直接 new Date() 再存成 UTC，服务端和客户端各解释了一遍时区。</p>
+          <div class="chip-row mt-12" style="gap:14px">
+            <span class="tag">Bug</span><span class="tag">时区</span><span class="tag">调试</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">18</div><div class="w">周三</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>组件库升级到 React 18</h3>
+            <span class="mood">🙂 满足 · ☀️ 晴 · 📍 公司</span>
+          </div>
+          <p class="summary clamp-2">并发了 7 个业务线的升级，靠一份迁移指南和两个 codemod 脚本压住了成本。StrictMode 下面暴露出来的副作用比预期多，但都是真问题。</p>
+          <div class="chip-row mt-12" style="gap:14px">
+            <span class="tag">组件库</span><span class="tag">React</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <a href="#">‹</a>
+        <a class="active" href="#">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">…</a>
+        <a href="#">9</a>
+        <a href="#">›</a>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a class="active"><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

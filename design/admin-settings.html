@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 站点设置</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 站点设置</b>
+  <span class="spec-tag">/admin/settings/:group</span>
+  <span class="spec-tag blue">PATCH /api/v1/admin/settings/:group</span>
+  <span class="spec-tag amber">仅 ADMIN</span>
+  <span class="spacer">按分组读写、整组提交 · 保存后前台立即生效，无需重新部署</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a class="active"><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">⚙️</span>
+      <div class="text-sm text-muted">站点设置 / <span class="bold" style="color:var(--fg)">基础信息</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">配置版本 v12 · 上次保存 2 天前</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>站点设置</span><span>/</span><span style="color:var(--fg-muted)">基础信息</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>站点设置</h1>
+          <div class="sub">这些配置会立即影响前台展示</div>
+        </div>
+      </div>
+
+      <div class="tabs mb-24">
+        <a class="active">基础信息</a>
+        <a>外观</a>
+        <a>SEO</a>
+        <a>社交</a>
+        <a>页脚</a>
+      </div>
+
+      <!-- ============ 表单 ============ -->
+      <div class="panel">
+        <div class="panel-body">
+          <div class="stack gap-20" style="max-width:720px">
+
+            <div class="field">
+              <label>站点名称</label>
+              <div class="control">Puly 的站</div>
+              <div class="hint">显示在浏览器标签页、导航栏与页脚</div>
+            </div>
+
+            <div class="field">
+              <div class="row between">
+                <label style="font-size:13.5px;font-weight:600">站点描述</label>
+                <span class="char-count">12 / 200</span>
+              </div>
+              <div class="control control-area">前端工程师 · 写代码也写字</div>
+              <div class="hint">用于 SEO 默认描述，建议 80–160 字</div>
+            </div>
+
+            <div class="field">
+              <label>站点 Logo</label>
+              <div class="row gap-16">
+                <div class="cover cover-1x1" style="width:64px;height:64px;flex:none">64</div>
+                <div>
+                  <a class="btn btn-sm">选择图片</a>
+                  <div class="hint mt-8">建议 512×512 PNG/SVG，透明背景</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>默认主题</label>
+                <div class="row gap-16 wrap" style="min-height:40px">
+                  <div class="cbx-row"><span class="radio"></span>亮色</div>
+                  <div class="cbx-row"><span class="radio on"></span>跟随系统</div>
+                  <div class="cbx-row"><span class="radio"></span>暗色</div>
+                </div>
+                <div class="hint">首次访问的默认值，用户点切换后以其本地选择为准</div>
+              </div>
+              <div class="field">
+                <label>语言</label>
+                <div class="select" style="width:100%">简体中文</div>
+                <div class="hint">影响前台文案与 &lt;html lang&gt;</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>主题强调色</label>
+              <div class="row gap-12 wrap">
+                <div class="input mono" style="width:132px">#6366F1</div>
+                <div class="row gap-8">
+                  <div style="width:24px;height:24px;border-radius:7px;background:#6366F1;box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent)"></div>
+                  <div style="width:24px;height:24px;border-radius:7px;background:#3B82F6;border:1px solid var(--border)"></div>
+                  <div style="width:24px;height:24px;border-radius:7px;background:#10B981;border:1px solid var(--border)"></div>
+                  <div style="width:24px;height:24px;border-radius:7px;background:#8B5CF6;border:1px solid var(--border)"></div>
+                  <div style="width:24px;height:24px;border-radius:7px;background:#F59E0B;border:1px solid var(--border)"></div>
+                  <div style="width:24px;height:24px;border-radius:7px;background:#F97316;border:1px solid var(--border)"></div>
+                  <div style="width:24px;height:24px;border-radius:7px;background:#EF4444;border:1px solid var(--border)"></div>
+                  <div style="width:24px;height:24px;border-radius:7px;background:#0EA5E9;border:1px solid var(--border)"></div>
+                </div>
+              </div>
+              <div class="hint">影响按钮、链接、高亮与图表</div>
+            </div>
+
+            <div class="field" style="max-width:340px">
+              <label>时区</label>
+              <div class="select" style="width:100%">UTC+8 亚洲/上海</div>
+              <div class="hint">文章发布时间、日志与审计记录都按此时区显示</div>
+            </div>
+
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="panel-body row gap-10" style="justify-content:flex-end;background:var(--bg-subtle)">
+          <a class="btn">重置</a>
+          <a class="btn btn-primary">保存</a>
+        </div>
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle">
+        <span>整组提交，任意字段校验失败则整组不落库</span><span>·</span>
+        <span>每次保存都会写入审计日志（含前后值）</span>
+      </div>
+
+      <!-- ================================================================
+           以下为状态与弹窗稿
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- ① 未保存离开确认 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 有改动时离开页面的二次确认</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:28px">
+              <div class="modal" style="max-width:440px">
+                <div class="modal-head">
+                  <div>
+                    <h3>有未保存的修改</h3>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body">
+                  <div class="text-sm text-muted">离开将丢失这些改动。</div>
+                  <div class="text-xs text-subtle mt-8">已改动 2 项：站点描述、主题强调色</div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">继续编辑</a>
+                  <a class="btn btn-danger">放弃修改</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ② 保存成功 toast + ③ 校验错误态 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 保存成功提示（顺手给一个去前台的入口）</div>
+            <div class="toast">
+              <span class="icon" style="color:var(--green)">✓</span>
+              <span>设置已保存，前台已更新</span>
+              <a class="undo">查看前台</a>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">③ 字段校验错误态（错误贴在字段下方，不弹窗打断）</div>
+            <div class="panel">
+              <div class="panel-body">
+                <div class="field">
+                  <label>站点名称</label>
+                  <div class="control invalid">Puly 的个人网站 · 前端工程师 · 写代码也写字 · 折腾各种小工具</div>
+                  <div class="err">站点名称不能超过 40 个字符</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 用户管理</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 用户管理</b>
+  <span class="spec-tag">/admin/users</span>
+  <span class="spec-tag violet">RBAC: ADMIN / EDITOR / VIEWER</span>
+  <span class="spec-tag amber">仅 ADMIN</span>
+  <span class="spacer">角色决定能力，权限矩阵是唯一事实来源 · 停用即刻失效，无需等 token 过期</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a class="active"><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">👥</span>
+      <div class="text-sm text-muted">系统 / <span class="bold" style="color:var(--fg)">用户管理</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">3 个账号 · 1 个已停用</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>系统</span><span>/</span><span style="color:var(--fg-muted)">用户管理</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>用户管理</h1>
+          <div class="sub">3 个账号</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-primary">+ 添加用户</a>
+        </div>
+      </div>
+
+      <div class="notice mb-16">
+        <span class="icon">ⓘ</span>
+        <div>不可停用或降级自己的账号 —— 防止把自己锁在门外。</div>
+      </div>
+
+      <!-- ============ 账号列表 ============ -->
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="width:230px">姓名</th>
+                <th style="width:210px">邮箱</th>
+                <th style="width:110px">角色</th>
+                <th style="width:100px">状态</th>
+                <th>最后登录</th>
+                <th style="width:150px;text-align:right">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="row gap-10">
+                    <div class="avatar">P</div>
+                    <div>
+                      <div class="cell-title">Puly <span class="badge badge-accent">当前账号</span></div>
+                      <div class="cell-sub">创建于 2024-03-02 · 唯一所有者</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="mono text-sm">admin@example.com</td>
+                <td><span class="badge badge-accent">管理员</span></td>
+                <td><span class="switch on disabled"></span></td>
+                <td>
+                  <div class="text-sm">10 分钟前</div>
+                  <div class="cell-sub mono">1.2.3.4 · Chrome / Windows</div>
+                </td>
+                <td style="text-align:right">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm btn-ghost">编辑</a>
+                    <a class="btn btn-sm" style="opacity:.5">停用</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <div class="row gap-10">
+                    <div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6)">助</div>
+                    <div>
+                      <div class="cell-title">小助手</div>
+                      <div class="cell-sub">创建于 2024-06-18</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="mono text-sm">editor@example.com</td>
+                <td><span class="badge badge-blue">编辑</span></td>
+                <td><span class="switch on"></span></td>
+                <td>
+                  <div class="text-sm">3 天前</div>
+                  <div class="cell-sub mono">—— · Safari / macOS</div>
+                </td>
+                <td style="text-align:right">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm btn-ghost">编辑</a>
+                    <a class="btn btn-sm">停用</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <div class="row gap-10">
+                    <div class="avatar" style="background:var(--bg-muted);color:var(--fg-subtle)">访</div>
+                    <div>
+                      <div class="cell-title text-muted">访客</div>
+                      <div class="cell-sub">创建于 2024-09-05</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="mono text-sm">viewer@example.com</td>
+                <td><span class="badge badge-gray">只读</span></td>
+                <td><span class="switch"></span></td>
+                <td>
+                  <div class="text-sm">1 个月前</div>
+                  <div class="cell-sub mono">—— · Edge / Windows</div>
+                </td>
+                <td style="text-align:right">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm btn-ghost">编辑</a>
+                    <a class="btn btn-sm btn-danger">删除</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle">
+        <span>停用后立即清除该用户的所有会话</span><span>·</span>
+        <span>删除账号会保留其历史操作记录</span><span>·</span>
+        <span>重置密码会向邮箱发送一次性链接</span>
+      </div>
+
+      <!-- ============ 权限矩阵 ============ -->
+      <div class="panel mt-32">
+        <div class="panel-head">
+          <div>
+            <div class="bold text-sm">权限矩阵</div>
+            <div class="text-xs text-subtle mt-4">角色的能力边界写死在代码里，不可在界面上自定义</div>
+          </div>
+          <span class="badge badge-gray mono">rbac.ts</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th style="width:120px;text-align:center">ADMIN</th>
+                <th style="width:120px;text-align:center">EDITOR</th>
+                <th style="width:120px;text-align:center">VIEWER</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>查看后台仪表盘</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+              </tr>
+              <tr>
+                <td>内容增删改</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+              </tr>
+              <tr>
+                <td>发布 / 下架内容</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+              </tr>
+              <tr>
+                <td>模块开关与排序</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+              </tr>
+              <tr>
+                <td>站点设置</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+              </tr>
+              <tr>
+                <td>媒体上传 / 删除</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+              </tr>
+              <tr>
+                <td>用户管理</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+              </tr>
+              <tr>
+                <td>查看审计日志</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+              </tr>
+              <tr>
+                <td>数据导入 / 导出</td>
+                <td style="text-align:center;color:var(--green)">✓</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+                <td style="text-align:center" class="text-subtle">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           以下为状态与弹窗稿
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 新建用户（初始密码只在此刻出现一次）</div>
+        <div class="overlay" style="border-radius:var(--radius);padding:28px">
+          <div class="modal">
+            <div class="modal-head">
+              <div>
+                <h3>添加用户</h3>
+                <div class="text-xs text-subtle mt-4">创建后该账号立即生效</div>
+              </div>
+              <button class="icon-btn">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="stack gap-16">
+                <div class="field">
+                  <label>邮箱</label>
+                  <div class="control">newuser@example.com</div>
+                  <div class="hint">用作登录账号，需唯一</div>
+                </div>
+                <div class="field">
+                  <label>姓名</label>
+                  <div class="control">小王</div>
+                </div>
+                <div class="field">
+                  <label>角色</label>
+                  <div class="select" style="width:100%">编辑（EDITOR）</div>
+                  <div class="hint">编辑可增删改与发布内容，但不能改站点设置与用户</div>
+                </div>
+
+                <div class="notice">
+                  <span class="icon">🔑</span>
+                  <div>将生成一个随机初始密码，仅在此处展示一次，请立即复制并转告该用户。</div>
+                </div>
+
+                <div class="field">
+                  <label>初始密码</label>
+                  <div class="row gap-10">
+                    <div class="control mono grow" style="letter-spacing:.08em">Kx7#mPq2Lw9a</div>
+                    <a class="btn" style="flex:none">复制</a>
+                  </div>
+                  <div class="hint">首次登录后强制修改密码</div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <a class="btn">取消</a>
+              <a class="btn btn-primary">创建用户</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

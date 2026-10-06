@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>作品集 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 作品集</b>
+  <span class="spec-tag">/portfolio</span>
+  <span class="spec-tag blue">模块 portfolio</span>
+  <span class="spec-tag violet">ISR 3600s</span>
+  <span class="spacer">类型筛选走 URL 参数 · 网格/列表两种视图复用同一卡片数据 · 每页 12 条</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a class="active" href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ 标题区 ============ -->
+  <section class="section" style="padding-bottom:0">
+    <div class="container">
+      <h1 style="font-size:32px;letter-spacing:-.025em">💼 作品集</h1>
+      <p class="section-intro">做过的一些东西：游戏、工具、代码库，以及一些没什么用但很好玩的</p>
+    </div>
+  </section>
+
+  <!-- ============ 筛选条 ============ -->
+  <div class="container">
+    <div class="filter-bar">
+      <div class="chip-row">
+        <span class="chip chip-active">全部 15</span>
+        <span class="chip">🎮 游戏 3</span>
+        <span class="chip">📦 代码库 7</span>
+        <span class="chip">⚡ Skills 3</span>
+        <span class="chip">🔧 其他 2</span>
+      </div>
+      <div class="chip-row ml-auto">
+        <span class="chip chip-active">网格</span>
+        <span class="chip">列表</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 作品网格 ============ -->
+  <section class="section" style="padding-top:26px">
+    <div class="container">
+      <div class="grid-3">
+
+        <!-- 1 -->
+        <article class="project-card">
+          <div class="cover cover-16x9">Pixel Runner 封面 16:9</div>
+          <div class="body">
+            <h3>Pixel Runner</h3>
+            <p class="desc clamp-2">用 Canvas 手写物理引擎的横版跑酷，无游戏框架依赖。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">TypeScript</span>
+              <span class="badge badge-gray">Canvas</span>
+              <span class="badge badge-gray">Vite</span>
+              <span class="badge badge-gray">+2</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-violet">🎮 游戏</span>
+              <span class="row gap-8 text-sm bold text-accent">
+                <span>试玩 ↗</span><span>源码 ↗</span>
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2 -->
+        <article class="project-card">
+          <div class="cover cover-16x9">组件库封面 16:9</div>
+          <div class="body">
+            <h3>公司级组件库</h3>
+            <p class="desc clamp-2">覆盖 12 条业务线，复用率 78% 的 React 组件库与设计系统。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">React</span>
+              <span class="badge badge-gray">TypeScript</span>
+              <span class="badge badge-gray">Rollup</span>
+              <span class="badge badge-gray">+2</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-blue">📦 代码库</span>
+              <span class="text-accent text-sm bold">文档 ↗</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3 -->
+        <article class="project-card">
+          <div class="cover cover-16x9">CLI 脚手架封面 16:9</div>
+          <div class="body">
+            <h3>CLI 脚手架</h3>
+            <p class="desc clamp-2">一键生成项目模板，内置规范、CI 与发布流程。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">Node</span>
+              <span class="badge badge-gray">TypeScript</span>
+              <span class="badge badge-gray">+1</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-orange">🔧 工具</span>
+              <span class="text-accent text-sm bold">GitHub ↗</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 4 · Skills 类型：无封面，用图标 + 代表产出 -->
+        <article class="project-card">
+          <div class="body">
+            <div class="icon-box icon-box-lg">📐</div>
+            <h3 class="mt-4">设计系统建设</h3>
+            <p class="desc clamp-2">从设计令牌到组件库再到文档站的完整落地能力，不只是画图。</p>
+            <div class="text-xs text-subtle" style="font-weight:650">代表产出</div>
+            <ul class="tl-highlights" style="margin-top:2px">
+              <li>沉淀 45 个基础与业务组件</li>
+              <li>200+ 页使用文档与代码示例</li>
+              <li>12 条业务线接入并统一升级</li>
+            </ul>
+            <div class="foot">
+              <span class="badge badge-amber">⚡ Skills</span>
+              <span class="text-accent text-sm bold">查看案例 ↗</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 5 -->
+        <article class="project-card">
+          <div class="cover cover-16x9">待办 PWA 封面 16:9</div>
+          <div class="body">
+            <h3>待办清单 PWA</h3>
+            <p class="desc clamp-2">离线可用的待办应用，IndexedDB 本地存储，装到桌面和原生没什么区别。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">React</span>
+              <span class="badge badge-gray">IndexedDB</span>
+              <span class="badge badge-gray">Vite</span>
+              <span class="badge badge-gray">+1</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-blue">📦 代码库</span>
+              <span class="text-accent text-sm bold">源码 ↗</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 6 -->
+        <article class="project-card">
+          <div class="cover cover-16x9">本站封面 16:9</div>
+          <div class="body">
+            <h3>个人博客系统</h3>
+            <p class="desc clamp-2">本站，Next.js + Prisma + Markdown 内容管线，前台与后台一体。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">Next.js</span>
+              <span class="badge badge-gray">Prisma</span>
+              <span class="badge badge-gray">Postgres</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-blue">📦 代码库</span>
+              <span class="text-accent text-sm bold">源码 ↗</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="pagination">
+        <a href="#">‹</a>
+        <a class="active" href="#">1</a>
+        <a href="#">2</a>
+        <a href="#">›</a>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a class="active"><span class="icon">💼</span>作品</a>
+  <a><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

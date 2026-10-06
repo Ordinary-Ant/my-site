@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>首页 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 首页</b>
+  <span class="spec-tag">/</span>
+  <span class="spec-tag blue">模块 home</span>
+  <span class="spec-tag violet">ISR 300s</span>
+  <span class="spacer">5 个区块均可开关 · 顺序/条数可在后台配置 · 区块数据来自 4 个不同模块</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a class="active" href="#">首页</a>
+      <a href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ Hero ============ -->
+  <section class="hero">
+    <div class="container-narrow" style="text-align:center">
+      <div class="avatar avatar-xl" style="margin:0 auto">P</div>
+      <h1 class="mt-24">Puly</h1>
+      <div class="headline">5 年经验前端工程师 · 写代码也写字</div>
+      <p class="quote" style="display:inline-block;text-align:left">
+        「用工程化的方式，把想法变成能用的东西。」
+      </p>
+      <div class="btn-row center mt-32">
+        <a class="btn btn-primary btn-lg">看看我的作品</a>
+        <a class="btn btn-outline btn-lg">读读我的文章</a>
+      </div>
+      <div class="social-row center mt-24 text-sm text-muted">
+        <span>GitHub</span><span class="text-subtle">·</span>
+        <span>掘金</span><span class="text-subtle">·</span>
+        <span>RSS</span><span class="text-subtle">·</span>
+        <span>hi@example.com</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 精选作品 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Portfolio</div>
+          <h2>💼 精选作品</h2>
+        </div>
+        <a class="more">全部作品 →</a>
+      </div>
+      <div class="grid-4">
+
+        <article class="project-card">
+          <div class="cover cover-16x9">封面 16:9</div>
+          <div class="body">
+            <h3>Pixel Runner</h3>
+            <p class="desc clamp-2">用 Canvas 手写物理引擎的横版跑酷，无游戏框架依赖。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">TypeScript</span>
+              <span class="badge badge-gray">Canvas</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-violet">🎮 游戏</span>
+              <span class="text-accent text-sm bold">试玩 ↗</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="cover cover-16x9">封面 16:9</div>
+          <div class="body">
+            <h3>公司级组件库</h3>
+            <p class="desc clamp-2">覆盖 12 条业务线，复用率 78% 的 React 组件库与设计系统。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">React</span>
+              <span class="badge badge-gray">Rollup</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-blue">📦 代码库</span>
+              <span class="text-accent text-sm bold">源码 ↗</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="cover cover-16x9">封面 16:9</div>
+          <div class="body">
+            <h3>CLI 脚手架</h3>
+            <p class="desc clamp-2">一键生成项目模板，内置规范、CI 与发布流程。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">Node</span>
+              <span class="badge badge-gray">TS</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-orange">🔧 工具</span>
+              <span class="text-accent text-sm bold">GitHub ↗</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="cover cover-16x9">封面 16:9</div>
+          <div class="body">
+            <h3>设计系统建设</h3>
+            <p class="desc clamp-2">从设计令牌到组件库到文档站的完整落地能力。</p>
+            <div class="chip-row" style="gap:6px">
+              <span class="badge badge-gray">Figma</span>
+              <span class="badge badge-gray">Tokens</span>
+            </div>
+            <div class="foot">
+              <span class="badge badge-amber">⚡ Skills</span>
+              <span class="text-accent text-sm bold">查看 ↗</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 最新文章 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Articles</div>
+          <h2>📄 最新文章</h2>
+        </div>
+        <a class="more">全部文章 →</a>
+      </div>
+      <div class="grid-2">
+
+        <article class="post-card" style="flex-direction:column">
+          <div class="cover cover-16x9" style="width:100%">封面 16:9</div>
+          <div class="grow">
+            <span class="badge badge-accent mb-8" style="display:inline-flex">技术</span>
+            <h3>我为什么选择 Next.js</h3>
+            <p class="desc text-sm text-muted clamp-2 mt-8">从渲染模型到工程化的一次梳理，以及我在真实项目里踩过的坑。</p>
+            <div class="meta mt-12">
+              <span>2025-01-15</span><span>8 分钟阅读</span><span>1024 次阅读</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="post-card" style="flex-direction:column">
+          <div class="cover cover-16x9" style="width:100%">封面 16:9</div>
+          <div class="grow">
+            <span class="badge badge-accent mb-8" style="display:inline-flex">性能</span>
+            <h3>Vite 构建优化实践</h3>
+            <p class="desc text-sm text-muted clamp-2 mt-8">把构建时间从 40s 降到 8s，以及那些没写在文档里的细节。</p>
+            <div class="meta mt-12">
+              <span>2025-01-14</span><span>6 分钟阅读</span><span>320 次阅读</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 最近日志 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Journal</div>
+          <h2>📓 最近日志</h2>
+        </div>
+        <a class="more">全部日志 →</a>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">15</div><div class="w">周三</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>重构了首页的动画</h3>
+            <span class="mood">😊 开心 · ☀️ 晴 · 📍 杭州</span>
+          </div>
+          <p class="summary clamp-2">把 Framer Motion 换成了纯 CSS，包体小了 40KB。意外发现 scroll-driven animation 已经可以用了。</p>
+          <div class="chip-row mt-8" style="gap:14px">
+            <span class="tag">重构</span><span class="tag">性能</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">14</div><div class="w">周二</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>面试了一个候选人</h3>
+            <span class="mood">😐 平静 · ☁️ 多云</span>
+          </div>
+          <p class="summary clamp-2">聊到工程化的时候发现，很多人会用工具但说不清为什么用。这大概就是"经验"和"年限"的区别。</p>
+        </div>
+      </div>
+
+      <div class="log-item">
+        <div class="log-date"><div class="d">12</div><div class="w">周日</div></div>
+        <div class="log-body grow">
+          <div class="row gap-12 wrap">
+            <h3>读完《重构》第二遍</h3>
+            <span class="mood">😄 兴奋 · 🌧️ 雨</span>
+          </div>
+          <p class="summary clamp-2">第二遍读感受完全不同，这次带着真实代码去读，每一章都能对上号。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 近期经历 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Timeline</div>
+          <h2>🕐 近期经历</h2>
+        </div>
+        <a class="more">完整时间轴 →</a>
+      </div>
+      <div class="stack gap-12">
+        <div class="card row gap-16">
+          <span class="tl-dot current" style="position:static;transform:none"></span>
+          <div class="grow">
+            <div class="bold">高级前端工程师 · 某科技有限公司</div>
+            <div class="text-sm text-muted mt-4">2023.03 — 至今 · 杭州</div>
+          </div>
+          <span class="badge badge-blue">进行中</span>
+        </div>
+        <div class="card row gap-16">
+          <span class="tl-dot work" style="position:static;transform:none"></span>
+          <div class="grow">
+            <div class="bold">前端工程师 · 某公司</div>
+            <div class="text-sm text-muted mt-4">2021.06 — 2023.02 · 北京</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a class="active"><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+{
+  "outDir": "shots",
+  "targets": [
+    { "file": "site-home.html", "out": "01a-site-home-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "site-home.html", "out": "01b-site-home-mobile.png", "width": 390, "scale": 2 },
+    { "file": "site-home.html", "out": "01c-site-home-dark.png", "width": 1440, "scale": 1.5, "dark": true },
+
+    { "file": "admin-modules.html", "out": "02a-admin-modules-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "admin-modules.html", "out": "02b-admin-modules-tablet.png", "width": 820, "scale": 1.5 },
+
+    { "file": "admin-article-list.html", "out": "03a-admin-article-list-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "admin-article-list.html", "out": "03b-admin-article-list-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "admin-dashboard.html", "out": "04a-admin-dashboard-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "site-logs.html", "out": "05a-site-logs-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "site-logs.html", "out": "05b-site-logs-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "site-log-detail.html", "out": "06a-site-log-detail-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "site-logs-calendar.html", "out": "07a-site-logs-calendar-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "site-portfolio.html", "out": "08a-site-portfolio-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "site-portfolio.html", "out": "08b-site-portfolio-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "site-project-detail.html", "out": "09a-site-project-detail-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "site-timeline.html", "out": "10a-site-timeline-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "site-timeline.html", "out": "10b-site-timeline-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "site-about.html", "out": "11a-site-about-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "site-about.html", "out": "11b-site-about-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "site-search.html", "out": "12a-site-search-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "site-404.html", "out": "13a-site-404-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "site-login.html", "out": "14a-site-login-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-article-edit.html", "out": "15a-admin-article-edit-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "admin-article-edit.html", "out": "15b-admin-article-edit-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "admin-logs.html", "out": "16a-admin-logs-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-projects.html", "out": "17a-admin-projects-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-timeline.html", "out": "18a-admin-timeline-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-about-edit.html", "out": "19a-admin-about-edit-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-media.html", "out": "20a-admin-media-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-settings.html", "out": "21a-admin-settings-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-users.html", "out": "22a-admin-users-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-audit.html", "out": "23a-admin-audit-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "design-system.html", "out": "24a-design-system-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-motion.html", "out": "25a-admin-motion-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "admin-motion.html", "out": "25b-admin-motion-tablet.png", "width": 820, "scale": 1.5 },
+
+    { "file": "motion-storyboard.html", "out": "26a-motion-storyboard-desktop.png", "width": 1440, "scale": 1.5 }
+  ]
+}

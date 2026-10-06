@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>搜索 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 站内搜索</b>
+  <span class="spec-tag">/search?q=next</span>
+  <span class="spec-tag amber">Dynamic 不缓存</span>
+  <span class="spec-tag">noindex</span>
+  <span class="spacer">结果按类型分组 · 关键词来自 URL query · 空结果单独兜底</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="section">
+    <div class="container-narrow">
+
+      <div class="section-head" style="margin-bottom:18px">
+        <div>
+          <div class="section-eyebrow">Search</div>
+          <h2>🔍 站内搜索</h2>
+        </div>
+      </div>
+
+      <!-- 搜索框 -->
+      <div class="search-input">
+        <span class="icon">🔍</span>
+        <input value="next" placeholder="搜索文章、日志、作品…">
+        <button class="btn btn-primary btn-sm">搜索</button>
+      </div>
+
+      <!-- 统计 + 类型筛选 -->
+      <div class="row between wrap gap-12 mt-16">
+        <span class="text-sm text-muted">找到 <b class="text-accent">7</b> 条关于「next」的内容</span>
+        <div class="chip-row">
+          <a class="chip chip-sm chip-active">全部 7</a>
+          <a class="chip chip-sm">文章 4</a>
+          <a class="chip chip-sm">日志 2</a>
+          <a class="chip chip-sm">作品 1</a>
+        </div>
+      </div>
+
+      <!-- ============ 分组：文章 ============ -->
+      <div class="log-group-label">📄 文章</div>
+
+      <div class="search-result">
+        <div class="row gap-8 wrap">
+          <span class="badge badge-accent">文章</span>
+          <a style="font-size:16px;font-weight:650">我为什么选择 <mark>Next.js</mark></a>
+        </div>
+        <p class="text-sm text-muted mt-8">从渲染模型到工程化的一次梳理：SSR、ISR 与 RSC 各自解决了什么问题，以及我在真实项目里为 <mark>Next.js</mark> 付出过哪些代价。</p>
+        <div class="path">/articles/why-i-choose-nextjs · 2025-01-15</div>
+      </div>
+
+      <div class="search-result">
+        <div class="row gap-8 wrap">
+          <span class="badge badge-accent">文章</span>
+          <a style="font-size:16px;font-weight:650"><mark>Next.js</mark> App Router 的数据获取实践</a>
+        </div>
+        <p class="text-sm text-muted mt-8">Server Component 里取数和客户端缓存怎么配合？记录一次从 pages 目录迁移到 App Router 的完整过程，含 4 个踩坑点。</p>
+        <div class="path">/articles/nextjs-app-router-data · 2024-11-08</div>
+      </div>
+
+      <div class="search-result">
+        <div class="row gap-8 wrap">
+          <span class="badge badge-accent">文章</span>
+          <a style="font-size:16px;font-weight:650">从 <mark>Next.js</mark> 迁回 Vite 的一次尝试</a>
+        </div>
+        <p class="text-sm text-muted mt-8">不是所有站点都需要服务端渲染。当内容量不大、团队只有一个人时，静态导出反而是更省心的选择。</p>
+        <div class="path">/articles/from-nextjs-to-vite · 2024-09-21</div>
+      </div>
+
+      <div class="search-result">
+        <div class="row gap-8 wrap">
+          <span class="badge badge-accent">文章</span>
+          <a style="font-size:16px;font-weight:650"><mark>Next.js</mark> 首屏性能优化清单</a>
+        </div>
+        <p class="text-sm text-muted mt-8">12 条按收益排序的优化项：字体、图片、路由预取、包体拆分，以及如何用 RUM 数据验证每一项是否真的有用。</p>
+        <div class="path">/articles/nextjs-performance-checklist · 2024-06-30</div>
+      </div>
+
+      <!-- ============ 分组：日志 ============ -->
+      <div class="log-group-label">📓 日志</div>
+
+      <div class="search-result">
+        <div class="row gap-8 wrap">
+          <span class="badge badge-violet">日志</span>
+          <a style="font-size:16px;font-weight:650">用 <mark>Next.js</mark> 重写了个人站</a>
+        </div>
+        <p class="text-sm text-muted mt-8">周末两天把站点迁到了 <mark>Next.js</mark>，顺手加上 RSS 与 sitemap。最大的收获不是新框架，而是终于把内容结构理顺了。</p>
+        <div class="path">/logs/2024-12-02 · 2024-12-02</div>
+      </div>
+
+      <div class="search-result">
+        <div class="row gap-8 wrap">
+          <span class="badge badge-violet">日志</span>
+          <a style="font-size:16px;font-weight:650">读完 <mark>Next.js</mark> 源码里的路由匹配</a>
+        </div>
+        <p class="text-sm text-muted mt-8">花了一个晚上看路由匹配的实现，终于搞懂了动态段与并行路由的优先级规则，比文档写得更清楚。</p>
+        <div class="path">/logs/2024-08-17 · 2024-08-17</div>
+      </div>
+
+      <!-- ============ 分组：作品 ============ -->
+      <div class="log-group-label">💼 作品</div>
+
+      <div class="search-result">
+        <div class="row gap-8 wrap">
+          <span class="badge badge-orange">作品</span>
+          <a style="font-size:16px;font-weight:650">个人站点（<mark>Next.js</mark> + MDX）</a>
+        </div>
+        <p class="text-sm text-muted mt-8">你现在看到的这个站。内容用 MDX 写，后台可配置模块开关，前台走 ISR 增量更新。</p>
+        <div class="path">/works/personal-site · 2024-12-20</div>
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination">
+        <a>←</a>
+        <a class="active">1</a>
+        <a>2</a>
+        <a>→</a>
+      </div>
+
+      <hr class="divider mt-32">
+
+      <!-- ============ 空结果状态 ============ -->
+      <div class="section-eyebrow mt-32">空结果状态</div>
+      <div class="empty-state">
+        <div class="ic">🔍</div>
+        <h3>没有找到关于「webgpu」的内容</h3>
+        <p>换个说法试试，只搜关键词效果更好。也可以从下面这些词开始。</p>
+        <div class="chip-row center mt-16">
+          <a class="chip chip-sm">Next.js</a>
+          <a class="chip chip-sm">Vite</a>
+          <a class="chip chip-sm">性能优化</a>
+          <a class="chip chip-sm">组件库</a>
+          <a class="chip chip-sm">TypeScript</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>浙ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a><span class="icon">🕐</span>时间戳</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

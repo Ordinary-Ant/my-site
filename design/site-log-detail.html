@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>重构了首页的动画 · 日志 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 日志详情</b>
+  <span class="spec-tag">/logs/:id</span>
+  <span class="spec-tag blue">模块 log</span>
+  <span class="spec-tag amber">轻量正文</span>
+  <span class="spacer">无 TOC / 无阅读量 / 无作者卡片 · 正文窄栏 720px · 上一篇下一篇按时间排序</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a class="active" href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="section" style="padding-bottom:0">
+    <div class="container-narrow">
+
+      <a class="text-sm text-muted" href="#">← 返回日志列表</a>
+
+      <div class="row between gap-16 wrap mt-24">
+        <span class="text-sm text-subtle mono">2025 年 1 月 15 日 周三</span>
+        <span class="mood">😊 开心 · ☀️ 晴 · 📍 杭州</span>
+      </div>
+
+      <h1 class="mt-12" style="font-size:36px;letter-spacing:-.028em">重构了首页的动画</h1>
+
+    </div>
+  </section>
+
+  <!-- ============ 封面 ============ -->
+  <div class="container-narrow mt-24">
+    <div class="cover cover-16x9">首页动画封面 16:9</div>
+  </div>
+
+  <!-- ============ 正文 ============ -->
+  <section class="section" style="padding-top:32px">
+    <div class="container-narrow">
+      <div class="prose">
+
+        <p>首页那套动画是一年多前写的，当时图省事直接上了 Framer Motion。功能没问题，但首屏要多下 40KB 的运行时，而且每个卡片的入场都走 JS 计算，低端机上滑动明显掉帧。这个月终于下决心重写。</p>
+
+        <p>思路很朴素：<strong>能用 CSS 表达的动画，就不要再交给 JS</strong>。入场用 <code>@keyframes</code> 配 <code>animation-delay</code> 做错峰，滚动触发的部分交给 scroll-driven animation，只有需要跟随指针的那两个交互保留 JS。</p>
+
+        <h2>顺手补上的降级</h2>
+
+        <p>重写的时候才发现，之前那版完全没处理「用户偏好减少动效」这个设置。这既是个可访问性问题，也是个很容易被忽略的细节——系统里关了动画的人，看到满屏飞入的卡片其实挺难受的。补上的写法大概是这样：</p>
+
+        <div class="code-head"><span>css</span><span>复制</span></div>
+        <pre><code><span class="tok-com">/* 全局兜底：用户要求减少动效时，把所有动画压到最小值 */</span>
+<span class="tok-key">@media</span> (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: <span class="tok-str">0.01ms</span> !important;
+    animation-iteration-count: <span class="tok-str">1</span> !important;
+    transition-duration: <span class="tok-str">0.01ms</span> !important;
+    scroll-behavior: <span class="tok-str">auto</span> !important;
+  }
+}
+
+<span class="tok-com">/* 只有在允许动效时，才注册入场动画 */</span>
+<span class="tok-key">@media</span> (prefers-reduced-motion: no-preference) {
+  <span class="tok-fn">.card-enter</span> {
+    animation: fade-up <span class="tok-str">420ms</span> <span class="tok-fn">cubic-bezier</span>(.22, 1, .36, 1) both;
+    animation-delay: <span class="tok-fn">calc</span>(var(--i) * <span class="tok-str">60ms</span>);
+  }
+
+  <span class="tok-fn">.card-enter</span>:hover {
+    transform: <span class="tok-fn">translateY</span>(<span class="tok-str">-2px</span>);
+  }
+}</code></pre>
+
+        <p>改完之后首屏 JS 少了 40KB，Lighthouse 的 CLS 从 0.08 掉到 0.01。更有意思的是代码量：从 180 行的动画组件变成 60 行 CSS，而真正需要维护的东西少了一大半。</p>
+
+        <p>唯一的遗憾是 Safari 对 scroll-driven animation 的支持还是慢半拍，所以滚动相关的部分我留了一个特性检测的旁路。等它稳定了再删。</p>
+
+      </div>
+
+      <!-- ============ 图集 ============ -->
+      <div class="grid-3 mt-32">
+        <div class="cover cover-4x3">改动前 4:3</div>
+        <div class="cover cover-4x3">改动后 4:3</div>
+        <div class="cover cover-4x3">性能面板 4:3</div>
+      </div>
+
+      <!-- ============ 标签 ============ -->
+      <div class="chip-row mt-32" style="gap:14px">
+        <span class="tag">重构</span>
+        <span class="tag">性能</span>
+        <span class="tag">CSS</span>
+        <span class="tag">可访问性</span>
+      </div>
+
+      <!-- ============ 上一篇 / 下一篇 ============ -->
+      <div class="prevnext mt-48">
+        <a href="#">
+          <span class="lbl">← 上一篇</span>
+          <span class="ttl">面试了一个候选人</span>
+        </a>
+        <a href="#">
+          <span class="lbl">下一篇 →</span>
+          <span class="ttl">读完《重构》第二遍</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a class="active"><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

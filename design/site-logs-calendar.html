@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日志日历 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 日志日历</b>
+  <span class="spec-tag">/logs?view=calendar</span>
+  <span class="spec-tag blue">模块 log</span>
+  <span class="spec-tag amber">月份走 URL 参数</span>
+  <span class="spacer">日期格内圆点数量 = 当日日志条数 · 点击日期在下方展开预览 · 与列表视图共用同一查询</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a class="active" href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ 标题区 + 视图切换 ============ -->
+  <section class="section" style="padding-bottom:0">
+    <div class="container">
+      <div class="section-head" style="margin-bottom:0">
+        <div>
+          <h1 style="font-size:32px;letter-spacing:-.025em">📓 日志</h1>
+          <p class="section-intro">记录每天发生的事，以及偶尔的顿悟</p>
+        </div>
+        <div class="chip-row">
+          <span class="chip">列表</span>
+          <span class="chip chip-active">日历</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 日历 + 本月概览 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="grid-2-1">
+
+        <!-- 左：日历面板 + 选中日预览 -->
+        <div style="max-width:640px">
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="icon-btn">‹</span>
+              <div class="bold" style="font-size:15px">2025 年 1 月</div>
+              <span class="icon-btn">›</span>
+            </div>
+            <div class="panel-body">
+              <div class="cal-grid">
+                <div class="dow">一</div>
+                <div class="dow">二</div>
+                <div class="dow">三</div>
+                <div class="dow">四</div>
+                <div class="dow">五</div>
+                <div class="dow">六</div>
+                <div class="dow">日</div>
+
+                <div class="cal-day muted">30</div>
+                <div class="cal-day muted">31</div>
+                <div class="cal-day">1</div>
+                <div class="cal-day">2</div>
+                <div class="cal-day has">3<span class="mark"><i></i></span></div>
+                <div class="cal-day">4</div>
+                <div class="cal-day has">5<span class="mark"><i></i></span></div>
+
+                <div class="cal-day">6</div>
+                <div class="cal-day">7</div>
+                <div class="cal-day has">8<span class="mark"><i></i><i></i><i></i></span></div>
+                <div class="cal-day">9</div>
+                <div class="cal-day">10</div>
+                <div class="cal-day">11</div>
+                <div class="cal-day has">12<span class="mark"><i></i></span></div>
+
+                <div class="cal-day">13</div>
+                <div class="cal-day has">14<span class="mark"><i></i><i></i></span></div>
+                <div class="cal-day has today" style="box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 26%, transparent)">15<span class="mark"><i></i></span></div>
+                <div class="cal-day">16</div>
+                <div class="cal-day">17</div>
+                <div class="cal-day has">18<span class="mark"><i></i></span></div>
+                <div class="cal-day">19</div>
+
+                <div class="cal-day">20</div>
+                <div class="cal-day has">21<span class="mark"><i></i></span></div>
+                <div class="cal-day">22</div>
+                <div class="cal-day">23</div>
+                <div class="cal-day has">24<span class="mark"><i></i></span></div>
+                <div class="cal-day">25</div>
+                <div class="cal-day">26</div>
+
+                <div class="cal-day">27</div>
+                <div class="cal-day">28</div>
+                <div class="cal-day">29</div>
+                <div class="cal-day">30</div>
+                <div class="cal-day">31</div>
+                <div class="cal-day muted">1</div>
+                <div class="cal-day muted">2</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 选中日预览 -->
+          <div class="card mt-16">
+            <div class="row between gap-12 wrap">
+              <div class="bold mono text-sm">2025-01-15 · 1 条日志</div>
+              <a class="text-accent text-sm bold">查看详情 →</a>
+            </div>
+            <div class="row gap-12 wrap mt-12">
+              <h3 style="font-size:16px">重构了首页的动画</h3>
+              <span class="mood">😊 开心 · ☀️ 晴 · 📍 杭州</span>
+            </div>
+            <p class="text-sm text-muted clamp-2 mt-8">把 Framer Motion 换成了纯 CSS，包体小了 40KB。scroll-driven animation 已经可以在生产里用了，只是要注意 Safari 的降级写法。</p>
+            <div class="chip-row mt-12" style="gap:14px">
+              <span class="tag">重构</span><span class="tag">性能</span><span class="tag">CSS</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 右：本月概览 -->
+        <div class="stack gap-16">
+          <div class="card">
+            <div class="text-xs text-subtle" style="letter-spacing:.07em;font-weight:650">本月概览</div>
+            <div class="row gap-8 mt-8" style="align-items:baseline">
+              <span style="font-size:30px;font-weight:700;letter-spacing:-.03em">12</span>
+              <span class="text-sm text-muted">篇日志</span>
+            </div>
+            <div class="text-xs text-subtle mt-4">比上月多 3 篇 · 连续记录 9 天</div>
+          </div>
+
+          <div class="card">
+            <div class="text-xs text-subtle mb-8" style="letter-spacing:.07em;font-weight:650">类型分布</div>
+            <div class="stack gap-8">
+              <div class="row between"><span class="badge badge-blue">每日随笔</span><span class="text-sm text-muted mono">7</span></div>
+              <div class="row between"><span class="badge badge-violet">大事件</span><span class="text-sm text-muted mono">3</span></div>
+              <div class="row between"><span class="badge badge-amber">总结</span><span class="text-sm text-muted mono">2</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="text-xs text-subtle mb-8" style="letter-spacing:.07em;font-weight:650">心情分布</div>
+            <div class="chip-row" style="gap:8px">
+              <span class="badge badge-gray">😊 4</span>
+              <span class="badge badge-gray">🙂 3</span>
+              <span class="badge badge-gray">😐 2</span>
+              <span class="badge badge-gray">😄 1</span>
+              <span class="badge badge-gray">😤 1</span>
+              <span class="badge badge-gray">😌 1</span>
+            </div>
+            <p class="text-xs text-subtle mt-12">心情取自日志本身的 emoji 标记，不需要额外维护。</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a class="active"><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

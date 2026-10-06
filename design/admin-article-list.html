@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 文章列表</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 文章列表</b>
+  <span class="spec-tag">/admin/articles</span>
+  <span class="spec-tag blue">GET /api/v1/admin/articles</span>
+  <span class="spec-tag violet">通用 DataTable 模板</span>
+  <span class="spacer">筛选/分页/排序全部写进 URL · 可刷新可分享 · 五个内容模块共用此骨架</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a class="active"><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">📄</span>
+      <div class="text-sm text-muted">内容管理 / <span class="bold" style="color:var(--fg)">文章</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="kbd">/</span><span class="text-xs text-subtle">聚焦搜索</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="page-head">
+        <div>
+          <h1>文章</h1>
+          <div class="sub">共 42 篇 · 38 已发布 · 4 草稿</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-ghost">🗑 回收站 <span class="badge badge-gray">2</span></a>
+          <a class="btn btn-primary">+ 新建文章</a>
+        </div>
+      </div>
+
+      <div class="panel">
+
+        <!-- ============ 筛选条 ============ -->
+        <div class="admin-filter">
+          <div class="input input-search">
+            <span>🔍</span>
+            <span style="color:var(--fg-subtle)">搜索标题或正文…</span>
+          </div>
+          <div class="select">全部状态</div>
+          <div class="select">全部分类</div>
+          <div class="select">全部标签</div>
+          <div class="select">最近 30 天</div>
+          <a class="btn btn-ghost btn-sm">重置</a>
+          <div class="ml-auto row gap-8">
+            <a class="btn btn-ghost btn-sm">⚙ 列设置</a>
+          </div>
+        </div>
+
+        <!-- ============ 表格 ============ -->
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="width:40px"><span class="cbx checked">✓</span></th>
+                <th style="width:34px"></th>
+                <th class="sorted">标题 ↕</th>
+                <th style="width:100px">分类</th>
+                <th style="width:110px">状态</th>
+                <th style="width:90px;text-align:right">浏览</th>
+                <th style="width:130px">发布时间 ↕</th>
+                <th style="width:100px;text-align:right">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="selected">
+                <td data-label="选择"><span class="cbx checked">✓</span></td>
+                <td data-label="置顶">📌</td>
+                <td data-label="标题">
+                  <div class="cell-title">我为什么选择 Next.js</div>
+                  <div class="cell-sub mono">why-i-choose-nextjs</div>
+                </td>
+                <td data-label="分类"><span class="badge badge-blue">技术</span></td>
+                <td data-label="状态"><span class="badge badge-green"><i class="dot-status dot-green"></i>已发布</span></td>
+                <td data-label="浏览" style="text-align:right" class="mono">1,024</td>
+                <td data-label="发布时间" class="text-muted">01-15 08:00</td>
+                <td data-label="操作">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm">编辑</a>
+                    <a class="btn btn-sm btn-ghost">⋯</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="selected">
+                <td data-label="选择"><span class="cbx checked">✓</span></td>
+                <td data-label="置顶"></td>
+                <td data-label="标题">
+                  <div class="cell-title">Vite 构建优化实践</div>
+                  <div class="cell-sub mono">vite-build-optimization</div>
+                </td>
+                <td data-label="分类"><span class="badge badge-blue">技术</span></td>
+                <td data-label="状态"><span class="badge badge-green"><i class="dot-status dot-green"></i>已发布</span></td>
+                <td data-label="浏览" style="text-align:right" class="mono">320</td>
+                <td data-label="发布时间" class="text-muted">01-14 09:30</td>
+                <td data-label="操作">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm">编辑</a>
+                    <a class="btn btn-sm btn-ghost">⋯</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="置顶"></td>
+                <td data-label="标题">
+                  <div class="cell-title">关于远程办公的思考</div>
+                  <div class="cell-sub mono">thoughts-on-remote-work</div>
+                </td>
+                <td data-label="分类"><span class="badge badge-violet">生活</span></td>
+                <td data-label="状态"><span class="badge badge-green"><i class="dot-status dot-green"></i>已发布</span></td>
+                <td data-label="浏览" style="text-align:right" class="mono">210</td>
+                <td data-label="发布时间" class="text-muted">01-12 21:10</td>
+                <td data-label="操作">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm">编辑</a>
+                    <a class="btn btn-sm btn-ghost">⋯</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="置顶"></td>
+                <td data-label="标题">
+                  <div class="cell-title">React Server Components 心智模型</div>
+                  <div class="cell-sub mono">rsc-mental-model</div>
+                </td>
+                <td data-label="分类"><span class="badge badge-blue">技术</span></td>
+                <td data-label="状态"><span class="badge badge-gray"><i class="dot-status dot-gray"></i>草稿</span></td>
+                <td data-label="浏览" style="text-align:right" class="text-subtle">—</td>
+                <td data-label="发布时间" class="text-subtle">—</td>
+                <td data-label="操作">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm">编辑</a>
+                    <a class="btn btn-sm btn-ghost">⋯</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="置顶"></td>
+                <td data-label="标题">
+                  <div class="cell-title">我如何做技术选型</div>
+                  <div class="cell-sub mono">how-i-choose-tech</div>
+                </td>
+                <td data-label="分类"><span class="badge badge-blue">技术</span></td>
+                <td data-label="状态"><span class="badge badge-green"><i class="dot-status dot-green"></i>已发布</span></td>
+                <td data-label="浏览" style="text-align:right" class="mono">876</td>
+                <td data-label="发布时间" class="text-muted">01-08 10:00</td>
+                <td data-label="操作">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm">编辑</a>
+                    <a class="btn btn-sm btn-ghost">⋯</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="置顶"></td>
+                <td data-label="标题">
+                  <div class="cell-title">2024 年终总结</div>
+                  <div class="cell-sub mono">2024-retrospective</div>
+                </td>
+                <td data-label="分类"><span class="badge badge-violet">生活</span></td>
+                <td data-label="状态"><span class="badge badge-amber"><i class="dot-status dot-amber"></i>已归档</span></td>
+                <td data-label="浏览" style="text-align:right" class="mono">1,530</td>
+                <td data-label="发布时间" class="text-muted">2024-12-31</td>
+                <td data-label="操作">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm">编辑</a>
+                    <a class="btn btn-sm btn-ghost">⋯</a>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="置顶"></td>
+                <td data-label="标题">
+                  <div class="cell-title">从 40s 到 8s：一次 CI 提速</div>
+                  <div class="cell-sub mono">ci-speedup</div>
+                </td>
+                <td data-label="分类"><span class="badge badge-blue">技术</span></td>
+                <td data-label="状态"><span class="badge badge-green"><i class="dot-status dot-green"></i>已发布</span></td>
+                <td data-label="浏览" style="text-align:right" class="mono">445</td>
+                <td data-label="发布时间" class="text-muted">2024-12-20</td>
+                <td data-label="操作">
+                  <div class="row-actions" style="justify-content:flex-end">
+                    <a class="btn btn-sm">编辑</a>
+                    <a class="btn btn-sm btn-ghost">⋯</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ============ 批量操作栏 ============ -->
+        <div class="bulk-bar">
+          <span class="bold">☑ 已选 2 项</span>
+          <div class="divider-v"></div>
+          <a class="btn btn-sm">发布</a>
+          <a class="btn btn-sm">下架</a>
+          <a class="btn btn-sm">打标签</a>
+          <a class="btn btn-sm" style="color:var(--red)">删除</a>
+          <a class="btn btn-sm btn-ghost ml-auto">取消选择</a>
+        </div>
+
+        <!-- ============ 分页 ============ -->
+        <div class="row between" style="padding:14px 18px;border-top:1px solid var(--border)">
+          <span class="text-xs text-subtle">显示 1–7 条，共 42 条</span>
+          <div class="row gap-6">
+            <a class="btn btn-sm">‹</a>
+            <a class="btn btn-sm btn-primary">1</a>
+            <a class="btn btn-sm">2</a>
+            <a class="btn btn-sm">3</a>
+            <a class="btn btn-sm">…</a>
+            <a class="btn btn-sm">6</a>
+            <a class="btn btn-sm">›</a>
+            <div class="divider-v"></div>
+            <div class="select" style="height:30px;font-size:12.5px">每页 10</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================
+           状态稿
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-24">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:24px">
+
+          <!-- 空态 -->
+          <div class="panel">
+            <div class="panel-head"><span class="bold text-sm">① 空态（区分"没有内容"与"筛选无结果"）</span></div>
+            <div class="empty-state">
+              <div class="ic">📄</div>
+              <h3>还没有任何文章</h3>
+              <p>写下第一篇吧，这会是你个人品牌的起点。</p>
+              <a class="btn btn-primary mt-16">+ 新建文章</a>
+            </div>
+            <hr class="divider">
+            <div class="empty-state">
+              <div class="ic">🔍</div>
+              <h3>没有符合条件的内容</h3>
+              <p>试试放宽筛选条件，或者换个关键词。</p>
+              <a class="btn mt-16">重置筛选</a>
+            </div>
+          </div>
+
+          <!-- 加载骨架 + 行菜单 -->
+          <div class="panel">
+            <div class="panel-head"><span class="bold text-sm">② 加载骨架 / 行操作菜单 / 删除确认</span></div>
+            <div class="panel-body stack gap-20">
+
+              <div>
+                <div class="text-xs text-subtle mb-8">骨架屏 —— 保持与真实行相同高度，避免布局跳动</div>
+                <div class="stack gap-12">
+                  <div class="row gap-14"><span class="skeleton" style="width:16px"></span><span class="skeleton" style="flex:1"></span><span class="skeleton" style="width:70px"></span><span class="skeleton" style="width:50px"></span></div>
+                  <div class="row gap-14"><span class="skeleton" style="width:16px"></span><span class="skeleton" style="flex:1"></span><span class="skeleton" style="width:70px"></span><span class="skeleton" style="width:50px"></span></div>
+                  <div class="row gap-14"><span class="skeleton" style="width:16px"></span><span class="skeleton" style="flex:1"></span><span class="skeleton" style="width:70px"></span><span class="skeleton" style="width:50px"></span></div>
+                </div>
+              </div>
+
+              <hr class="divider">
+
+              <div>
+                <div class="text-xs text-subtle mb-8">行操作菜单（⋯）—— 危险操作置底且用红色</div>
+                <div class="card card-sm stack gap-2" style="max-width:220px;box-shadow:var(--shadow-md);padding:6px">
+                  <a class="btn btn-ghost btn-sm" style="justify-content:flex-start">📄 预览</a>
+                  <a class="btn btn-ghost btn-sm" style="justify-content:flex-start">📌 取消置顶</a>
+                  <a class="btn btn-ghost btn-sm" style="justify-content:flex-start">📥 下架为草稿</a>
+                  <a class="btn btn-ghost btn-sm" style="justify-content:flex-start">🔗 复制链接</a>
+                  <hr class="divider" style="margin:4px 0">
+                  <a class="btn btn-ghost btn-sm" style="justify-content:flex-start;color:var(--red)">🗑 移入回收站</a>
+                </div>
+              </div>
+
+              <hr class="divider">
+
+              <div>
+                <div class="text-xs text-subtle mb-8">错误态 —— 表格区域局部报错，导航与页脚保持可用</div>
+                <div class="notice notice-danger">
+                  <span class="icon">!</span>
+                  <div>
+                    <div class="bold">加载失败</div>
+                    <div class="text-xs mt-4">请求超时 · 错误编号 <span class="mono">req_01HQZX8M4K</span></div>
+                    <div class="row gap-8 mt-8">
+                      <a class="btn btn-sm">重试</a>
+                      <a class="btn btn-sm btn-ghost">复制错误编号</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 键盘快捷键 -->
+        <div class="panel mt-24">
+          <div class="panel-head"><span class="bold text-sm">③ 列表页键盘操作（键盘党的效率来源）</span></div>
+          <div class="panel-body">
+            <div class="row gap-32 wrap text-sm text-muted">
+              <span><span class="kbd">J</span> <span class="kbd">K</span> 上下移动行焦点</span>
+              <span><span class="kbd">Enter</span> 打开编辑</span>
+              <span><span class="kbd">X</span> 选中/取消</span>
+              <span><span class="kbd">/</span> 聚焦搜索框</span>
+              <span><span class="kbd">Esc</span> 清空筛选</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

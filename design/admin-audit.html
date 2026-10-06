@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 审计日志</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 审计日志</b>
+  <span class="spec-tag">/admin/audit-logs</span>
+  <span class="spec-tag">保留 180 天</span>
+  <span class="spacer">只记录写操作（POST / PATCH / DELETE）· 登录与上传同样留痕，不可编辑不可删除</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a class="active"><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">📋</span>
+      <div class="text-sm text-muted">系统 / <span class="bold" style="color:var(--fg)">审计日志</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">近 7 天 63 条 · 最早可追溯到 2024-08-01</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>系统</span><span>/</span><span style="color:var(--fg-muted)">审计日志</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>审计日志</h1>
+          <div class="sub">记录每一次写操作，可追溯"谁在什么时候改了什么"</div>
+        </div>
+      </div>
+
+      <!-- ============ 日志表 ============ -->
+      <div class="panel">
+
+        <div class="admin-filter">
+          <div class="select">全部资源</div>
+          <div class="select">全部操作</div>
+          <div class="select">全部用户</div>
+          <div class="select">最近 7 天</div>
+          <a class="btn btn-sm">重置</a>
+          <div class="ml-auto">
+            <a class="btn btn-sm">导出 CSV</a>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="width:150px">时间</th>
+                <th style="width:90px">用户</th>
+                <th style="width:90px">操作</th>
+                <th style="width:230px">对象</th>
+                <th>变更摘要</th>
+                <th style="width:60px;text-align:center">展开</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- ① 已展开 -->
+              <tr class="selected">
+                <td class="mono text-xs text-subtle">2025-01-15 10:23</td>
+                <td>Puly</td>
+                <td><span class="badge badge-amber">修改</span></td>
+                <td>模块 · 日志</td>
+                <td class="text-xs">
+                  <span class="mono"><span style="color:#b91c1c">enabled: true</span> → <span style="color:#047857">enabled: false</span></span>
+                </td>
+                <td style="text-align:center" class="text-accent">▾</td>
+              </tr>
+              <tr>
+                <td colspan="6" style="background:var(--bg-subtle);padding:16px 14px 18px">
+                  <div class="row between mb-8">
+                    <span class="text-xs bold text-subtle" style="letter-spacing:.06em">变更详情 · PATCH /api/v1/admin/modules/log</span>
+                    <span class="text-xs text-subtle mono">1.2.3.4 · Chrome / Windows</span>
+                  </div>
+                  <div class="diff">
+                    <div class="del">- { "key": "log", "enabled": true,  "navVisible": true }</div>
+                    <div class="add">+ { "key": "log", "enabled": false, "navVisible": false }</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- ② -->
+              <tr>
+                <td class="mono text-xs text-subtle">2025-01-15 09:12</td>
+                <td>Puly</td>
+                <td><span class="badge badge-green">发布</span></td>
+                <td>文章 · 我为什么选择 Next.js</td>
+                <td class="text-xs mono"><span style="color:#b91c1c">status: DRAFT</span> → <span style="color:#047857">status: PUBLISHED</span></td>
+                <td style="text-align:center" class="text-subtle">▸</td>
+              </tr>
+
+              <!-- ③ -->
+              <tr>
+                <td class="mono text-xs text-subtle">2025-01-15 08:40</td>
+                <td>Puly</td>
+                <td><span class="badge badge-gray">登录</span></td>
+                <td class="text-subtle">—</td>
+                <td class="text-xs mono text-muted">1.2.3.4 · Chrome / Windows</td>
+                <td style="text-align:center" class="text-subtle">▸</td>
+              </tr>
+
+              <!-- ④ -->
+              <tr>
+                <td class="mono text-xs text-subtle">2025-01-14 16:08</td>
+                <td>Puly</td>
+                <td><span class="badge badge-amber">修改</span></td>
+                <td>模块 · 作品集</td>
+                <td class="text-xs mono"><span style="color:#b91c1c">navOrder: 2</span> → <span style="color:#047857">navOrder: 3</span></td>
+                <td style="text-align:center" class="text-subtle">▸</td>
+              </tr>
+
+              <!-- ⑤ -->
+              <tr>
+                <td class="mono text-xs text-subtle">2025-01-14 11:20</td>
+                <td>小助手</td>
+                <td><span class="badge badge-green">新增</span></td>
+                <td>作品 · 待办清单 PWA</td>
+                <td class="text-xs mono text-muted">Project#clx9f2</td>
+                <td style="text-align:center" class="text-subtle">▸</td>
+              </tr>
+
+              <!-- ⑥ -->
+              <tr>
+                <td class="mono text-xs text-subtle">2025-01-13 15:02</td>
+                <td>Puly</td>
+                <td><span class="badge badge-blue">上传</span></td>
+                <td>媒体 · screenshot-home.webp</td>
+                <td class="text-xs mono text-muted">204 KB</td>
+                <td style="text-align:center" class="text-subtle">▸</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <hr class="divider">
+
+        <div class="pagination" style="padding:18px 0">
+          <a>‹</a>
+          <a class="active">1</a>
+          <a>2</a>
+          <a>3</a>
+          <a>…</a>
+          <a>9</a>
+          <a>›</a>
+        </div>
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle">
+        <span>每行可展开查看完整前后值</span><span>·</span>
+        <span>超过 180 天的记录自动归档并删除</span><span>·</span>
+        <span>日志本身不可编辑、不可删除</span>
+      </div>
+
+      <!-- ================================================================
+           以下为放大的变更详情面板
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 展开后的完整变更详情（展示字段级 before / after）</div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="bold text-sm">文章 · 我为什么选择 Next.js · 发布操作</div>
+              <div class="text-xs text-subtle mono mt-4">2025-01-15 09:12 · Puly · 1.2.3.4 · Chrome / Windows</div>
+            </div>
+            <span class="badge badge-green">发布</span>
+          </div>
+          <div class="panel-body">
+            <div class="diff">
+              <div>  {</div>
+              <div class="del">-   "status": "DRAFT",</div>
+              <div class="add">+   "status": "PUBLISHED",</div>
+              <div class="del">-   "publishedAt": null,</div>
+              <div class="add">+   "publishedAt": "2025-01-15T09:12:00Z",</div>
+              <div class="del">-   "readingTime": 8,</div>
+              <div class="add">+   "readingTime": 9,</div>
+              <div class="del">-   "updatedAt": "2025-01-14T16:20:00Z",</div>
+              <div class="add">+   "updatedAt": "2025-01-15T09:12:00Z",</div>
+              <div>    "slug": "why-i-choose-nextjs"</div>
+              <div>  }</div>
+            </div>
+            <div class="row between mt-16">
+              <span class="text-xs text-subtle">变更记录不可编辑、不可删除</span>
+              <div class="row gap-8">
+                <a class="btn btn-sm btn-ghost">复制 JSON</a>
+                <a class="btn btn-sm">查看该文章</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

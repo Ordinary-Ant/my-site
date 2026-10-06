@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>设计系统 · UI Kit 总览</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>设计系统 · UI Kit</b>
+  <span class="spec-tag">所有页面的视觉基准</span>
+  <span class="spec-tag violet">Tailwind v4 + shadcn/ui 落地</span>
+  <span class="spacer">本页是设计基准，任何新页面都应复用这里的 token 与组件，不要另起一套</span>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly 设计系统</a>
+    <nav class="site-nav">
+      <a class="active">UI Kit</a>
+      <a>色板</a>
+      <a>排版</a>
+      <a>组件</a>
+      <a>断点</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="mt-32">
+    <div class="section-eyebrow">Design Tokens &amp; Components</div>
+    <h1 style="font-size:32px;letter-spacing:-.025em">UI Kit 总览</h1>
+    <p class="section-intro" style="max-width:760px">
+      前台、后台、登录页与 404 共用同一套 token 与组件。变量定义在 <span class="mono text-xs">mock.css</span> 的
+      <span class="mono text-xs">:root</span>，深色模式通过 <span class="mono text-xs">[data-theme="dark"]</span> 整体换值。
+    </p>
+  </div>
+
+  <div class="notice mt-16" style="max-width:880px">
+    <span class="icon">📐</span>
+    <div>本页是设计基准，任何新页面都应复用这里的 token 与组件，不要另起一套。</div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     01 色板
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">01 · Color</div>
+        <h2>色板</h2>
+        <p class="section-intro">品牌色只用于交互主路径；语义色用于内容分类与状态标记。</p>
+      </div>
+    </div>
+
+    <div class="text-xs bold text-subtle mb-12" style="letter-spacing:.06em">品牌色 · 4 个</div>
+    <div class="grid-4 mb-32">
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#6366F1"></div>
+        <div class="text-sm bold mt-8 mono">--accent</div>
+        <div class="text-xs text-subtle mono">#6366F1 · 主按钮 / 链接 / 选中态</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#4F46E5"></div>
+        <div class="text-sm bold mt-8 mono">--accent-hover</div>
+        <div class="text-xs text-subtle mono">#4F46E5 · 悬停 / 按下</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#EEF2FF"></div>
+        <div class="text-sm bold mt-8 mono">--accent-soft</div>
+        <div class="text-xs text-subtle mono">#EEF2FF · 选中行 / 提示底色</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#C7D2FE"></div>
+        <div class="text-sm bold mt-8 mono">--accent-border</div>
+        <div class="text-xs text-subtle mono">#C7D2FE · 强调块描边</div>
+      </div>
+    </div>
+
+    <div class="text-xs bold text-subtle mb-12" style="letter-spacing:.06em">语义色 · 6 个（内容分类与状态）</div>
+    <div class="grid-3 mb-32">
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#3B82F6"></div>
+        <div class="text-sm bold mt-8 mono">--blue #3B82F6</div>
+        <div class="text-xs text-subtle">工作 · Work</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#10B981"></div>
+        <div class="text-sm bold mt-8 mono">--green #10B981</div>
+        <div class="text-xs text-subtle">成功 · 已发布</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#8B5CF6"></div>
+        <div class="text-sm bold mt-8 mono">--violet #8B5CF6</div>
+        <div class="text-xs text-subtle">项目 · Project</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#F59E0B"></div>
+        <div class="text-sm bold mt-8 mono">--amber #F59E0B</div>
+        <div class="text-xs text-subtle">荣誉 · Award</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#F97316"></div>
+        <div class="text-sm bold mt-8 mono">--orange #F97316</div>
+        <div class="text-xs text-subtle">里程碑 · Milestone</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:#EF4444"></div>
+        <div class="text-sm bold mt-8 mono">--red #EF4444</div>
+        <div class="text-xs text-subtle">危险 · 删除</div>
+      </div>
+    </div>
+
+    <div class="text-xs bold text-subtle mb-12" style="letter-spacing:.06em">中性色 · 8 个（下方 hex 为浅色模式取值）</div>
+    <div class="grid-4" style="gap:16px">
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--bg)"></div>
+        <div class="text-sm bold mt-8 mono">--bg</div>
+        <div class="text-xs text-subtle mono">#FFFFFF · 页面底色</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--bg-subtle)"></div>
+        <div class="text-sm bold mt-8 mono">--bg-subtle</div>
+        <div class="text-xs text-subtle mono">#FAFAFA · 次级底色</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--bg-muted)"></div>
+        <div class="text-sm bold mt-8 mono">--bg-muted</div>
+        <div class="text-xs text-subtle mono">#F4F4F5 · 填充 / 代码底</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--card)"></div>
+        <div class="text-sm bold mt-8 mono">--card</div>
+        <div class="text-xs text-subtle mono">#FFFFFF · 卡片面</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--border)"></div>
+        <div class="text-sm bold mt-8 mono">--border</div>
+        <div class="text-xs text-subtle mono">#E5E7EB · 常规描边</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--fg)"></div>
+        <div class="text-sm bold mt-8 mono">--fg</div>
+        <div class="text-xs text-subtle mono">#0A0A0A · 正文与标题</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--fg-muted)"></div>
+        <div class="text-sm bold mt-8 mono">--fg-muted</div>
+        <div class="text-xs text-subtle mono">#52525B · 次要文字</div>
+      </div>
+      <div>
+        <div class="cover" style="aspect-ratio:16/10;background:var(--fg-subtle)"></div>
+        <div class="text-sm bold mt-8 mono">--fg-subtle</div>
+        <div class="text-xs text-subtle mono">#A1A1AA · 时间 / 占位</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     02 排版
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">02 · Typography</div>
+        <h2>排版</h2>
+        <p class="section-intro">正文 15px；标题字重 650、字距 -0.011em，让中文标题更紧凑。</p>
+      </div>
+      <span class="text-xs text-subtle mono">--font / --mono</span>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body stack gap-4">
+
+        <div class="row between gap-20 wrap" style="border-bottom:1px solid var(--border);padding:12px 0">
+          <div style="font-size:42px;font-weight:650;line-height:1.15;letter-spacing:-.025em">写代码，也写字</div>
+          <div class="text-xs text-subtle mono nowrap">H1 · 42px / 1.15 / 650</div>
+        </div>
+
+        <div class="row between gap-20 wrap" style="border-bottom:1px solid var(--border);padding:12px 0">
+          <div style="font-size:23px;font-weight:650;line-height:1.3;letter-spacing:-.02em">最近在做的事</div>
+          <div class="text-xs text-subtle mono nowrap">H2 · 23px / 1.30 / 650</div>
+        </div>
+
+        <div class="row between gap-20 wrap" style="border-bottom:1px solid var(--border);padding:12px 0">
+          <div style="font-size:19px;font-weight:650;line-height:1.3">为什么我不再手写 CSS 变量</div>
+          <div class="text-xs text-subtle mono nowrap">H3 · 19px / 1.30 / 650</div>
+        </div>
+
+        <div class="row between gap-20 wrap" style="border-bottom:1px solid var(--border);padding:12px 0">
+          <div style="font-size:15.5px;font-weight:650;line-height:1.3">技术栈</div>
+          <div class="text-xs text-subtle mono nowrap">H4 · 15.5px / 1.30 / 650</div>
+        </div>
+
+        <div class="row between gap-20 wrap" style="border-bottom:1px solid var(--border);padding:12px 0">
+          <div style="font-size:15px;line-height:1.6;max-width:560px" class="text-muted">
+            写了五年界面，最深的体会是：把间距、圆角和层级统一之后，页面自然就好看了。
+          </div>
+          <div class="text-xs text-subtle mono nowrap">正文 · 15px / 1.60 / 400</div>
+        </div>
+
+        <div class="row between gap-20 wrap" style="border-bottom:1px solid var(--border);padding:12px 0">
+          <div class="text-sm text-subtle">更新于 2025-01-15 · 阅读 8 分钟</div>
+          <div class="text-xs text-subtle mono nowrap">小字 · 13px / 1.60 / 400</div>
+        </div>
+
+        <div class="row between gap-20 wrap" style="padding:12px 0">
+          <div class="mono text-sm">pnpm dev --filter web</div>
+          <div class="text-xs text-subtle mono nowrap">.mono · 13.5px / 代码与 ID</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     03 按钮
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">03 · Buttons</div>
+        <h2>按钮</h2>
+        <p class="section-intro">一个界面里最多一个主按钮；危险操作永远放在最右，且需要二次确认。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body stack gap-24">
+
+        <div>
+          <div class="text-xs text-subtle mono mb-8">变体 · .btn-primary / .btn / .btn-outline / .btn-ghost / .btn-danger</div>
+          <div class="btn-row">
+            <a class="btn btn-primary">保存</a>
+            <a class="btn">取消</a>
+            <a class="btn btn-outline">预览</a>
+            <a class="btn btn-ghost">稍后再说</a>
+            <a class="btn btn-danger">删除</a>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div>
+          <div class="text-xs text-subtle mono mb-8">尺寸 · .btn-lg / 默认 / .btn-sm / .btn-icon</div>
+          <div class="row gap-12 wrap">
+            <a class="btn btn-primary btn-lg">发布文章</a>
+            <a class="btn btn-primary">保存</a>
+            <a class="btn btn-primary btn-sm">保存</a>
+            <a class="btn btn-icon">✎</a>
+            <a class="btn btn-sm btn-icon">⋯</a>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div>
+          <div class="text-xs text-subtle mono mb-8">状态 · 默认 / 禁用（opacity .45 + 不响应点击）/ 加载中</div>
+          <div class="btn-row">
+            <a class="btn">可点击</a>
+            <a class="btn" style="opacity:.45">禁用</a>
+            <a class="btn btn-primary">提交中 ⋯</a>
+            <a class="btn btn-primary" style="opacity:.5">保存中…</a>
+            <a class="btn btn-block btn-primary" style="max-width:220px">.btn-block 通栏按钮</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     04 徽章与状态
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">04 · Badges</div>
+        <h2>徽章与状态</h2>
+        <p class="section-intro">徽章表示"是什么"，状态点表示"现在怎么样"，两者不要混用。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body stack gap-24">
+
+        <div>
+          <div class="text-xs text-subtle mono mb-8">.badge 全部变体</div>
+          <div class="chip-row">
+            <span class="badge badge-accent">管理员</span>
+            <span class="badge badge-blue">编辑</span>
+            <span class="badge badge-green">已发布</span>
+            <span class="badge badge-violet">项目</span>
+            <span class="badge badge-amber">修改</span>
+            <span class="badge badge-orange">里程碑</span>
+            <span class="badge badge-red">已删除</span>
+            <span class="badge badge-gray">只读</span>
+            <span class="badge">默认</span>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div>
+          <div class="text-xs text-subtle mono mb-8">筛选 .chip / .chip-active / .chip-sm；标签 .tag</div>
+          <div class="chip-row">
+            <span class="chip chip-active">全部</span>
+            <span class="chip">文章</span>
+            <span class="chip">日志</span>
+            <span class="chip chip-sm">React</span>
+            <span class="chip chip-sm">TypeScript</span>
+            <span class="divider-v"></span>
+            <span class="tag">Next.js</span>
+            <span class="tag">Tailwind</span>
+            <span class="tag">性能优化</span>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div>
+          <div class="text-xs text-subtle mono mb-8">状态点 .dot-status（绿 / 灰 / 黄 + 文字）</div>
+          <div class="row gap-24 wrap text-sm">
+            <span class="row gap-8"><i class="dot-status dot-green"></i>已发布</span>
+            <span class="row gap-8"><i class="dot-status dot-gray"></i>草稿</span>
+            <span class="row gap-8"><i class="dot-status dot-amber"></i>已归档</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     05 表单控件
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">05 · Forms</div>
+        <h2>表单控件</h2>
+        <p class="section-intro">标签在控件上方、错误在控件下方；必填不加星号，用 hint 说明规则。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <div style="max-width:640px" class="stack gap-20">
+
+          <div class="field">
+            <label>控件默认态</label>
+            <div class="control">前端工程师 · 写代码也写字</div>
+            <div class="hint">.control 默认高度 40px，圆角 9px</div>
+          </div>
+
+          <div class="field">
+            <label>校验错误态</label>
+            <div class="control invalid">admin@</div>
+            <div class="err">请输入完整的邮箱地址</div>
+          </div>
+
+          <div class="field">
+            <label>多行文本 .control-area</label>
+            <div class="control control-area">写点什么呢？随便记一句也行。这里会保存为草稿，随时可以继续。</div>
+            <div class="char-count">30 / 200</div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>下拉 .select</label>
+              <div class="select" style="width:100%">编辑（EDITOR）</div>
+            </div>
+            <div class="field">
+              <label>搜索 .input-search</label>
+              <div class="input input-search" style="width:100%;max-width:none"><span>🔍</span><span>搜索文章标题…</span></div>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="field">
+            <label>复选框 .ck</label>
+            <div class="row gap-24 wrap">
+              <span class="cbx-row"><span class="ck on">✓</span>选中</span>
+              <span class="cbx-row"><span class="ck"></span>未选</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>单选框 .radio</label>
+            <div class="row gap-24 wrap">
+              <span class="cbx-row"><span class="radio on"></span>选中</span>
+              <span class="cbx-row"><span class="radio"></span>未选</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>开关 .switch</label>
+            <div class="row gap-24 wrap">
+              <span class="cbx-row"><span class="switch on"></span>开</span>
+              <span class="cbx-row"><span class="switch"></span>关</span>
+              <span class="cbx-row"><span class="switch disabled"></span>禁用（如自己的账号）</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>快捷键 .kbd</label>
+            <div class="row gap-8 wrap text-sm text-muted">
+              保存草稿 <span class="kbd">⌘</span><span class="kbd">S</span>
+              <span style="margin-left:8px">全局搜索</span> <span class="kbd">⌘</span><span class="kbd">K</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     06 卡片
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">06 · Cards</div>
+        <h2>卡片</h2>
+        <p class="section-intro">卡片只做一层边框 + 极小阴影，不叠阴影、不加悬浮放大。</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="project-card">
+        <div class="cover cover-16x9"></div>
+        <div class="body">
+          <div class="row between">
+            <h3>个人博客系统</h3>
+            <span class="badge badge-violet">项目</span>
+          </div>
+          <div class="desc">基于 Next.js 的内容站，带后台模块开关与审计日志。</div>
+          <div class="foot">
+            <span class="text-xs text-subtle mono">Next.js · Prisma</span>
+            <a class="text-xs text-accent">查看详情 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="post-card pinned">
+        <div class="cover cover-16x9"></div>
+        <div class="grow">
+          <h3>我为什么选择 Next.js</h3>
+          <div class="text-sm text-muted mt-8 clamp-2">不是因为流行，而是因为它把路由、数据获取和渲染方式放进了一个能讲清楚的模型里。</div>
+          <div class="meta mt-12">
+            <span>2025-01-15</span><span>·</span><span>9 分钟</span><span>·</span><span>#Next.js</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="log-item mt-16">
+      <div class="log-date">
+        <div class="d">15</div>
+        <div class="w">周三</div>
+      </div>
+      <div class="log-body grow">
+        <h3>把设计系统收进一个文件</h3>
+        <div class="summary">今天花了两个小时把散落在各处的颜色和间距收敛到一组 CSS 变量里。改完后才发现，之前有七种不同的灰色。</div>
+        <div class="mt-12"><span class="badge badge-gray">每日随笔</span></div>
+      </div>
+    </div>
+
+    <div class="grid-2 mt-16">
+      <div class="stat-card">
+        <div class="lbl">📄 已发布文章</div>
+        <div class="num">42</div>
+        <div class="sub">本月新增 5 篇 · 草稿 3 篇</div>
+        <div class="bar-chart">
+          <i style="height:38%"></i><i style="height:56%"></i><i style="height:44%"></i>
+          <i style="height:72%"></i><i style="height:60%"></i><i style="height:88%"></i>
+          <i style="height:66%"></i>
+        </div>
+      </div>
+
+      <div class="panel" style="align-self:start">
+        <div class="panel-head">
+          <div class="bold text-sm">.panel 最小实例</div>
+          <a class="text-xs text-accent">操作 →</a>
+        </div>
+        <div class="panel-body">
+          <div class="text-sm text-muted">
+            面板 = 标题栏（可选）+ 内容区 + 分隔线。表格、表单、列表都装进面板里，页面层级就不会超过三层。
+          </div>
+          <div class="row gap-8 mt-12">
+            <a class="btn btn-sm">取消</a>
+            <a class="btn btn-sm btn-primary">保存</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     07 反馈
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">07 · Feedback</div>
+        <h2>反馈</h2>
+        <p class="section-intro">页面级说明用 .notice，瞬时结果用 .toast，没有内容就用 .empty-state 说清下一步。</p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="align-items:start;gap:20px">
+      <div class="stack gap-12">
+        <div class="notice">
+          <span class="icon">ⓘ</span>
+          <div>默认提示：用于补充说明与操作预期。</div>
+        </div>
+        <div class="notice notice-warn">
+          <span class="icon">⚠️</span>
+          <div>警告：该图片被 2 篇文章引用，删除后图片会失效。</div>
+        </div>
+        <div class="notice notice-ok">
+          <span class="icon">✓</span>
+          <div>成功：设置已保存，前台已更新。</div>
+        </div>
+        <div class="notice notice-danger">
+          <span class="icon">✕</span>
+          <div>危险：操作失败，草稿未能同步到服务器。</div>
+        </div>
+      </div>
+
+      <div class="stack gap-12">
+        <div class="toast">
+          <span class="icon" style="color:var(--green)">✓</span>
+          <span>文章已发布</span>
+          <a class="undo">查看</a>
+        </div>
+
+        <div class="panel">
+          <div class="empty-state" style="padding:34px 20px">
+            <div class="ic">🗂</div>
+            <h3>还没有日志</h3>
+            <p>写下的第一句话，比完美的第一句话重要。</p>
+            <div class="mt-16"><a class="btn btn-sm btn-primary">写一条</a></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-body stack gap-10">
+            <div class="text-xs text-subtle mono mb-4">骨架屏 .skeleton（加载占位）</div>
+            <div class="skeleton" style="width:100%"></div>
+            <div class="skeleton" style="width:70%"></div>
+            <div class="skeleton" style="width:45%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     08 圆角与阴影
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">08 · Radius &amp; Shadow</div>
+        <h2>圆角与阴影</h2>
+        <p class="section-intro">圆角随容器变大而变大；阴影只用于浮层（弹窗、抽屉、toast）。</p>
+      </div>
+    </div>
+
+    <div class="text-xs bold text-subtle mb-12" style="letter-spacing:.06em">圆角</div>
+    <div class="row gap-24 wrap mb-32">
+      <div style="text-align:center">
+        <div style="width:96px;height:96px;border-radius:8px;background:var(--accent-soft);border:1px solid var(--accent-border)"></div>
+        <div class="text-xs mono text-subtle mt-8">--radius-sm · 8px</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:96px;height:96px;border-radius:12px;background:var(--accent-soft);border:1px solid var(--accent-border)"></div>
+        <div class="text-xs mono text-subtle mt-8">--radius · 12px</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:96px;height:96px;border-radius:16px;background:var(--accent-soft);border:1px solid var(--accent-border)"></div>
+        <div class="text-xs mono text-subtle mt-8">--radius-lg · 16px</div>
+      </div>
+    </div>
+
+    <div class="text-xs bold text-subtle mb-12" style="letter-spacing:.06em">阴影</div>
+    <div class="grid-4">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);height:84px;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center">
+        <span class="text-xs mono text-subtle">--shadow-sm</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);height:84px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center">
+        <span class="text-xs mono text-subtle">--shadow</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);height:84px;box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center">
+        <span class="text-xs mono text-subtle">--shadow-md</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);height:84px;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center">
+        <span class="text-xs mono text-subtle">--shadow-lg</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     09 间距刻度
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">09 · Spacing</div>
+        <h2>间距刻度</h2>
+        <p class="section-intro">只允许使用这 9 个值，不要出现 5px、14px、18px 这种随手写的数。</p>
+      </div>
+      <span class="text-xs text-subtle mono">4 · 8 · 12 · 16 · 20 · 24 · 32 · 48 · 64</span>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body stack gap-12">
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-4 · 4px</span>
+          <div style="height:16px;width:4px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">图标与文字之间</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-8 · 8px</span>
+          <div style="height:16px;width:8px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">徽章、按钮之间</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-12 · 12px</span>
+          <div style="height:16px;width:12px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">标签与控件之间</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-16 · 16px</span>
+          <div style="height:16px;width:16px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">卡片内边距</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-20 · 20px</span>
+          <div style="height:16px;width:20px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">卡片网格间距</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-24 · 24px</span>
+          <div style="height:16px;width:24px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">区块内边距</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-32 · 32px</span>
+          <div style="height:16px;width:32px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">区块与区块之间</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-48 · 48px</span>
+          <div style="height:16px;width:48px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">章节之间</span>
+        </div>
+
+        <div class="row gap-16">
+          <span class="mono text-xs text-subtle nowrap" style="min-width:76px">gap-64 · 64px</span>
+          <div style="height:16px;width:64px;background:var(--accent);border-radius:2px"></div>
+          <span class="text-xs text-subtle">页面级留白</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     10 响应式断点
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">10 · Breakpoints</div>
+        <h2>响应式断点</h2>
+        <p class="section-intro">主要维护三端：手机（&lt;768）、平板（768–1023）、桌面（≥1024）。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th style="width:90px">断点</th>
+              <th style="width:120px">宽度</th>
+              <th style="width:220px">设备</th>
+              <th>布局策略</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-gray mono">xs</span></td>
+              <td class="mono text-sm">380px</td>
+              <td>小屏手机</td>
+              <td class="text-sm text-muted">单列；表格变卡片；后台侧边栏收起，底部 Tab 导航</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray mono">sm</span></td>
+              <td class="mono text-sm">640px</td>
+              <td>大屏手机 / 小平板竖屏</td>
+              <td class="text-sm text-muted">仍单列，但按钮可并排、封面恢复 16:9 完整比例</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray mono">md</span></td>
+              <td class="mono text-sm">768px</td>
+              <td>平板竖屏</td>
+              <td class="text-sm text-muted">两列网格；文章列表封面回到左侧缩略图布局</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray mono">lg</span></td>
+              <td class="mono text-sm">1024px</td>
+              <td>平板横屏 / 小笔记本</td>
+              <td class="text-sm text-muted">三列网格、后台侧边栏常驻、文章右侧出现目录</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray mono">xl</span></td>
+              <td class="mono text-sm">1280px</td>
+              <td>桌面</td>
+              <td class="text-sm text-muted">容器封顶 1200px；四列网格；后台表单改为双列</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray mono">2xl</span></td>
+              <td class="mono text-sm">1536px</td>
+              <td>大桌面</td>
+              <td class="text-sm text-muted">不再变宽，只增加两侧留白，保证行长不超过 80 字</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="notice mt-24" style="max-width:880px">
+      <span class="icon">📌</span>
+      <div>本页是设计基准，任何新页面都应复用这里的 token 与组件，不要另起一套。</div>
+    </div>
+  </div>
+</section>
+
+<div class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="margin-top:0;border-top:0;padding-top:0">
+      <span>Puly 设计系统 · v1.0 · 2025-01-15</span>
+      <span class="mono text-xs">built with mock.css · Tailwind v4 + shadcn/ui</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

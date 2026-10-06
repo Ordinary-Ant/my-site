@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面不存在 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 404</b>
+  <span class="spec-tag">/404</span>
+  <span class="spec-tag amber">模块被关闭时也走此页，但文案不同</span>
+  <span class="spacer">不暴露后台与实现细节 · 两个状态共用同一版式</span>
+</div>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ 404 ============ -->
+  <div class="err-404">
+    <div class="code">404</div>
+    <h2 class="mt-16">这个页面不存在，或者已被我藏起来了</h2>
+    <p class="text-muted mt-12">链接可能已经失效，也可能是我改了路径。你可以回首页，或者直接搜一下。</p>
+    <div class="btn-row center mt-24">
+      <a class="btn btn-primary btn-lg">回首页</a>
+      <a class="btn btn-outline btn-lg">看看文章</a>
+    </div>
+    <div class="search-input" style="max-width:420px;margin:24px auto 0;text-align:left">
+      <span class="icon">🔍</span>
+      <input placeholder="搜索文章、日志、作品…">
+      <button class="btn btn-primary btn-sm">搜索</button>
+    </div>
+  </div>
+
+  <!-- ============ 状态变体：模块已下线 ============ -->
+  <div class="container-narrow">
+    <hr class="divider">
+    <div class="section-eyebrow mt-32">状态变体 · 模块已下线</div>
+
+    <div class="err-404" style="padding:60px 20px 40px">
+      <div class="icon-box icon-box-lg" style="margin:0 auto;font-size:22px">📦</div>
+      <h2 class="mt-16">该栏目暂时下线了</h2>
+      <p class="text-muted mt-12">这里曾经有一个栏目，现在被收起来了。</p>
+      <div class="btn-row center mt-24">
+        <a class="btn btn-primary btn-lg">回首页</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============ Footer ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>浙ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ 移动端底部 Tab（仅 < 768px 显示） ============ -->
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a class="active"><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a><span class="icon">🕐</span>时间戳</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  /* 移动端专属：显示底部 Tab、隐藏桌面导航 */
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+  }
+</style>
+
+</body>
+</html>

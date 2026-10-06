@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台登录 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 登录</b>
+  <span class="spec-tag">/login</span>
+  <span class="spec-tag violet">Access Token 15min + Refresh Token 7d</span>
+  <span class="spacer">独立全屏页 · 无侧边栏 / 无前台 header 与 footer</span>
+</div>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <!-- ============ 登录卡片 ============ -->
+    <div class="card">
+      <div class="row center gap-12">
+        <span class="brand-mark" style="width:36px;height:36px;border-radius:10px;font-size:16px">P</span>
+        <span style="font-size:18px;font-weight:700">Puly 的后台</span>
+      </div>
+      <p class="text-sm text-muted mt-8" style="text-align:center">请登录以管理站点内容</p>
+
+      <div class="field mt-24">
+        <label>邮箱</label>
+        <div class="control">admin@example.com</div>
+      </div>
+
+      <div class="field mt-16">
+        <label>密码</label>
+        <div class="control">
+          <span class="grow">••••••••</span>
+          <span class="icon">👁</span>
+        </div>
+      </div>
+
+      <div class="row between mt-16">
+        <span class="cbx-row"><span class="ck on">✓</span> 记住我</span>
+        <span class="text-xs text-subtle">忘记密码？</span>
+      </div>
+
+      <button class="btn btn-primary btn-lg btn-block mt-24">登 录</button>
+
+      <p class="text-xs text-subtle mt-16" style="text-align:center">登录即表示同意站点使用 Cookie 维持会话</p>
+    </div>
+
+    <!-- ============ 状态变体 ============ -->
+    <hr class="divider" style="margin:32px 0 0">
+    <div class="section-eyebrow mt-24">状态变体</div>
+
+    <!-- 失败 -->
+    <div class="card mt-16">
+      <div class="row between">
+        <span class="bold text-sm">登录失败</span>
+        <span class="badge badge-red">401</span>
+      </div>
+
+      <div class="notice notice-danger mt-12">
+        <span>⛔</span>
+        <span>邮箱或密码错误</span>
+      </div>
+      <p class="text-xs text-subtle mt-8">为安全起见，不区分账号是否存在。</p>
+
+      <div class="field mt-16">
+        <label>邮箱</label>
+        <div class="control invalid">puly@example.com</div>
+      </div>
+
+      <div class="field mt-16">
+        <label>密码</label>
+        <div class="control">
+          <span class="grow">••••••••</span>
+          <span class="icon">👁</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block mt-20">登 录</button>
+    </div>
+
+    <!-- 限流 -->
+    <div class="card mt-16">
+      <div class="row between">
+        <span class="bold text-sm">尝试次数过多</span>
+        <span class="badge badge-amber">429</span>
+      </div>
+
+      <div class="notice notice-warn mt-12">
+        <span>⏳</span>
+        <span>尝试次数过多，请在 12:34 后重试</span>
+      </div>
+
+      <div class="field mt-16">
+        <label>邮箱</label>
+        <div class="control">admin@example.com</div>
+      </div>
+
+      <button class="btn btn-primary btn-block mt-20" style="opacity:.45">登 录</button>
+      <p class="text-xs text-subtle mt-8" style="text-align:center">5 次 / 15 分钟</p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

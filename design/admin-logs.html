@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 日志管理</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 日志管理 ★</b>
+  <span class="spec-tag">/admin/logs</span>
+  <span class="spec-tag amber">快速记录 &lt; 60 秒完成</span>
+  <span class="spacer">日历为主视图 · 记录先于整理 · 无发布流程，写完即上线</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a class="active"><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">📓</span>
+      <div class="text-sm text-muted">内容管理 / <span class="bold" style="color:var(--fg)">日志</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">连续记录 9 天 🔥</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="page-head">
+        <div>
+          <h1>日志</h1>
+          <div class="sub">共 86 条 · 80 已发布 · 6 草稿</div>
+        </div>
+        <div class="btn-row">
+          <div class="chip-row">
+            <span class="chip chip-active">日历</span>
+            <span class="chip">列表</span>
+          </div>
+          <a class="btn btn-primary">+ 记一笔</a>
+        </div>
+      </div>
+
+      <!-- ============ 日历 + 当日日志 ============ -->
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
+
+        <!-- 左：日历 -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="row gap-12">
+              <a class="icon-btn">‹</a>
+              <div class="bold">2025 年 1 月</div>
+              <a class="icon-btn">›</a>
+              <a class="btn btn-sm btn-ghost">今天</a>
+            </div>
+            <div class="row gap-12 text-xs text-subtle">
+              <span class="row gap-6"><i style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block"></i>有记录</span>
+              <span class="row gap-6"><i style="width:8px;height:8px;border-radius:50%;border:2px solid var(--accent);display:inline-block"></i>今天</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="cal-grid">
+              <div class="dow">一</div><div class="dow">二</div><div class="dow">三</div>
+              <div class="dow">四</div><div class="dow">五</div><div class="dow">六</div>
+              <div class="dow">日</div>
+
+              <div class="cal-day muted">30</div>
+              <div class="cal-day muted">31</div>
+
+              <div class="cal-day">1</div>
+              <div class="cal-day has">2<span class="mark"><i></i></span></div>
+              <div class="cal-day has">3<span class="mark"><i></i></span></div>
+              <div class="cal-day">4</div>
+              <div class="cal-day has">5<span class="mark"><i></i></span></div>
+              <div class="cal-day">6</div>
+              <div class="cal-day">7</div>
+              <div class="cal-day has">8<span class="mark"><i></i></span></div>
+              <div class="cal-day has">9<span class="mark"><i></i><i></i></span></div>
+              <div class="cal-day">10</div>
+              <div class="cal-day has">11<span class="mark"><i></i></span></div>
+              <div class="cal-day has">12<span class="mark"><i></i></span></div>
+              <div class="cal-day">13</div>
+              <div class="cal-day">14</div>
+              <div class="cal-day has today">15<span class="mark"><i></i></span></div>
+              <div class="cal-day">16</div>
+              <div class="cal-day">17</div>
+              <div class="cal-day has">18<span class="mark"><i></i></span></div>
+              <div class="cal-day">19</div>
+              <div class="cal-day">20</div>
+              <div class="cal-day has">21<span class="mark"><i></i></span></div>
+              <div class="cal-day">22</div>
+              <div class="cal-day">23</div>
+              <div class="cal-day has">24<span class="mark"><i></i></span></div>
+              <div class="cal-day">25</div>
+              <div class="cal-day">26</div>
+              <div class="cal-day">27</div>
+              <div class="cal-day has">28<span class="mark"><i></i></span></div>
+              <div class="cal-day">29</div>
+              <div class="cal-day">30</div>
+              <div class="cal-day">31</div>
+              <div class="cal-day muted">1</div>
+              <div class="cal-day muted">2</div>
+            </div>
+
+            <div class="row between mt-16 text-xs text-subtle" style="padding-top:14px;border-top:1px solid var(--border)">
+              <span>本月 <b style="color:var(--fg)">12</b> 篇 · 最长连续记录 <b style="color:var(--fg)">9</b> 天</span>
+              <span>点击日期查看当日日志 →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右：当日日志 -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">1 月 15 日 · 1 条日志</div>
+            <span class="badge badge-gray">周三</span>
+          </div>
+          <div class="panel-body stack gap-12">
+
+            <div class="card card-sm" style="border-left:3px solid var(--accent)">
+              <div class="row between gap-8 mb-8">
+                <div class="bold" style="font-size:14.5px">重构了后台的权限校验</div>
+                <a class="btn btn-sm btn-ghost">编辑</a>
+              </div>
+              <div class="row gap-12 mb-8 text-xs text-subtle">
+                <span class="mood">😊 状态不错</span>
+                <span>☀️ 晴 · 7℃</span>
+              </div>
+              <div class="text-sm text-muted">原来每个接口里散着 <span class="mono" style="font-size:12px">if (role === 'ADMIN')</span>，
+                今天统一收到中间件里。删掉了 11 处重复判断，顺手补了 3 个越权测试。</div>
+              <div class="row gap-8 mt-12">
+                <span class="badge badge-gray">每日随笔</span>
+                <span class="text-xs text-subtle">10:41 记录</span>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle" style="text-align:center;padding:6px 0">这一天没有其他记录</div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============ 最近日志 ============ -->
+      <div class="panel mt-24">
+        <div class="panel-head">
+          <div class="bold text-sm">最近日志</div>
+          <a class="text-xs text-accent">按标签筛选 →</a>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="width:132px">日期</th>
+                <th>标题</th>
+                <th style="width:110px">类型</th>
+                <th style="width:110px">心情</th>
+                <th style="width:100px">状态</th>
+                <th style="width:110px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono text-xs" data-label="日期">2025-01-15</td>
+                <td data-label="标题"><div class="cell-title">重构了后台的权限校验</div><div class="cell-sub">删掉 11 处重复判断，补了 3 个越权测试</div></td>
+                <td data-label="类型"><span class="badge badge-gray">每日随笔</span></td>
+                <td data-label="心情"><span class="mood">😊</span></td>
+                <td data-label="状态"><span class="row gap-6"><i class="dot-status dot-green"></i><span class="text-xs text-muted">已发布</span></span></td>
+                <td data-label="操作"><div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div></td>
+              </tr>
+              <tr>
+                <td class="mono text-xs" data-label="日期">2025-01-12</td>
+                <td data-label="标题"><div class="cell-title">把 Next.js 缓存策略理清了</div><div class="cell-sub">revalidate 与 tag 组合起来比想象中好用</div></td>
+                <td data-label="类型"><span class="badge badge-gray">每日随笔</span></td>
+                <td data-label="心情"><span class="mood">😌</span></td>
+                <td data-label="状态"><span class="row gap-6"><i class="dot-status dot-green"></i><span class="text-xs text-muted">已发布</span></span></td>
+                <td data-label="操作"><div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div></td>
+              </tr>
+              <tr>
+                <td class="mono text-xs" data-label="日期">2025-01-09</td>
+                <td data-label="标题"><div class="cell-title">网站上线一周年</div><div class="cell-sub">从零到 42 篇文章、86 条日志，访问量翻了 6 倍</div></td>
+                <td data-label="类型"><span class="badge badge-amber">大事件</span></td>
+                <td data-label="心情"><span class="mood">😊</span></td>
+                <td data-label="状态"><span class="row gap-6"><i class="dot-status dot-green"></i><span class="text-xs text-muted">已发布</span></span></td>
+                <td data-label="操作"><div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div></td>
+              </tr>
+              <tr>
+                <td class="mono text-xs" data-label="日期">2025-01-06</td>
+                <td data-label="标题"><div class="cell-title">2024 年度总结：我写下的 96 篇</div><div class="cell-sub">写作这件事，终于在第八个月变成了习惯</div></td>
+                <td data-label="类型"><span class="badge badge-blue">总结</span></td>
+                <td data-label="心情"><span class="mood">😐</span></td>
+                <td data-label="状态"><span class="row gap-6"><i class="dot-status dot-green"></i><span class="text-xs text-muted">已发布</span></span></td>
+                <td data-label="操作"><div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div></td>
+              </tr>
+              <tr>
+                <td class="mono text-xs" data-label="日期">2025-01-03</td>
+                <td data-label="标题"><div class="cell-title">凌晨改完一个内存泄漏</div><div class="cell-sub">是 event listener 没解绑，找了三个小时</div></td>
+                <td data-label="类型"><span class="badge badge-gray">每日随笔</span></td>
+                <td data-label="心情"><span class="mood">😮‍💨</span></td>
+                <td data-label="状态"><span class="row gap-6"><i class="dot-status dot-green"></i><span class="text-xs text-muted">已发布</span></span></td>
+                <td data-label="操作"><div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div></td>
+              </tr>
+              <tr>
+                <td class="mono text-xs" data-label="日期">2025-01-01</td>
+                <td data-label="标题"><div class="cell-title">新年第一天，定三个目标</div><div class="cell-sub">还在改，想再加一条关于跑步的</div></td>
+                <td data-label="类型"><span class="badge badge-amber">大事件</span></td>
+                <td data-label="心情"><span class="mood">😊</span></td>
+                <td data-label="状态"><span class="row gap-6"><i class="dot-status dot-gray"></i><span class="text-xs text-muted">草稿</span></span></td>
+                <td data-label="操作"><div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-head" style="border-top:1px solid var(--border);border-bottom:0">
+          <span class="text-xs text-subtle">显示第 1–6 条，共 86 条</span>
+          <a class="text-xs text-accent">查看全部 →</a>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           以下为弹窗 / 状态稿（同一页面内的设计状态展示）
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- 快速记录抽屉 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 快速记录抽屉（从任意页面右下角唤起，目标 60 秒内写完）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="drawer" style="box-shadow:none;border:1px solid var(--border);border-radius:var(--radius)">
+                <div class="drawer-head">
+                  <div class="row gap-8">
+                    <div class="icon-box" style="width:32px;height:32px;font-size:15px">✏️</div>
+                    <div class="bold">记一笔</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="drawer-body">
+
+                  <div class="field">
+                    <label>日期</label>
+                    <div class="control">2025-01-15 <span class="ml-auto">📅</span></div>
+                  </div>
+
+                  <div class="field">
+                    <label>类型</label>
+                    <div class="select" style="width:100%">每日随笔</div>
+                  </div>
+
+                  <div class="field">
+                    <label>心情</label>
+                    <div class="row gap-8">
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;border:1.5px solid var(--accent);background:var(--accent-soft)">😊</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;border:1.5px solid var(--border)">😌</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;border:1.5px solid var(--border)">😐</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;border:1.5px solid var(--border)">😮‍💨</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;border:1.5px solid var(--border)">😔</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;border:1.5px solid var(--border)">😤</span>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label>天气</label>
+                    <div class="row gap-8">
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--border)">☀️</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--border)">☁️</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--border)">🌧️</span>
+                      <span style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--border)">❄️</span>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label>标题</label>
+                    <div class="control">重构了后台的权限校验</div>
+                  </div>
+
+                  <div class="field">
+                    <label>内容</label>
+                    <div class="control control-area" style="min-height:120px;font-size:13.5px;line-height:1.65">原来每个接口里散着 if (role === 'ADMIN')，今天统一收到中间件里。删掉了 11 处重复判断，顺手补了 3 个越权测试。</div>
+                  </div>
+
+                  <div style="border:1.5px dashed var(--border-strong);border-radius:10px;padding:22px;text-align:center;color:var(--fg-subtle);font-size:13px">
+                    🖼 拖入或粘贴图片
+                    <div class="text-xs mt-4">支持 PNG / JPG / WebP，自动压缩到 1600px 宽</div>
+                  </div>
+
+                </div>
+                <div class="drawer-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-primary">保存</a>
+                </div>
+              </div>
+            </div>
+            <div class="text-xs text-subtle mt-12">💡 日志默认直接发布，无需「发布」动作 —— 记录的价值在于快，别让流程拦住你。</div>
+          </div>
+
+          <!-- 列表视图 + toast -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 同一批数据的列表视图（切到「列表」chip 的结果）</div>
+            <div class="panel">
+              <div class="log-item" style="margin:0;border:0;border-bottom:1px solid var(--border);border-radius:0">
+                <div class="log-date">
+                  <div class="d">15</div>
+                  <div class="w">1 月 · 周三</div>
+                </div>
+                <div class="log-body grow">
+                  <div class="row between gap-8">
+                    <h3>重构了后台的权限校验</h3>
+                    <span class="badge badge-gray">每日随笔</span>
+                  </div>
+                  <div class="summary clamp-2">原来每个接口里散着 if (role === 'ADMIN')，今天统一收到中间件里。删掉了 11 处重复判断。</div>
+                  <div class="row gap-12 mt-8 text-xs text-subtle">
+                    <span class="mood">😊 状态不错</span><span>☀️ 晴</span><span>10:41</span>
+                  </div>
+                </div>
+              </div>
+              <div class="log-item" style="margin:0;border:0;border-radius:0">
+                <div class="log-date">
+                  <div class="d">12</div>
+                  <div class="w">1 月 · 周日</div>
+                </div>
+                <div class="log-body grow">
+                  <div class="row between gap-8">
+                    <h3>把 Next.js 缓存策略理清了</h3>
+                    <span class="badge badge-gray">每日随笔</span>
+                  </div>
+                  <div class="summary clamp-2">revalidate 与 tag 组合起来比想象中好用，删掉了一整层手动失效逻辑。</div>
+                  <div class="row gap-12 mt-8 text-xs text-subtle">
+                    <span class="mood">😌 平静</span><span>☁️ 多云</span><span>22:10</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">③ 保存反馈</div>
+            <div class="stack gap-16">
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>日志已发布 · 1 月 15 日</span>
+                <a class="undo">查看</a>
+              </div>
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>连续记录 9 天，刷新了个人纪录 🔥</span>
+                <a class="undo">好</a>
+              </div>
+              <div class="toast" style="border-color:var(--amber)">
+                <span class="icon" style="color:var(--amber)">!</span>
+                <span>图片上传失败，日志已保存但无配图</span>
+                <a class="undo">重传</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

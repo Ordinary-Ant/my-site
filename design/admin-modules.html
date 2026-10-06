@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 模块开关中心</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 模块开关中心 ★</b>
+  <span class="spec-tag">/admin/modules</span>
+  <span class="spec-tag amber">仅 ADMIN 可操作</span>
+  <span class="spec-tag blue">PATCH /api/v1/admin/modules/:key</span>
+  <span class="spacer">本页是「开启关闭所有功能」的落地界面 · 改动即时生效、无需发版</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a class="active"><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">🧩</span>
+      <div class="text-sm text-muted">站点设置 / <span class="bold" style="color:var(--fg)">模块开关</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">上次更新 2 分钟前</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="page-head">
+        <div>
+          <h1>模块开关</h1>
+          <div class="sub">控制前台栏目是否可见、叫什么名字、排在哪里。改动立即生效，无需重新部署。</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-ghost">查看前台 ↗</a>
+          <a class="btn btn-outline">↺ 恢复默认顺序</a>
+        </div>
+      </div>
+
+      <div class="notice mb-16">
+        <span class="icon">ⓘ</span>
+        <div>
+          关闭模块<strong>不会删除任何内容</strong> —— 数据完整保留，可随时重新开启。
+          关闭后前台导航、首页区块、sitemap 与 RSS 会同步更新。
+        </div>
+      </div>
+
+      <!-- ============ 模块表格 ============ -->
+      <div class="panel">
+        <div class="module-row head">
+          <span></span>
+          <span>模块</span>
+          <span>前台路径</span>
+          <span>内容量</span>
+          <span>显示</span>
+          <span>导航</span>
+          <span style="text-align:right">操作</span>
+        </div>
+
+        <!-- 首页：不可关闭 -->
+        <div class="module-row">
+          <div class="drag-handle">⋮⋮</div>
+          <div class="module-name">
+            <div class="icon-box">🏠</div>
+            <div>
+              <div class="nm">首页</div>
+              <div class="route">/ · 不可关闭</div>
+            </div>
+          </div>
+          <div><span class="badge badge-gray mono">/</span></div>
+          <div class="text-sm text-subtle">—</div>
+          <div><span class="switch on disabled"></span></div>
+          <div><span class="switch disabled"></span></div>
+          <div style="text-align:right"><a class="btn btn-sm">配置</a></div>
+        </div>
+
+        <!-- 日志：已关闭（演示态） -->
+        <div class="module-row" style="background:var(--bg-subtle)">
+          <div class="drag-handle">⋮⋮</div>
+          <div class="module-name">
+            <div class="icon-box" style="background:var(--bg-muted);color:var(--fg-subtle)">📓</div>
+            <div>
+              <div class="nm text-muted">日志 <span class="badge badge-gray" style="margin-left:6px">已关闭</span></div>
+              <div class="route">/logs</div>
+            </div>
+          </div>
+          <div><span class="badge badge-gray mono">/logs</span></div>
+          <div class="text-sm"><span class="bold">86</span> <span class="text-subtle">条</span></div>
+          <div><span class="switch"></span></div>
+          <div><span class="switch"></span></div>
+          <div style="text-align:right"><a class="btn btn-sm">配置</a></div>
+        </div>
+
+        <!-- 作品集 -->
+        <div class="module-row">
+          <div class="drag-handle">⋮⋮</div>
+          <div class="module-name">
+            <div class="icon-box">💼</div>
+            <div>
+              <div class="nm">作品集</div>
+              <div class="route">/portfolio</div>
+            </div>
+          </div>
+          <div><span class="badge badge-gray mono">/portfolio</span></div>
+          <div class="text-sm"><span class="bold">15</span> <span class="text-subtle">条</span></div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div style="text-align:right"><a class="btn btn-sm">配置</a></div>
+        </div>
+
+        <!-- 时间戳 -->
+        <div class="module-row">
+          <div class="drag-handle">⋮⋮</div>
+          <div class="module-name">
+            <div class="icon-box">🕐</div>
+            <div>
+              <div class="nm">时间戳</div>
+              <div class="route">/timeline</div>
+            </div>
+          </div>
+          <div><span class="badge badge-gray mono">/timeline</span></div>
+          <div class="text-sm"><span class="bold">9</span> <span class="text-subtle">条</span></div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div style="text-align:right"><a class="btn btn-sm">配置</a></div>
+        </div>
+
+        <!-- 文章 -->
+        <div class="module-row">
+          <div class="drag-handle">⋮⋮</div>
+          <div class="module-name">
+            <div class="icon-box">📄</div>
+            <div>
+              <div class="nm">文章</div>
+              <div class="route">/articles</div>
+            </div>
+          </div>
+          <div><span class="badge badge-gray mono">/articles</span></div>
+          <div class="text-sm"><span class="bold">42</span> <span class="text-subtle">条</span></div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div style="text-align:right"><a class="btn btn-sm">配置</a></div>
+        </div>
+
+        <!-- 关于我 -->
+        <div class="module-row">
+          <div class="drag-handle">⋮⋮</div>
+          <div class="module-name">
+            <div class="icon-box">👤</div>
+            <div>
+              <div class="nm">关于我</div>
+              <div class="route">/about</div>
+            </div>
+          </div>
+          <div><span class="badge badge-gray mono">/about</span></div>
+          <div class="text-sm"><span class="bold">1</span> <span class="text-subtle">份</span></div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div style="text-align:right"><a class="btn btn-sm">配置</a></div>
+        </div>
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle">
+        <span>拖拽 <b>⋮⋮</b> 调整导航顺序</span><span>·</span>
+        <span>点开关即时生效</span><span>·</span>
+        <span>点模块名可改名</span><span>·</span>
+        <span>点路径可改为自定义路由（旧路径自动 301）</span>
+      </div>
+
+      <!-- ============ 变更记录（内嵌审计） ============ -->
+      <div class="panel mt-32">
+        <div class="panel-head">
+          <div class="bold text-sm">最近变更记录</div>
+          <a class="text-xs text-accent">查看全部审计日志 →</a>
+        </div>
+        <table class="data">
+          <tbody>
+            <tr>
+              <td style="width:150px" class="text-subtle text-xs mono">2025-01-15 10:23</td>
+              <td style="width:80px">Puly</td>
+              <td>
+                <span class="badge badge-amber">修改</span>
+                <span style="margin-left:8px">模块 · 日志</span>
+              </td>
+              <td class="mono text-xs"><span class="diff"><span class="del">enabled: true</span> → <span class="add">enabled: false</span></span></td>
+            </tr>
+            <tr>
+              <td class="text-subtle text-xs mono">2025-01-14 16:08</td>
+              <td>Puly</td>
+              <td><span class="badge badge-amber">修改</span><span style="margin-left:8px">模块 · 作品集</span></td>
+              <td class="mono text-xs"><span class="diff"><span class="del">navOrder: 2</span> → <span class="add">navOrder: 3</span></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ================================================================
+           以下为弹窗 / 状态稿（同一页面内的设计状态展示）
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- 关闭确认弹窗 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 关闭模块的确认弹窗（不用简单确定/取消，而是列出影响清单）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="modal">
+                <div class="modal-head">
+                  <div>
+                    <h3>关闭「日志」模块？</h3>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body">
+                  <div class="text-xs bold text-subtle mb-8" style="letter-spacing:.06em">将会发生</div>
+                  <div class="stack gap-8 mb-16">
+                    <div class="row gap-8 text-sm"><span style="color:var(--green)">✓</span> 顶部导航与移动端 Tab 中移除「日志」</div>
+                    <div class="row gap-8 text-sm"><span style="color:var(--green)">✓</span> 首页「最近日志」区块整块隐藏</div>
+                    <div class="row gap-8 text-sm"><span style="color:var(--green)">✓</span> <span class="mono">/logs</span> 与所有日志详情页返回 404</div>
+                    <div class="row gap-8 text-sm"><span style="color:var(--green)">✓</span> sitemap.xml 与 RSS 中移除相关条目</div>
+                  </div>
+                  <div class="text-xs bold text-subtle mb-8" style="letter-spacing:.06em">不会发生</div>
+                  <div class="stack gap-8">
+                    <div class="row gap-8 text-sm text-muted"><span style="color:var(--red)">✗</span> 不会删除任何内容（86 条将完整保留）</div>
+                    <div class="row gap-8 text-sm text-muted"><span style="color:var(--red)">✗</span> 后台「日志管理」仍可正常访问</div>
+                  </div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-danger">确认关闭</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 撤销 toast + 模块配置抽屉 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 操作成功的撤销提示（5 秒内可一键恢复）</div>
+            <div class="stack gap-16">
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>「日志」已关闭，前台不再显示</span>
+                <a class="undo">撤销</a>
+              </div>
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>已开启「日志」，86 条内容恢复可见</span>
+                <a class="undo">查看前台</a>
+              </div>
+              <div class="toast" style="border-color:var(--red)">
+                <span class="icon" style="color:var(--red)">!</span>
+                <span>操作失败：路由 <span class="mono">/admin</span> 为保留路径</span>
+                <a class="undo">重试</a>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">③ 模块配置抽屉（点「配置」打开，内容随模块而变）</div>
+            <div class="drawer" style="border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)">
+              <div class="drawer-head">
+                <div class="row gap-10">
+                  <div class="icon-box" style="width:32px;height:32px;font-size:15px">📓</div>
+                  <div class="bold">日志 · 模块配置</div>
+                </div>
+                <button class="icon-btn">✕</button>
+              </div>
+              <div class="drawer-body">
+                <div class="field">
+                  <label>导航显示名</label>
+                  <div class="control">日志</div>
+                </div>
+                <div class="field">
+                  <label>栏目导语</label>
+                  <div class="control">记录每天发生的事，以及偶尔的顿悟</div>
+                </div>
+                <div class="field-row">
+                  <div class="field">
+                    <label>列表每页条数</label>
+                    <div class="select" style="width:100%">10</div>
+                  </div>
+                  <div class="field">
+                    <label>默认视图</label>
+                    <div class="select" style="width:100%">列表</div>
+                  </div>
+                </div>
+                <hr class="divider">
+                <div class="field">
+                  <label>首页露出</label>
+                  <div class="row between">
+                    <span class="text-xs text-subtle">在首页显示日志区块</span>
+                    <span class="switch on"></span>
+                  </div>
+                  <div class="field-row mt-8">
+                    <div>
+                      <div class="text-xs text-subtle mb-4">露出条数</div>
+                      <div class="control input-sm">5</div>
+                    </div>
+                    <div>
+                      <div class="text-xs text-subtle mb-4">区块位置</div>
+                      <div class="control input-sm">3</div>
+                    </div>
+                  </div>
+                </div>
+                <hr class="divider">
+                <div class="field">
+                  <label>日志类型开关</label>
+                  <div class="stack gap-8 mt-4">
+                    <div class="cbx-row"><span class="ck on">✓</span>每日随笔 (DAILY) <span class="text-xs text-subtle">72 条</span></div>
+                    <div class="cbx-row"><span class="ck on">✓</span>大事件 (EVENT) <span class="text-xs text-subtle">9 条</span></div>
+                    <div class="cbx-row"><span class="ck"></span>阶段总结 (SUMMARY) <span class="text-xs text-subtle">5 条</span></div>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>空态文案</label>
+                  <div class="control">还没有日志</div>
+                </div>
+              </div>
+              <div class="drawer-foot">
+                <a class="btn">取消</a>
+                <a class="btn btn-primary">保存</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

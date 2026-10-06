@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 时间戳管理</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 时间戳管理 ★</b>
+  <span class="spec-tag">/admin/timeline</span>
+  <span class="spec-tag amber">拖拽排序 · 双可见性开关</span>
+  <span class="spacer">列表即排序界面 · 排序仅在同年内生效 · 「至今」条目自动置顶</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a class="active"><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">🕐</span>
+      <div class="text-sm text-muted">内容管理 / <span class="bold" style="color:var(--fg)">时间戳</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">与「关于我」共用数据</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="page-head">
+        <div>
+          <h1>时间戳</h1>
+          <div class="sub">共 9 条</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn">👁 预览前台</a>
+          <a class="btn btn-primary">+ 新建条目</a>
+        </div>
+      </div>
+
+      <div class="notice mb-16">
+        <span class="icon">ⓘ</span>
+        <div>
+          拖拽 <strong>☰</strong> 调整顺序 —— 仅在同一年内生效；跨年仍按开始时间倒序排列。
+          「至今」的条目自动置顶。
+        </div>
+      </div>
+
+      <!-- ============ 时间戳列表 ============ -->
+      <div class="panel">
+
+        <!-- 表头 -->
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:10px 18px;background:var(--bg-subtle);border-bottom:1px solid var(--border);font-size:12px;font-weight:650;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.05em">
+          <span></span>
+          <span>时间区间</span>
+          <span>类型</span>
+          <span>标题 / 组织</span>
+          <span>时间戳页</span>
+          <span>关于我页</span>
+          <span>操作</span>
+          <span></span>
+        </div>
+
+        <!-- ===== 2023 ===== -->
+        <div class="log-group-label" style="margin:0;padding:16px 18px 10px;background:var(--card)">2023</div>
+
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--border);background:var(--accent-soft)">
+          <div class="drag-handle" style="cursor:grab">☰</div>
+          <div class="mono text-sm">2023.03 — 至今</div>
+          <div><span class="badge badge-blue">工作</span></div>
+          <div style="min-width:0">
+            <div class="row gap-8">
+              <span class="bold" style="font-size:14.5px">高级前端工程师</span>
+              <span class="badge badge-green">进行中</span>
+            </div>
+            <div class="cell-sub">某科技 · 上海 · 前端架构组</div>
+          </div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div class="row gap-4"><a class="btn btn-sm">编辑</a></div>
+          <div class="row-actions"><a class="btn btn-sm btn-ghost">⋯</a></div>
+        </div>
+
+        <!-- ===== 2021 ===== -->
+        <div class="log-group-label" style="margin:0;padding:16px 18px 10px;background:var(--card)">2021</div>
+
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--border)">
+          <div class="drag-handle" style="cursor:grab">☰</div>
+          <div class="mono text-sm">2021.06 — 2023.02</div>
+          <div><span class="badge badge-blue">工作</span></div>
+          <div style="min-width:0">
+            <div class="bold" style="font-size:14.5px">前端工程师</div>
+            <div class="cell-sub">某公司 · 杭州 · 中台业务</div>
+          </div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div class="row gap-4"><a class="btn btn-sm">编辑</a></div>
+          <div class="row-actions"><a class="btn btn-sm btn-ghost">⋯</a></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--border)">
+          <div class="drag-handle" style="cursor:grab">☰</div>
+          <div class="mono text-sm">2021.03 — 2022.08</div>
+          <div><span class="badge badge-violet">项目</span></div>
+          <div style="min-width:0">
+            <div class="bold" style="font-size:14.5px">开源项目维护</div>
+            <div class="cell-sub">vue-hooks-plus · 3.2k star</div>
+          </div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div class="row gap-4"><a class="btn btn-sm">编辑</a></div>
+          <div class="row-actions"><a class="btn btn-sm btn-ghost">⋯</a></div>
+        </div>
+
+        <!-- ===== 2020 ===== -->
+        <div class="log-group-label" style="margin:0;padding:16px 18px 10px;background:var(--card)">2020</div>
+
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--border)">
+          <div class="drag-handle" style="cursor:grab">☰</div>
+          <div class="mono text-sm">2020.09 — 2021.05</div>
+          <div><span class="badge badge-blue">工作</span></div>
+          <div style="min-width:0">
+            <div class="bold" style="font-size:14.5px">前端实习</div>
+            <div class="cell-sub">某创业公司 · 杭州 · 8 人团队</div>
+          </div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div class="row gap-4"><a class="btn btn-sm">编辑</a></div>
+          <div class="row-actions"><a class="btn btn-sm btn-ghost">⋯</a></div>
+        </div>
+
+        <!-- ===== 2019 ===== -->
+        <div class="log-group-label" style="margin:0;padding:16px 18px 10px;background:var(--card)">2019</div>
+
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--border)">
+          <div class="drag-handle" style="cursor:grab">☰</div>
+          <div class="mono text-sm">2019.11</div>
+          <div><span class="badge badge-amber">荣誉</span></div>
+          <div style="min-width:0">
+            <div class="bold" style="font-size:14.5px">全国大学生程序设计竞赛 · 银奖</div>
+            <div class="cell-sub">ICPC 区域赛 · 武汉赛区</div>
+          </div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div class="row gap-4"><a class="btn btn-sm">编辑</a></div>
+          <div class="row-actions"><a class="btn btn-sm btn-ghost">⋯</a></div>
+        </div>
+
+        <!-- ===== 2016 ===== -->
+        <div class="log-group-label" style="margin:0;padding:16px 18px 10px;background:var(--card)">2016</div>
+
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--border)">
+          <div class="drag-handle" style="cursor:grab">☰</div>
+          <div class="mono text-sm">2016.09 — 2020.06</div>
+          <div><span class="badge badge-green">教育</span></div>
+          <div style="min-width:0">
+            <div class="bold" style="font-size:14.5px">计算机科学与技术 · 本科</div>
+            <div class="cell-sub">某大学 · 工学学士</div>
+          </div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch"></span></div>
+          <div class="row gap-4"><a class="btn btn-sm">编辑</a></div>
+          <div class="row-actions"><a class="btn btn-sm btn-ghost">⋯</a></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:30px 190px 110px 1fr 150px 110px 110px 90px;align-items:center;gap:14px;padding:15px 18px">
+          <div class="drag-handle" style="cursor:grab">☰</div>
+          <div class="mono text-sm">2016.10 — 2018.06</div>
+          <div><span class="badge badge-orange">里程碑</span></div>
+          <div style="min-width:0">
+            <div class="bold" style="font-size:14.5px">校 ACM 集训队</div>
+            <div class="cell-sub">某大学 · 算法竞赛队 · 队长</div>
+          </div>
+          <div><span class="switch on"></span></div>
+          <div><span class="switch on"></span></div>
+          <div class="row gap-4"><a class="btn btn-sm">编辑</a></div>
+          <div class="row-actions"><a class="btn btn-sm btn-ghost">⋯</a></div>
+        </div>
+
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle wrap">
+        <span>「时间戳页」控制前台 <span class="mono">/timeline</span> 是否展示</span><span>·</span>
+        <span>「关于我页」控制 <span class="mono">/about</span> 的工作经历区块</span><span>·</span>
+        <span>两个开关互相独立</span>
+      </div>
+
+      <!-- ================================================================
+           以下为弹窗 / 状态稿（同一页面内的设计状态展示）
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- 条目编辑表单 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 条目编辑表单（新建 / 编辑共用一套）</div>
+            <div class="panel">
+              <div class="panel-head">
+                <div class="bold text-sm">编辑条目</div>
+                <span class="badge badge-blue">工作</span>
+              </div>
+              <div class="panel-body stack gap-16">
+
+                <div class="field">
+                  <label>标题</label>
+                  <div class="control">高级前端工程师</div>
+                </div>
+
+                <div class="field">
+                  <label>副标题</label>
+                  <div class="control">前端架构组 · 负责性能与工程化</div>
+                  <div class="hint">前台时间轴卡片上的一行小字，可留空</div>
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label>类型</label>
+                    <div class="select" style="width:100%">工作</div>
+                  </div>
+                  <div class="field">
+                    <label>组织</label>
+                    <div class="control">某科技</div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>地点</label>
+                  <div class="control">上海 · 徐汇</div>
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label>开始</label>
+                    <div class="control mono" style="font-size:13px">2023-03</div>
+                  </div>
+                  <div class="field">
+                    <label>结束</label>
+                    <div class="control"><span class="ph">未填写</span></div>
+                    <div class="cbx-row mt-4"><span class="ck on">✓</span> 至今</div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>描述</label>
+                  <div class="control control-area" style="font-size:13.5px;line-height:1.65">负责公司级组件库与构建体系的建设，主导性能专项，把三个核心业务的首屏指标拉进 1.5s 以内。</div>
+                </div>
+
+                <!-- highlights 数组编辑器 -->
+                <div class="field">
+                  <label>亮点</label>
+                  <div class="stack gap-8">
+                    <div class="row gap-8">
+                      <span class="drag-handle">⋮⋮</span>
+                      <div class="control grow" style="font-size:13.5px">首屏 LCP 从 3.2s 优化到 1.1s</div>
+                      <a class="btn btn-sm btn-ghost">✕</a>
+                    </div>
+                    <div class="row gap-8">
+                      <span class="drag-handle">⋮⋮</span>
+                      <div class="control grow" style="font-size:13.5px">组件库被 7 条业务线接入，重复代码减少 42%</div>
+                      <a class="btn btn-sm btn-ghost">✕</a>
+                    </div>
+                    <div class="row gap-8">
+                      <span class="drag-handle">⋮⋮</span>
+                      <div class="control grow" style="font-size:13.5px">推动构建时间从 6 分钟压缩到 50 秒</div>
+                      <a class="btn btn-sm btn-ghost">✕</a>
+                    </div>
+                    <div style="border:1.5px dashed var(--border-strong);border-radius:9px;padding:10px;text-align:center;color:var(--accent);font-size:13px">+ 添加亮点</div>
+                  </div>
+                  <div class="hint">好的写法要有数字和结果，例如「首屏 LCP 从 3.2s 优化到 1.1s」。</div>
+                </div>
+
+                <div class="field">
+                  <label>标签</label>
+                  <div class="chip-row">
+                    <span class="chip chip-sm">React <span class="text-subtle">×</span></span>
+                    <span class="chip chip-sm">Node.js <span class="text-subtle">×</span></span>
+                    <span class="chip chip-sm" style="border-style:dashed;color:var(--accent)">+ 添加</span>
+                  </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="stack gap-12">
+                  <div class="row between">
+                    <div>
+                      <div class="text-sm bold">在时间戳页展示</div>
+                      <div class="text-xs text-subtle">前台 /timeline 时间轴</div>
+                    </div>
+                    <span class="switch on"></span>
+                  </div>
+                  <div class="row between">
+                    <div>
+                      <div class="text-sm bold">在关于我页展示</div>
+                      <div class="text-xs text-subtle">前台 /about 工作经历区块</div>
+                    </div>
+                    <span class="switch on"></span>
+                  </div>
+                  <div class="text-xs text-subtle">时间戳页 / 关于我页 可独立控制 —— 荣誉和里程碑通常只出现在时间戳页。</div>
+                </div>
+
+              </div>
+              <div class="modal-foot">
+                <a class="btn">取消</a>
+                <a class="btn btn-primary">保存</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 排序说明 + toast -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 拖拽排序的规则提示（松手后弹出，只在跨年拖拽时出现）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="modal" style="max-width:440px">
+                <div class="modal-head">
+                  <div>
+                    <h3>顺序仅在同年内生效</h3>
+                    <div class="text-xs text-subtle mt-4">你把「校 ACM 集训队」拖到了 2019 分组</div>
+                  </div>
+                </div>
+                <div class="modal-body">
+                  <div class="text-sm text-muted mb-16">跨年排序由开始时间决定，前台不会按你拖的位置展示。要把这条移到 2019 年吗？</div>
+                  <div class="stack gap-8">
+                    <div class="row gap-8 text-sm"><span style="color:var(--fg-subtle)">•</span> 保持 2016.10 开始时间，回到原位置</div>
+                    <div class="row gap-8 text-sm"><span style="color:var(--fg-subtle)">•</span> 或修改开始时间后重新排序</div>
+                  </div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">回到原位置</a>
+                  <a class="btn btn-primary">修改开始时间</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">③ 保存与开关反馈</div>
+            <div class="stack gap-16">
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>顺序已保存</span>
+                <a class="undo">撤销</a>
+              </div>
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>「计算机科学与技术 · 本科」已从关于我页隐藏</span>
+                <a class="undo">撤销</a>
+              </div>
+              <div class="toast" style="border-color:var(--amber)">
+                <span class="icon" style="color:var(--amber)">!</span>
+                <span>「高级前端工程师」的开始时间晚于结束时间</span>
+                <a class="undo">去修改</a>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">④ 删除确认</div>
+            <div class="toast" style="max-width:none;display:block;padding:16px">
+              <div class="bold mb-8">删除「前端实习」？</div>
+              <div class="text-xs text-muted mb-12">该条目会同时从「关于我」页的工作经历中消失，可在回收站恢复 30 天。</div>
+              <div class="row gap-8" style="justify-content:flex-end">
+                <a class="btn btn-sm">取消</a>
+                <a class="btn btn-sm btn-danger">删除</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

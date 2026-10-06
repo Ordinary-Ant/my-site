@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 作品集管理</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 作品集管理 ★</b>
+  <span class="spec-tag">/admin/projects</span>
+  <span class="spec-tag amber">拖拽排序 = 前台展示顺序</span>
+  <span class="spacer">表格为主 · 精选位最多 4 个 · 删除走回收站，不做硬删</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a class="active"><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">💼</span>
+      <div class="text-sm text-muted">内容管理 / <span class="bold" style="color:var(--fg)">作品集</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">前台 /portfolio 共 15 个</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="page-head">
+        <div>
+          <h1>作品集</h1>
+          <div class="sub">共 15 个 · 4 个精选</div>
+        </div>
+        <div class="btn-row">
+          <div class="chip-row">
+            <span class="chip chip-active">网格预览</span>
+            <span class="chip">表格</span>
+          </div>
+          <a class="btn btn-primary">+ 新建作品</a>
+        </div>
+      </div>
+
+      <div class="panel">
+
+        <!-- 筛选栏 -->
+        <div class="admin-filter">
+          <div class="input input-search">
+            <span>🔍</span>
+            <span class="ph">搜索标题或简介…</span>
+          </div>
+          <div class="select">全部类型</div>
+          <div class="select">全部状态</div>
+          <a class="btn btn-sm btn-outline">重置</a>
+          <a class="btn btn-sm btn-ghost ml-auto">⚙ 列设置</a>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="width:40px"><span class="cbx"></span></th>
+                <th style="width:84px">封面</th>
+                <th>标题</th>
+                <th style="width:96px">类型</th>
+                <th style="width:250px">技术栈</th>
+                <th style="width:76px">精选</th>
+                <th style="width:56px">排序</th>
+                <th style="width:112px">更新时间</th>
+                <th style="width:108px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="封面"><div class="cover" style="width:64px;height:40px;font-size:17px">🎮</div></td>
+                <td data-label="标题">
+                  <div class="cell-title">Pixel Runner</div>
+                  <div class="cell-sub mono">/portfolio/pixel-runner</div>
+                </td>
+                <td data-label="类型"><span class="badge badge-violet">游戏</span></td>
+                <td data-label="技术栈">
+                  <div class="chip-row">
+                    <span class="badge badge-gray">TypeScript</span>
+                    <span class="badge badge-gray">Canvas</span>
+                    <span class="badge badge-gray">Web Audio</span>
+                  </div>
+                </td>
+                <td data-label="精选"><span class="switch on"></span></td>
+                <td data-label="排序" class="text-subtle" style="text-align:center;cursor:grab">⋮⋮</td>
+                <td data-label="更新时间" class="mono text-xs">2025-01-14</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="封面"><div class="cover" style="width:64px;height:40px;font-size:17px">🧱</div></td>
+                <td data-label="标题">
+                  <div class="cell-title">公司级组件库</div>
+                  <div class="cell-sub mono">/portfolio/ui-kit</div>
+                </td>
+                <td data-label="类型"><span class="badge badge-blue">代码库</span></td>
+                <td data-label="技术栈">
+                  <div class="chip-row">
+                    <span class="badge badge-gray">React</span>
+                    <span class="badge badge-gray">Vite</span>
+                    <span class="badge badge-gray">Storybook</span>
+                  </div>
+                </td>
+                <td data-label="精选"><span class="switch on"></span></td>
+                <td data-label="排序" class="text-subtle" style="text-align:center;cursor:grab">⋮⋮</td>
+                <td data-label="更新时间" class="mono text-xs">2025-01-11</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr class="selected">
+                <td data-label="选择"><span class="cbx checked">✓</span></td>
+                <td data-label="封面"><div class="cover" style="width:64px;height:40px;font-size:17px">⌨️</div></td>
+                <td data-label="标题">
+                  <div class="cell-title">CLI 脚手架</div>
+                  <div class="cell-sub mono">/portfolio/create-puly-app</div>
+                </td>
+                <td data-label="类型"><span class="badge badge-amber">工具</span></td>
+                <td data-label="技术栈">
+                  <div class="chip-row">
+                    <span class="badge badge-gray">Node.js</span>
+                    <span class="badge badge-gray">Commander</span>
+                  </div>
+                </td>
+                <td data-label="精选"><span class="switch"></span></td>
+                <td data-label="排序" class="text-subtle" style="text-align:center;cursor:grab">⋮⋮</td>
+                <td data-label="更新时间" class="mono text-xs">2025-01-08</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="封面"><div class="cover" style="width:64px;height:40px;font-size:17px">🎨</div></td>
+                <td data-label="标题">
+                  <div class="cell-title">设计系统建设</div>
+                  <div class="cell-sub mono">/portfolio/design-system</div>
+                </td>
+                <td data-label="类型"><span class="badge badge-green">Skills</span></td>
+                <td data-label="技术栈">
+                  <div class="chip-row">
+                    <span class="badge badge-gray">Design Token</span>
+                    <span class="badge badge-gray">Tailwind</span>
+                  </div>
+                </td>
+                <td data-label="精选"><span class="switch"></span></td>
+                <td data-label="排序" class="text-subtle" style="text-align:center;cursor:grab">⋮⋮</td>
+                <td data-label="更新时间" class="mono text-xs">2024-12-29</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr class="selected">
+                <td data-label="选择"><span class="cbx checked">✓</span></td>
+                <td data-label="封面"><div class="cover" style="width:64px;height:40px;font-size:17px">✅</div></td>
+                <td data-label="标题">
+                  <div class="cell-title">待办清单 PWA</div>
+                  <div class="cell-sub mono">/portfolio/todo-pwa</div>
+                </td>
+                <td data-label="类型"><span class="badge badge-blue">代码库</span></td>
+                <td data-label="技术栈">
+                  <div class="chip-row">
+                    <span class="badge badge-gray">Vue 3</span>
+                    <span class="badge badge-gray">IndexedDB</span>
+                    <span class="badge badge-gray">Service Worker</span>
+                  </div>
+                </td>
+                <td data-label="精选"><span class="switch"></span></td>
+                <td data-label="排序" class="text-subtle" style="text-align:center;cursor:grab">⋮⋮</td>
+                <td data-label="更新时间" class="mono text-xs">2024-12-20</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="封面"><div class="cover" style="width:64px;height:40px;font-size:17px">📝</div></td>
+                <td data-label="标题">
+                  <div class="cell-title">个人博客系统</div>
+                  <div class="cell-sub mono">/portfolio/blog</div>
+                </td>
+                <td data-label="类型"><span class="badge badge-blue">代码库</span></td>
+                <td data-label="技术栈">
+                  <div class="chip-row">
+                    <span class="badge badge-gray">Next.js</span>
+                    <span class="badge badge-gray">MDX</span>
+                    <span class="badge badge-gray">Prisma</span>
+                  </div>
+                </td>
+                <td data-label="精选"><span class="switch on"></span></td>
+                <td data-label="排序" class="text-subtle" style="text-align:center;cursor:grab">⋮⋮</td>
+                <td data-label="更新时间" class="mono text-xs">2024-12-15</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 批量操作栏 -->
+        <div class="bulk-bar">
+          <span class="bold">☑ 已选 2 项</span>
+          <div class="divider-v"></div>
+          <a class="btn btn-sm">设为精选</a>
+          <a class="btn btn-sm">取消精选</a>
+          <a class="btn btn-sm">删除</a>
+          <a class="btn btn-sm btn-ghost ml-auto">取消选择</a>
+        </div>
+
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination">
+        <a>‹</a>
+        <a class="active">1</a>
+        <a>2</a>
+        <a>3</a>
+        <a>›</a>
+        <span class="text-xs text-subtle" style="margin-left:12px">每页 6 条 · 共 15 条</span>
+      </div>
+
+      <div class="row gap-12 text-xs text-subtle">
+        <span>拖拽 <b>⋮⋮</b> 调整前台展示顺序</span><span>·</span>
+        <span>精选位最多 4 个，当前已用 4 个</span><span>·</span>
+        <span>删除后进入回收站，保留 30 天</span>
+      </div>
+
+      <!-- ================================================================
+           以下为弹窗 / 状态稿（同一页面内的设计状态展示）
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- 外链管理 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 外链管理卡片（作品编辑页的 links 字段，逐个可测）</div>
+            <div class="panel">
+              <div class="panel-head">
+                <div class="bold text-sm">外链</div>
+                <span class="badge badge-gray">Pixel Runner</span>
+              </div>
+              <div class="panel-body stack gap-16">
+
+                <div class="field">
+                  <label>GitHub</label>
+                  <div class="row gap-8">
+                    <div class="control mono grow" style="font-size:12.5px">github.com/puly/pixel-runner</div>
+                    <a class="btn btn-sm nowrap">测试链接</a>
+                  </div>
+                  <div class="hint row gap-6" style="color:var(--green)"><span class="bold">✓</span> 可访问 · 200 · 响应 218ms</div>
+                </div>
+
+                <div class="field">
+                  <label>在线 Demo</label>
+                  <div class="row gap-8">
+                    <div class="control mono grow" style="font-size:12.5px">pixel-runner.puly.dev</div>
+                    <a class="btn btn-sm nowrap">测试链接</a>
+                  </div>
+                  <div class="hint row gap-6" style="color:var(--green)"><span class="bold">✓</span> 可访问 · 200 · 响应 341ms</div>
+                </div>
+
+                <div class="field">
+                  <label>演示视频</label>
+                  <div class="row gap-8">
+                    <div class="control mono grow" style="font-size:12.5px;border-color:var(--red)">youtu.be/dQw4w9WgXcQ</div>
+                    <a class="btn btn-sm nowrap">测试链接</a>
+                  </div>
+                  <div class="err row gap-6"><span class="bold">✕</span> 链接无法访问 · 404 Not Found</div>
+                  <div class="hint">仅警告，不阻止保存 —— 外链随时可能失效，不该卡住内容编辑。</div>
+                </div>
+
+                <div class="field">
+                  <label>文档</label>
+                  <div class="row gap-8">
+                    <div class="control mono grow" style="font-size:12.5px">docs.puly.dev/pixel-runner</div>
+                    <a class="btn btn-sm nowrap">测试链接</a>
+                  </div>
+                  <div class="hint">未测试</div>
+                </div>
+
+                <div class="text-xs text-subtle">留空的行不会在前台渲染按钮。</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 删除确认 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 删除确认弹窗（说清后果，不吓唬人）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="modal">
+                <div class="modal-head">
+                  <div>
+                    <h3>删除「Pixel Runner」？</h3>
+                    <div class="text-xs text-subtle mt-4">/portfolio/pixel-runner</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body">
+                  <div class="text-sm text-muted mb-16">将移入回收站，可随时恢复。</div>
+                  <div class="stack gap-8">
+                    <div class="row gap-8 text-sm text-muted"><span style="color:var(--fg-subtle)">•</span> 前台 <span class="mono">/portfolio</span> 列表与首页精选位将同步移除</div>
+                    <div class="row gap-8 text-sm text-muted"><span style="color:var(--fg-subtle)">•</span> 已上传的 6 张配图保留在媒体库中</div>
+                    <div class="row gap-8 text-sm text-muted"><span style="color:var(--fg-subtle)">•</span> 30 天后自动彻底清理</div>
+                  </div>
+                  <div class="cbx-row mt-16"><span class="ck"></span> 同时删除关联的 3 条时间戳记录</div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-danger">移入回收站</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">③ 批量操作提示</div>
+            <div class="stack gap-16">
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>已将 2 个作品设为精选</span>
+                <a class="undo">撤销</a>
+              </div>
+              <div class="toast">
+                <span class="icon" style="color:var(--green)">✓</span>
+                <span>2 个作品已移入回收站</span>
+                <a class="undo">撤销</a>
+              </div>
+              <div class="toast" style="border-color:var(--amber)">
+                <span class="icon" style="color:var(--amber)">!</span>
+                <span>精选位已满（4/4），请先取消一个</span>
+                <a class="undo">去处理</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

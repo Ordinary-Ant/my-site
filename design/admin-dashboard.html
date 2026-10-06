@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 仪表盘</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 仪表盘</b>
+  <span class="spec-tag">/admin</span>
+  <span class="spec-tag blue">GET /api/v1/admin/stats</span>
+  <span class="spec-tag violet">登录后落地页</span>
+  <span class="spacer">登录后第一屏 · 3 秒内回答"现在站点什么状态、我该做什么"</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a class="active"><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">📊</span>
+      <div class="text-sm text-muted"><span class="bold" style="color:var(--fg)">仪表盘</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">2025-01-15 周三</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="page-head">
+        <div>
+          <h1>晚上好，Puly 👋</h1>
+          <div class="sub">这里是你的站点概览。今天还没有写日志 —— 要记一笔吗？</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn">+ 记一笔</a>
+          <a class="btn btn-primary">+ 写文章</a>
+        </div>
+      </div>
+
+      <!-- ============ 统计卡 ============ -->
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="lbl">📄 文章</div>
+          <div class="num">42</div>
+          <div class="sub">38 已发布 · 4 草稿</div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">📓 日志</div>
+          <div class="num">86</div>
+          <div class="sub">本月新增 12 条</div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">💼 作品集</div>
+          <div class="num">15</div>
+          <div class="sub">4 个首页精选</div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">🕐 时间戳</div>
+          <div class="num">9</div>
+          <div class="sub">1 条进行中</div>
+        </div>
+      </div>
+
+      <!-- ============ 访问趋势 + 快捷操作 ============ -->
+      <div class="mt-16" style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;align-items:start">
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="bold text-sm">近 7 天访问</span>
+            <span class="badge badge-green">↑ 12.4%</span>
+          </div>
+          <div class="panel-body">
+            <div class="row between" style="align-items:flex-end">
+              <div>
+                <div class="num" style="font-size:32px;font-weight:700;letter-spacing:-.03em">3,204</div>
+                <div class="text-xs text-subtle mt-4">较上周期 +354</div>
+              </div>
+              <div class="text-xs text-subtle">日均 458</div>
+            </div>
+            <div class="bar-chart">
+              <i style="height:26%"></i>
+              <i style="height:44%"></i>
+              <i style="height:68%"></i>
+              <i style="height:32%"></i>
+              <i style="height:92%"></i>
+              <i style="height:54%"></i>
+              <i style="height:78%"></i>
+            </div>
+            <div class="row between text-xs text-subtle mt-8">
+              <span>01-09</span><span>01-15</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span class="bold text-sm">⚡ 快捷操作</span></div>
+          <div class="panel-body stack gap-8">
+            <a class="btn" style="justify-content:flex-start">📄 写新文章</a>
+            <a class="btn" style="justify-content:flex-start">📓 记一笔日志</a>
+            <a class="btn" style="justify-content:flex-start">💼 添加作品</a>
+            <a class="btn" style="justify-content:flex-start">🖼 上传媒体</a>
+            <hr class="divider" style="margin:4px 0">
+            <a class="btn btn-ghost" style="justify-content:flex-start">🧩 模块开关 →</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============ 热门内容 + 最近编辑 ============ -->
+      <div class="mt-16" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="bold text-sm">🏆 热门文章</span>
+            <a class="text-xs text-accent">全部 →</a>
+          </div>
+          <table class="data">
+            <tbody>
+              <tr>
+                <td style="width:34px" class="text-subtle bold">1</td>
+                <td>
+                  <div class="cell-title">我为什么选择 Next.js</div>
+                  <div class="cell-sub">技术 · 01-15</div>
+                </td>
+                <td style="text-align:right" class="mono bold">1,024</td>
+              </tr>
+              <tr>
+                <td class="text-subtle bold">2</td>
+                <td>
+                  <div class="cell-title">我如何做技术选型</div>
+                  <div class="cell-sub">技术 · 01-08</div>
+                </td>
+                <td style="text-align:right" class="mono bold">876</td>
+              </tr>
+              <tr>
+                <td class="text-subtle bold">3</td>
+                <td>
+                  <div class="cell-title">从 40s 到 8s：一次 CI 提速</div>
+                  <div class="cell-sub">技术 · 2024-12-20</div>
+                </td>
+                <td style="text-align:right" class="mono bold">445</td>
+              </tr>
+              <tr>
+                <td class="text-subtle bold">4</td>
+                <td>
+                  <div class="cell-title">Vite 构建优化实践</div>
+                  <div class="cell-sub">技术 · 01-14</div>
+                </td>
+                <td style="text-align:right" class="mono bold">320</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span class="bold text-sm">🕐 最近编辑</span>
+            <a class="text-xs text-accent">审计日志 →</a>
+          </div>
+          <table class="data">
+            <tbody>
+              <tr>
+                <td>
+                  <div class="cell-title">📄 我为什么选择 Next.js</div>
+                  <div class="cell-sub">发布 · 2 分钟前</div>
+                </td>
+                <td style="text-align:right"><span class="badge badge-green">已发布</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="cell-title">📓 重构了首页的动画</div>
+                  <div class="cell-sub">更新 · 1 小时前</div>
+                </td>
+                <td style="text-align:right"><span class="badge badge-green">已发布</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="cell-title">💼 Pixel Runner</div>
+                  <div class="cell-sub">更新 · 昨天 16:20</div>
+                </td>
+                <td style="text-align:right"><span class="badge badge-green">已发布</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="cell-title">📄 React Server Components 心智模型</div>
+                  <div class="cell-sub">创建 · 3 天前</div>
+                </td>
+                <td style="text-align:right"><span class="badge badge-gray">草稿</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- ============ 系统状态 ============ -->
+      <div class="panel mt-16">
+        <div class="panel-head">
+          <span class="bold text-sm">⚙ 系统状态</span>
+          <span class="text-xs text-subtle">每分钟自动刷新</span>
+        </div>
+        <div class="panel-body row gap-32 wrap">
+          <div class="row gap-8">
+            <span class="dot-status dot-green" style="width:8px;height:8px"></span>
+            <div>
+              <div class="text-sm bold">数据库正常</div>
+              <div class="text-xs text-subtle">PostgreSQL · 延迟 12ms</div>
+            </div>
+          </div>
+          <div class="divider-v" style="height:34px"></div>
+          <div>
+            <div class="text-sm bold">模块启用 5 / 6</div>
+            <div class="text-xs text-subtle">「日志」当前已关闭</div>
+          </div>
+          <div class="divider-v" style="height:34px"></div>
+          <div>
+            <div class="text-sm bold">上次备份 2025-01-15 03:00</div>
+            <div class="text-xs text-subtle">pg_dump → 对象存储 · 保留 30 天</div>
+          </div>
+          <div class="divider-v" style="height:34px"></div>
+          <div>
+            <div class="text-sm bold">存储占用 510 MB / 10 GB</div>
+            <div style="width:180px;height:6px;background:var(--bg-muted);border-radius:999px;overflow:hidden;margin-top:6px">
+              <div style="width:5%;height:100%;background:var(--accent);border-radius:999px"></div>
+            </div>
+          </div>
+          <a class="btn btn-sm ml-auto">运行健康检查</a>
+        </div>
+      </div>
+
+      <!-- ============ 待办提醒 ============ -->
+      <div class="notice notice-warn mt-16">
+        <span class="icon">⚠</span>
+        <div>
+          <div class="bold">有 3 项待处理</div>
+          <div class="text-xs mt-4" style="line-height:1.8">
+            · 4 篇文章处于草稿状态，其中「React Server Components 心智模型」已 3 天未更新<br>
+            · 2 篇文章缺少 SEO 描述，会影响搜索展示效果<br>
+            · 「日志」模块当前处于关闭状态，86 条内容前台不可见
+          </div>
+          <div class="row gap-8 mt-8">
+            <a class="btn btn-sm">查看草稿</a>
+            <a class="btn btn-sm">去模块开关</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

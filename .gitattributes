@@ -1,0 +1,30 @@
+# 统一换行符，避免 Windows / macOS / CI 之间产生无意义的 diff
+* text=auto eol=lf
+
+# 明确文本类型
+*.md    text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.css   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.sql   text eol=lf
+*.prisma text eol=lf
+
+# 二进制文件不做换行转换
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.avif  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.pdf   binary
+*.mp4   binary
+
+# 让 GitHub 语言统计更准确
+docs/** linguist-documentation

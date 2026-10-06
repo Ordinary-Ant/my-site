@@ -89,14 +89,20 @@ console.log(
     : `\n✅ 全部 ${files.length} 个设计稿通过一致性检查`
 )
 
-const expected = [
-  'site-home.html', 'site-logs.html', 'site-log-detail.html', 'site-logs-calendar.html',
-  'site-portfolio.html', 'site-project-detail.html', 'site-timeline.html', 'site-about.html',
-  'site-search.html', 'site-404.html', 'site-login.html',
-  'admin-dashboard.html', 'admin-modules.html', 'admin-article-list.html', 'admin-article-edit.html',
-  'admin-logs.html', 'admin-projects.html', 'admin-timeline.html', 'admin-about-edit.html',
-  'admin-media.html', 'admin-settings.html', 'admin-users.html', 'admin-audit.html',
-  'design-system.html',
-]
+// 预期页面清单直接来自 manifest —— 单一数据源，避免两处各写一份对不上
+const manifestPath = join(root, 'manifest-all.json')
+let expected = []
+if (existsSync(manifestPath)) {
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  expected = [...new Set(manifest.targets.map((t) => t.file))]
+}
 const missing = expected.filter((f) => !existsSync(join(root, f)))
-console.log(missing.length ? `\n⏳ 尚未产出：${missing.join(', ')}` : `\n✅ 24 个页面全部就位`)
+console.log(
+  missing.length
+    ? `\n⏳ 尚未产出（manifest 里声明但文件不存在）：${missing.join(', ')}`
+    : `\n✅ manifest 声明的 ${expected.length} 个源文件全部就位`,
+)
+const notInManifest = files.filter((f) => !expected.includes(f))
+if (notInManifest.length) {
+  console.log(`⚠ 存在但未在 manifest 里声明（不会被截图）：${notInManifest.join(', ')}`)
+}

@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>标签 · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 标签云</b>
+  <span class="spec-tag">/tags</span>
+  <span class="spec-tag violet">ISR 3600s</span>
+  <span class="spec-tag">可选页面</span>
+  <span class="spacer">标签是跨模块的（文章 / 日志 / 作品共用）· 字号映射使用次数 · 点进去是标签归档页</span>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a class="active" href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <div style="padding:52px 0 26px">
+      <div class="section-eyebrow">Tags</div>
+      <h1 style="font-size:32px;letter-spacing:-.025em">🏷 标签</h1>
+      <p class="section-intro">
+        42 个标签，覆盖 42 篇文章、86 条日志与 15 个作品。字号代表使用频率。
+      </p>
+    </div>
+
+    <!-- ============ 标签云 ============ -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="bold text-sm">标签云</span>
+        <div class="row gap-6">
+          <span class="text-xs text-subtle">排序</span>
+          <div class="select" style="height:30px;font-size:12.5px">按使用次数</div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="row wrap" style="gap:10px 18px;align-items:baseline;line-height:1.9">
+
+          <a style="font-size:26px;font-weight:650;color:var(--accent);letter-spacing:-.02em">Next.js</a>
+          <a style="font-size:24px;font-weight:650;color:var(--accent);letter-spacing:-.02em">React</a>
+          <a style="font-size:22px;font-weight:600;color:var(--accent)">性能</a>
+          <a style="font-size:20px;font-weight:600;color:var(--fg)">工程化</a>
+          <a style="font-size:19px;font-weight:600;color:var(--fg)">TypeScript</a>
+          <a style="font-size:17px;font-weight:550;color:var(--fg-muted)">重构</a>
+          <a style="font-size:16px;font-weight:550;color:var(--fg-muted)">踩坑</a>
+          <a style="font-size:15px;font-weight:550;color:var(--fg-muted)">设计系统</a>
+          <a style="font-size:15px;font-weight:500;color:var(--fg-muted)">算法</a>
+          <a style="font-size:14px;font-weight:500;color:var(--fg-muted)">工具链</a>
+          <a style="font-size:14px;font-weight:500;color:var(--fg-muted)">RSC</a>
+          <a style="font-size:14px;font-weight:500;color:var(--fg-muted)">CI</a>
+          <a style="font-size:13.5px;font-weight:500;color:var(--fg-muted)">Vite</a>
+          <a style="font-size:13.5px;font-weight:500;color:var(--fg-muted)">状态管理</a>
+          <a style="font-size:13.5px;font-weight:500;color:var(--fg-muted)">组件库</a>
+          <a style="font-size:13.5px;font-weight:500;color:var(--fg-muted)">可访问性</a>
+          <a style="font-size:13px;font-weight:500;color:var(--fg-subtle)">动效</a>
+          <a style="font-size:13px;font-weight:500;color:var(--fg-subtle)">缓存</a>
+          <a style="font-size:13px;font-weight:500;color:var(--fg-subtle)">监控</a>
+          <a style="font-size:13px;font-weight:500;color:var(--fg-subtle)">远程</a>
+          <a style="font-size:12.5px;font-weight:500;color:var(--fg-subtle)">协作</a>
+          <a style="font-size:12.5px;font-weight:500;color:var(--fg-subtle)">复盘</a>
+          <a style="font-size:12.5px;font-weight:500;color:var(--fg-subtle)">读书记录</a>
+          <a style="font-size:12.5px;font-weight:500;color:var(--fg-subtle)">职业发展</a>
+          <a style="font-size:12px;font-weight:500;color:var(--fg-subtle)">面试</a>
+          <a style="font-size:12px;font-weight:500;color:var(--fg-subtle)">规范</a>
+          <a style="font-size:12px;font-weight:500;color:var(--fg-subtle)">调试</a>
+          <a style="font-size:12px;font-weight:500;color:var(--fg-subtle)">测试</a>
+          <a style="font-size:12px;font-weight:500;color:var(--fg-subtle)">数据库</a>
+          <a style="font-size:11.5px;font-weight:500;color:var(--fg-subtle)">部署</a>
+          <a style="font-size:11.5px;font-weight:500;color:var(--fg-subtle)">开源</a>
+          <a style="font-size:11.5px;font-weight:500;color:var(--fg-subtle)">副业</a>
+
+        </div>
+      </div>
+      <div class="panel-body" style="border-top:1px solid var(--border);padding-top:14px;padding-bottom:14px">
+        <div class="row gap-20 wrap text-xs text-subtle">
+          <span>字号映射：<span class="mono">≥15 次 → 26px</span> · <span class="mono">8–14 次 → 18px</span> · <span class="mono">&lt;8 次 → 12px</span></span>
+          <span>颜色：<span style="color:var(--accent)">≥15 次用强调色</span>，其余用中性色，避免整页都在喊</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 按分组浏览 ============ -->
+    <div class="panel mt-16">
+      <div class="panel-head">
+        <span class="bold text-sm">按主题分组</span>
+        <span class="text-xs text-subtle">另一种浏览方式 —— 比按字母更适合中文标签</span>
+      </div>
+      <div class="panel-body" style="display:grid;grid-template-columns:repeat(2,1fr);gap:22px">
+
+        <div>
+          <div class="text-xs bold text-subtle mb-8" style="letter-spacing:.06em">框架与语言</div>
+          <div class="stack gap-2">
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>Next.js</span><span class="text-xs text-subtle">16 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>React</span><span class="text-xs text-subtle">14 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>TypeScript</span><span class="text-xs text-subtle">8 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>RSC</span><span class="text-xs text-subtle">4 篇</span>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs bold text-subtle mb-8" style="letter-spacing:.06em">工程与质量</div>
+          <div class="stack gap-2">
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>工程化</span><span class="text-xs text-subtle">9 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>重构</span><span class="text-xs text-subtle">6 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>CI</span><span class="text-xs text-subtle">3 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>测试</span><span class="text-xs text-subtle">2 篇</span>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs bold text-subtle mb-8" style="letter-spacing:.06em">性能与体验</div>
+          <div class="stack gap-2">
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>性能</span><span class="text-xs text-subtle">11 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>动效</span><span class="text-xs text-subtle">3 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>可访问性</span><span class="text-xs text-subtle">3 篇</span>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs bold text-subtle mb-8" style="letter-spacing:.06em">生活与思考</div>
+          <div class="stack gap-2">
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>复盘</span><span class="text-xs text-subtle">5 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>职业发展</span><span class="text-xs text-subtle">4 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>读书记录</span><span class="text-xs text-subtle">3 篇</span>
+            </a>
+            <a class="row between" style="padding:7px 10px;border-radius:8px;font-size:13.5px">
+              <span>远程</span><span class="text-xs text-subtle">2 篇</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============ 状态稿 ============ -->
+    <div class="mt-48" style="padding-bottom:40px">
+      <div class="row gap-12 mb-24">
+        <div class="divider" style="flex:1"></div>
+        <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态稿</span>
+        <div class="divider" style="flex:1"></div>
+      </div>
+
+      <div class="grid-2" style="align-items:start;gap:24px">
+        <div class="panel">
+          <div class="panel-head"><span class="bold text-sm">① 标签数量很少时（&lt; 10 个）</span></div>
+          <div class="panel-body">
+            <p class="text-xs text-muted mb-12">不用硬撑标签云 —— 直接平铺成 chip 列表，字号统一，避免"4 个标签却有三种大小"的尴尬。</p>
+            <div class="chip-row">
+              <span class="chip">Next.js</span>
+              <span class="chip">React</span>
+              <span class="chip">性能</span>
+              <span class="chip">工程化</span>
+              <span class="chip">TypeScript</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span class="bold text-sm">② 空态</span></div>
+          <div class="empty-state">
+            <div class="ic">🏷</div>
+            <h3>还没有标签</h3>
+            <p>标签是在写内容时顺手打上的。写第一篇的时候就会有了。</p>
+            <a class="btn mt-16">去看看文章</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel mt-16">
+        <div class="panel-head"><span class="bold text-sm">③ 悬停与当前态</span></div>
+        <div class="panel-body">
+          <div class="row gap-24 wrap">
+            <div>
+              <div class="text-xs text-subtle mb-8">默认</div>
+              <span class="chip">性能</span>
+            </div>
+            <div>
+              <div class="text-xs text-subtle mb-8">悬停（颜色变强调色 + 下划线展开）</div>
+              <span class="chip" style="color:var(--accent);border-color:var(--brand-border);background:var(--brand-soft)">性能</span>
+            </div>
+            <div>
+              <div class="text-xs text-subtle mb-8">当前标签（从归档页回跳时）</div>
+              <span class="chip chip-active">Next.js</span>
+            </div>
+          </div>
+          <div class="stage-note" style="margin-top:16px">
+            <b>无障碍</b>：标签云里字号差异只表达视觉权重，<b>不承载语义</b> —— 因此每个标签都带 <span class="mono">title="Next.js · 16 篇内容"</span>，屏幕阅读器可读；计数不用纯视觉表达。
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a class="active"><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-only] { display: flex !important; }
+    .header-actions .icon-btn:not([data-mobile-only]) { display: none; }
+    main { padding-bottom: 62px; }
+    /* 移动端标签云整体收一档字号，避免个别标签占满一行 */
+    .panel-body [style*="font-size:26px"] { font-size: 21px !important; }
+    .panel-body [style*="font-size:24px"] { font-size: 20px !important; }
+  }
+</style>
+
+</body>
+</html>

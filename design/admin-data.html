@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 数据管理</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 数据管理</b>
+  <span class="spec-tag">/admin/data</span>
+  <span class="spec-tag amber">仅 ADMIN</span>
+  <span class="spacer">导出 JSON · 导入 · 备份</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a class="active"><span class="icon">💾</span>数据导入 / 导出</a>
+      <a><span class="icon">👤</span>个人设置</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">💾</span>
+      <div class="text-sm text-muted">系统 / <span class="bold" style="color:var(--fg)">数据管理</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">SQLite · 上次备份 3 小时前</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>系统</span><span>/</span><span style="color:var(--fg-muted)">数据</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>数据管理</h1>
+          <div class="sub">导出留档、迁移换库、备份恢复都在这里</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-ghost">查看数据字典 →</a>
+        </div>
+      </div>
+
+      <div class="stack gap-20">
+
+        <!-- ============ ① 导出全站数据 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">📤 导出全站数据</div>
+            <span class="text-xs text-subtle">上次导出：2025-01-10 14:22</span>
+          </div>
+          <div class="panel-body">
+
+            <div class="text-sm text-muted">导出一个 JSON 文件，包含以下全部内容。用于换库迁移或本地留档。</div>
+
+            <div class="mt-16" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--bg-subtle)">
+              <div class="grid-3" style="gap:10px 20px">
+                <div class="cbx-row"><span class="ck on">✓</span>模块<span class="ml-auto text-xs text-subtle mono">6</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>站点设置<span class="ml-auto text-xs text-subtle mono">20</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>个人档案<span class="ml-auto text-xs text-subtle mono">1</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>分类<span class="ml-auto text-xs text-subtle mono">3</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>标签<span class="ml-auto text-xs text-subtle mono">42</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>文章<span class="ml-auto text-xs text-subtle mono">42</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>日志<span class="ml-auto text-xs text-subtle mono">86</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>作品集<span class="ml-auto text-xs text-subtle mono">15</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>时间戳<span class="ml-auto text-xs text-subtle mono">9</span></div>
+                <div class="cbx-row"><span class="ck on">✓</span>媒体元数据<span class="ml-auto text-xs text-subtle mono">214</span></div>
+              </div>
+            </div>
+
+            <div class="notice mt-16">
+              <span class="icon">ⓘ</span>
+              <div>导出<strong>不包含</strong>媒体文件本体（.png/.jpg 等），只包含元数据。迁移时请另行拷贝对象存储。</div>
+            </div>
+
+            <div class="row gap-10 mt-16" style="justify-content:flex-end">
+              <a class="btn btn-primary">导出 JSON</a>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="row gap-12 text-xs text-subtle">
+          <span>预计导出 1.2 MB · 约 420 条记录</span>
+          <span>·</span>
+          <span>文件名格式：puly-site-2025-01-15.json</span>
+        </div>
+
+        <!-- ============ ② 导入数据 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">📥 导入数据</div>
+            <span class="text-xs text-subtle">仅接受 .json · 单文件 ≤ 50 MB</span>
+          </div>
+          <div class="panel-body">
+
+            <div style="border:2px dashed var(--border-strong);border-radius:var(--radius);padding:30px 20px;text-align:center;background:var(--bg-subtle)">
+              <div style="font-size:28px;line-height:1">📥</div>
+              <div class="bold mt-12">拖拽 JSON 文件到此处，或</div>
+              <div class="mt-12"><a class="btn btn-sm">选择文件</a></div>
+              <div class="text-xs text-subtle mt-12">由「导出全站数据」生成的文件可直接回灌 · 导入前会先解析并给出预览</div>
+            </div>
+
+            <div class="mt-20">
+              <div class="bold text-sm">导入模式</div>
+              <div class="stack gap-12 mt-12">
+                <div class="cbx-row" style="align-items:flex-start">
+                  <span class="radio on" style="margin-top:4px"></span>
+                  <div>
+                    <div class="bold" style="color:var(--fg)">合并 <span class="text-xs text-subtle mono">merge</span></div>
+                    <div class="text-xs text-subtle mt-2">保留现有数据，按 slug 匹配：已存在的条目跳过或覆盖，其余作为新记录写入。</div>
+                  </div>
+                </div>
+                <div class="cbx-row" style="align-items:flex-start">
+                  <span class="radio" style="margin-top:4px"></span>
+                  <div>
+                    <div class="bold" style="color:var(--red)">覆盖 <span class="text-xs mono" style="color:var(--red)">replace</span></div>
+                    <div class="text-xs mt-2" style="color:var(--red)">清空所有内容后导入 —— 现有文章、日志、作品、标签会被全部删除，不可撤销。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="notice notice-danger mt-16">
+              <span class="icon">⚠️</span>
+              <div>覆盖模式会<strong>先清空</strong>现有全部内容。这是不可逆操作。建议先执行一次「导出全站数据」。</div>
+            </div>
+
+            <div class="row gap-10 mt-16" style="justify-content:flex-end">
+              <a class="btn btn-danger">开始导入</a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ============ ③ 数据库备份 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">🗄 数据库备份</div>
+            <span class="badge badge-green">正常</span>
+          </div>
+          <div class="panel-body">
+
+            <div class="row between wrap gap-16">
+              <div>
+                <div class="text-xs text-subtle">上次备份</div>
+                <div class="text-sm bold mt-4 mono">2025-01-15 03:00 <span class="badge badge-green">成功</span></div>
+              </div>
+              <div>
+                <div class="text-xs text-subtle">保留策略</div>
+                <div class="text-sm bold mt-4">30 天</div>
+              </div>
+              <div>
+                <div class="text-xs text-subtle">存储位置</div>
+                <div class="text-sm bold mt-4">Cloudflare R2</div>
+              </div>
+              <div>
+                <div class="text-xs text-subtle">下次备份</div>
+                <div class="text-sm bold mt-4">明日 03:00</div>
+              </div>
+            </div>
+
+            <div class="btn-row mt-16">
+              <a class="btn btn-primary">立即备份</a>
+              <a class="btn btn-outline">恢复演练</a>
+              <a class="btn">下载最近备份</a>
+            </div>
+
+            <div class="notice notice-ok mt-16">
+              <span class="icon">✅</span>
+              <div><strong>备份没做过恢复演练 = 没有备份。</strong>建议每季度点一次「恢复演练」，它会从最近备份恢复到临时库并校验记录条数。</div>
+            </div>
+
+          </div>
+
+          <hr class="divider">
+
+          <div class="row between" style="padding:14px 18px 10px">
+            <div class="bold text-sm">备份历史</div>
+            <span class="text-xs text-subtle">保留最近 30 份 · 超时自动重试 1 次</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th style="width:170px">时间</th>
+                  <th style="width:110px">大小</th>
+                  <th style="width:90px">耗时</th>
+                  <th style="width:110px">触发方式</th>
+                  <th>状态</th>
+                  <th style="width:100px;text-align:right">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono text-sm">2025-01-15 03:00</td>
+                  <td class="mono text-sm">198 MB</td>
+                  <td class="mono text-sm">12s</td>
+                  <td><span class="badge badge-gray">定时</span></td>
+                  <td><span style="color:var(--green)">✓</span> <span class="text-sm">成功</span></td>
+                  <td style="text-align:right"><a class="btn btn-sm btn-ghost">下载</a></td>
+                </tr>
+                <tr>
+                  <td class="mono text-sm">2025-01-14 03:00</td>
+                  <td class="mono text-sm">197 MB</td>
+                  <td class="mono text-sm">11s</td>
+                  <td><span class="badge badge-gray">定时</span></td>
+                  <td><span style="color:var(--green)">✓</span> <span class="text-sm">成功</span></td>
+                  <td style="text-align:right"><a class="btn btn-sm btn-ghost">下载</a></td>
+                </tr>
+                <tr>
+                  <td class="mono text-sm">2025-01-13 03:00</td>
+                  <td class="mono text-sm">195 MB</td>
+                  <td class="mono text-sm">12s</td>
+                  <td><span class="badge badge-gray">定时</span></td>
+                  <td><span style="color:var(--green)">✓</span> <span class="text-sm">成功</span></td>
+                  <td style="text-align:right"><a class="btn btn-sm btn-ghost">下载</a></td>
+                </tr>
+                <tr>
+                  <td class="mono text-sm">2025-01-12 14:30</td>
+                  <td class="mono text-sm">195 MB</td>
+                  <td class="mono text-sm">11s</td>
+                  <td><span class="badge badge-blue">手动</span></td>
+                  <td><span style="color:var(--green)">✓</span> <span class="text-sm">成功</span></td>
+                  <td style="text-align:right"><a class="btn btn-sm btn-ghost">下载</a></td>
+                </tr>
+                <tr>
+                  <td class="mono text-sm">2025-01-11 03:00</td>
+                  <td class="mono text-sm">194 MB</td>
+                  <td class="mono text-sm">35s</td>
+                  <td><span class="badge badge-gray">定时</span></td>
+                  <td><span style="color:var(--amber)">⚠</span> <span class="text-sm">超时重试后成功</span></td>
+                  <td style="text-align:right"><a class="btn btn-sm btn-ghost">下载</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle">
+        <span>导入与覆盖都会写入审计日志（含操作人与文件指纹）</span><span>·</span>
+        <span>备份文件加密存储，下载链接 15 分钟内有效</span>
+      </div>
+
+      <!-- ================================================================
+           以下为状态与弹窗稿
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- ① 导入预览弹窗 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 导入预览（先给数字，再让用户决定；此处尚未写库）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:28px">
+              <div class="modal">
+                <div class="modal-head">
+                  <div>
+                    <h3>导入预览</h3>
+                    <div class="text-xs text-subtle mt-4">解析完成，尚未写入数据库。</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body">
+                  <div class="text-xs text-subtle mono">puly-site-2025-01-10.json · 1.2 MB · 合并模式</div>
+
+                  <div class="mt-12">
+                    <div class="perf-row"><span class="k">将新增</span><span class="v perf-ok">12 条</span></div>
+                    <div class="perf-row"><span class="k">将更新</span><span class="v">3 条</span></div>
+                    <div class="perf-row"><span class="k">将跳过（slug 冲突）</span><span class="v perf-warn">1 条</span></div>
+                    <div class="perf-row"><span class="k">将删除</span><span class="v">0 条</span></div>
+                  </div>
+
+                  <div class="text-xs text-subtle bold mt-16 mb-8" style="letter-spacing:.06em">冲突详情</div>
+                  <div class="table-wrap" style="border:1px solid var(--border);border-radius:9px">
+                    <table class="data">
+                      <thead>
+                        <tr>
+                          <th style="width:90px">类型</th>
+                          <th style="width:170px">slug</th>
+                          <th>原因</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td class="text-sm">文章</td>
+                          <td class="mono text-sm">vue3-reactivity</td>
+                          <td class="text-xs text-subtle">已存在，跳过</td>
+                        </tr>
+                        <tr>
+                          <td class="text-sm">标签</td>
+                          <td class="mono text-sm">typescript</td>
+                          <td class="text-xs text-subtle">已存在，跳过</td>
+                        </tr>
+                        <tr>
+                          <td class="text-sm">作品集</td>
+                          <td class="mono text-sm">dsh-harness</td>
+                          <td class="text-xs text-subtle">标题相同，将覆盖</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-primary">确认导入</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ② 覆盖模式二次确认 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 覆盖模式二次确认（列出将删除的东西 + 手打关键词）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:28px">
+              <div class="modal" style="max-width:480px">
+                <div class="modal-head">
+                  <div>
+                    <h3>确认清空并覆盖？</h3>
+                    <div class="text-xs text-subtle mt-4">此操作不可撤销，也没有回收站。</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body">
+                  <div class="notice notice-danger">
+                    <span class="icon">⚠️</span>
+                    <div>
+                      将删除全部现有内容：
+                      <div class="mt-8">
+                        · 42 篇文章<br>
+                        · 86 条日志<br>
+                        · 15 个作品<br>
+                        · 9 条时间戳<br>
+                        · 3 个分类<br>
+                        · 42 个标签<br>
+                        · 6 个模块配置
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field mt-16">
+                    <label>请输入 <span class="mono bold">REPLACE</span> 以确认</label>
+                    <div class="control mono" style="letter-spacing:.1em">REPLACE</div>
+                    <div class="hint">区分大小写 · 粘贴无效，必须手动输入</div>
+                  </div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-danger">我确认，清空并导入</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ③ 导出进行中 -->
+        <div class="mt-32">
+          <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">③ 导出进行中（长任务给进度，不做假死按钮）</div>
+          <div class="panel" style="max-width:560px">
+            <div class="panel-body">
+
+              <div class="row gap-12">
+                <span class="icon">📤</span>
+                <div class="bold text-sm">正在导出全站数据</div>
+                <span class="ml-auto text-xs text-subtle mono">62%</span>
+              </div>
+
+              <div class="mt-12" style="height:6px;border-radius:999px;background:var(--bg-muted);overflow:hidden">
+                <div style="height:100%;width:62%;background:var(--accent)"></div>
+              </div>
+
+              <div class="stack gap-8 mt-16">
+                <div class="row gap-10 text-sm">
+                  <span class="icon" style="color:var(--green)">✓</span>
+                  <span>收集数据</span>
+                  <span class="ml-auto text-xs text-subtle mono">420 条</span>
+                </div>
+                <div class="row gap-10 text-sm">
+                  <span class="icon">⏳</span>
+                  <span class="bold">序列化 JSON</span>
+                  <span class="ml-auto text-xs text-subtle mono">62%</span>
+                </div>
+                <div class="row gap-10 text-sm text-subtle">
+                  <span class="icon">⬜</span>
+                  <span>打包下载</span>
+                  <span class="ml-auto text-xs text-subtle mono">等待中</span>
+                </div>
+              </div>
+
+              <div class="text-xs text-subtle mt-16">不要关闭页面，完成后会自动开始下载。</div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

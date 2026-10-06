@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 个人设置</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 个人设置</b>
+  <span class="spec-tag">/admin/account</span>
+  <span class="spacer">修改自己的资料与密码 · 角色与权限由管理员分配</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+      <a class="active"><span class="icon">👤</span>个人设置</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">👤</span>
+      <div class="text-sm text-muted">系统 / <span class="bold" style="color:var(--fg)">个人设置</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">账号创建于 2024-03-02 · 上次改密 32 天前</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>系统</span><span>/</span><span style="color:var(--fg-muted)">个人设置</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>个人设置</h1>
+          <div class="sub">你在后台的账号信息。角色与权限由管理员分配，不可自改。</div>
+        </div>
+      </div>
+
+      <div class="stack gap-20">
+
+        <!-- ============ ① 个人资料 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">👤 个人资料</div>
+            <span class="text-xs text-subtle">最后更新 2024-12-08</span>
+          </div>
+          <div class="panel-body">
+            <div class="stack gap-20" style="max-width:720px">
+
+              <div class="field">
+                <label>头像</label>
+                <div class="row gap-16">
+                  <div class="avatar" style="width:56px;height:56px;font-size:22px;flex:none">P</div>
+                  <div>
+                    <div class="row gap-8 wrap">
+                      <a class="btn btn-sm btn-outline">更换头像</a>
+                      <a class="btn btn-sm btn-ghost">移除</a>
+                    </div>
+                    <div class="text-xs text-subtle mt-8">建议 256×256，PNG/JPG</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label>姓名</label>
+                  <div class="control">Puly</div>
+                  <div class="hint">显示在后台顶栏与审计日志的操作人一列</div>
+                </div>
+                <div class="field">
+                  <label>邮箱</label>
+                  <div class="control" style="opacity:.6">admin@example.com<span class="badge badge-gray ml-auto">不可自改</span></div>
+                  <div class="hint">登录账号，如需更换请联系其他管理员</div>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label>角色</label>
+                  <div class="row gap-8 wrap" style="min-height:40px">
+                    <span class="badge badge-accent">管理员</span>
+                    <span class="text-xs text-subtle mono">ADMIN</span>
+                  </div>
+                  <div class="hint">如需变更请联系其他管理员</div>
+                </div>
+                <div class="field">
+                  <label>时区</label>
+                  <div class="select" style="width:100%">UTC+8 亚洲/上海</div>
+                  <div class="hint">只影响你自己的时间显示，不改站点全局设置</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="panel-body row gap-10" style="justify-content:flex-end;background:var(--bg-subtle)">
+            <a class="btn btn-primary">保存</a>
+          </div>
+        </div>
+
+        <!-- ============ ② 修改密码 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">🔒 修改密码</div>
+            <span class="text-xs text-subtle">上次修改：2024-12-14</span>
+          </div>
+          <div class="panel-body">
+            <div class="stack gap-20" style="max-width:520px">
+
+              <div class="field">
+                <label>当前密码</label>
+                <div class="control mono" style="letter-spacing:.14em">••••••••</div>
+              </div>
+
+              <div class="field">
+                <label>新密码</label>
+                <div class="control mono" style="letter-spacing:.14em">••••••••••••</div>
+                <div class="row gap-6 mt-4" style="max-width:260px">
+                  <span style="height:5px;flex:1;border-radius:999px;background:var(--green)"></span>
+                  <span style="height:5px;flex:1;border-radius:999px;background:var(--green)"></span>
+                  <span style="height:5px;flex:1;border-radius:999px;background:var(--green)"></span>
+                </div>
+                <div class="row gap-8">
+                  <span class="text-xs bold" style="color:var(--green)">强</span>
+                  <span class="text-xs text-subtle">长度 12 · 含大小写 · 含数字 · 含符号</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>确认新密码</label>
+                <div class="control mono" style="letter-spacing:.14em">••••••••••••<span class="ml-auto" style="color:var(--green)">✓</span></div>
+              </div>
+
+              <div class="notice">
+                <span class="icon">ⓘ</span>
+                <div>修改密码后，除当前设备外的<strong>所有登录会话会被强制退出</strong>。</div>
+              </div>
+
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="panel-body row gap-10" style="justify-content:flex-end;background:var(--bg-subtle)">
+            <a class="btn btn-primary">更新密码</a>
+          </div>
+        </div>
+
+        <!-- ============ ③ 活跃会话 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">🖥 活跃会话</div>
+            <span class="badge">3 个设备</span>
+          </div>
+
+          <div class="panel-body" style="padding-bottom:14px">
+            <div class="text-sm text-muted">这些设备当前持有有效的登录凭证。发现不认识的设备，直接退出它。</div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th style="width:170px">设备</th>
+                  <th style="width:190px">浏览器</th>
+                  <th style="width:150px">IP</th>
+                  <th style="width:110px">地点</th>
+                  <th>最后活动</th>
+                  <th style="width:120px;text-align:right">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="cell-title">🖥 Windows</div></td>
+                  <td class="text-sm text-muted">Chrome 131</td>
+                  <td class="mono text-sm">1.2.3.4</td>
+                  <td class="text-sm text-muted">杭州</td>
+                  <td class="text-sm">刚刚</td>
+                  <td style="text-align:right"><span class="badge badge-green">当前会话</span></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-title">📱 iPhone</div></td>
+                  <td class="text-sm text-muted">Safari 18</td>
+                  <td class="mono text-sm">5.6.7.8</td>
+                  <td class="text-sm text-muted">杭州</td>
+                  <td class="text-sm">2 小时前</td>
+                  <td style="text-align:right"><a class="btn btn-sm btn-ghost">退出</a></td>
+                </tr>
+                <tr>
+                  <td><div class="cell-title">💻 macOS</div></td>
+                  <td class="text-sm text-muted">Edge 131</td>
+                  <td class="mono text-sm">9.10.11.12</td>
+                  <td class="text-sm text-muted">上海</td>
+                  <td class="text-sm">3 天前</td>
+                  <td style="text-align:right"><a class="btn btn-sm btn-ghost">退出</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr class="divider">
+
+          <div class="panel-body row gap-10" style="justify-content:flex-end;background:var(--bg-subtle)">
+            <a class="btn btn-outline" style="color:var(--red)">退出其他所有设备</a>
+          </div>
+        </div>
+
+        <div class="notice notice-warn">
+          <span class="icon">⚠️</span>
+          <div>发现陌生设备？立即退出该会话并修改密码。</div>
+        </div>
+
+        <!-- ============ ④ 界面偏好 ============ -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="bold text-sm">🎨 界面偏好</div>
+            <span class="text-xs text-subtle">只存在这台设备的浏览器里</span>
+          </div>
+          <div class="panel-body">
+            <div class="stack gap-20" style="max-width:720px">
+
+              <div class="field">
+                <label>主题</label>
+                <div class="row gap-16 wrap" style="min-height:40px">
+                  <div class="cbx-row"><span class="radio on"></span>跟随系统</div>
+                  <div class="cbx-row"><span class="radio"></span>亮色</div>
+                  <div class="cbx-row"><span class="radio"></span>暗色</div>
+                </div>
+                <div class="hint">跟随系统时会随操作系统的深浅色实时切换</div>
+              </div>
+
+              <div class="field">
+                <label>后台列表密度</label>
+                <div class="row gap-16 wrap" style="min-height:40px">
+                  <div class="cbx-row"><span class="radio on"></span>舒适</div>
+                  <div class="cbx-row"><span class="radio"></span>紧凑</div>
+                </div>
+                <div class="hint">紧凑模式一屏大约多看 5 行，适合批量整理内容</div>
+              </div>
+
+              <div class="field" style="max-width:260px">
+                <label>每页条数</label>
+                <div class="select" style="width:100%">20</div>
+                <div class="hint">影响文章、日志、媒体与审计日志列表</div>
+              </div>
+
+              <div class="cbx-row"><span class="ck on">✓</span>操作成功后显示 toast 提示</div>
+
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="panel-body row gap-10" style="justify-content:flex-end;background:var(--bg-subtle)">
+            <a class="btn btn-primary">保存偏好</a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle">
+        <span>资料与密码的修改都会写入审计日志</span><span>·</span>
+        <span>密码使用 bcrypt 存储，后台任何地方都不会回显明文</span>
+      </div>
+
+      <!-- ================================================================
+           以下为状态与弹窗稿
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <!-- ① 密码强度三态对照 -->
+        <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 密码强度三态（边输边提示，不阻止提交，只在弱时给建议）</div>
+        <div class="grid-3">
+          <div class="card" style="padding:16px">
+            <div class="row between">
+              <span class="bold text-sm">弱</span>
+              <span class="text-xs text-subtle">1 / 3</span>
+            </div>
+            <div class="row gap-6 mt-12">
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--red)"></span>
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--bg-muted)"></span>
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--bg-muted)"></span>
+            </div>
+            <div class="text-xs mt-12" style="color:var(--red)">至少 8 位</div>
+            <div class="text-xs text-subtle mt-4 mono">puly2025</div>
+          </div>
+
+          <div class="card" style="padding:16px">
+            <div class="row between">
+              <span class="bold text-sm">中</span>
+              <span class="text-xs text-subtle">2 / 3</span>
+            </div>
+            <div class="row gap-6 mt-12">
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--amber)"></span>
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--amber)"></span>
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--bg-muted)"></span>
+            </div>
+            <div class="text-xs mt-12" style="color:#92400e">建议加入符号</div>
+            <div class="text-xs text-subtle mt-4 mono">Puly2025dev</div>
+          </div>
+
+          <div class="card" style="padding:16px">
+            <div class="row between">
+              <span class="bold text-sm">强</span>
+              <span class="text-xs text-subtle">3 / 3</span>
+            </div>
+            <div class="row gap-6 mt-12">
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--green)"></span>
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--green)"></span>
+              <span style="height:5px;flex:1;border-radius:999px;background:var(--green)"></span>
+            </div>
+            <div class="text-xs mt-12 bold" style="color:var(--green)">很好</div>
+            <div class="text-xs text-subtle mt-4 mono">Puly#2025Dev!</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-32" style="align-items:start;gap:32px">
+
+          <!-- ② 退出所有设备确认弹窗 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 退出其他所有设备（说清撤销几个会话）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:28px">
+              <div class="modal" style="max-width:440px">
+                <div class="modal-head">
+                  <div>
+                    <h3>退出其他所有设备？</h3>
+                    <div class="text-xs text-subtle mt-4">当前设备不受影响。</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body">
+                  <div class="text-sm text-muted">将撤销 2 个会话。这些设备下次访问后台需要重新登录。</div>
+                  <div class="stack gap-8 mt-16">
+                    <div class="row gap-10 text-sm"><span style="color:var(--fg-subtle)">📱</span>iPhone · Safari 18<span class="ml-auto text-xs text-subtle">2 小时前</span></div>
+                    <div class="row gap-10 text-sm"><span style="color:var(--fg-subtle)">💻</span>macOS · Edge 131<span class="ml-auto text-xs text-subtle">3 天前</span></div>
+                  </div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-danger">全部退出</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ③ 保存成功 toast -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">③ 保存成功提示（右上角 3 秒后自动消失）</div>
+            <div class="toast">
+              <span class="icon" style="color:var(--green)">✓</span>
+              <span>个人设置已保存</span>
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">④ 密码强度不达标时的字段错误态</div>
+            <div class="panel">
+              <div class="panel-body">
+                <div class="field">
+                  <label>新密码</label>
+                  <div class="control invalid mono" style="letter-spacing:.14em">••••••</div>
+                  <div class="err">密码至少 8 位，且需包含字母与数字</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

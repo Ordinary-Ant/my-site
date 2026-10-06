@@ -61,6 +61,22 @@
     { "file": "admin-motion.html", "out": "25a-admin-motion-desktop.png", "width": 1440, "scale": 1.5 },
     { "file": "admin-motion.html", "out": "25b-admin-motion-tablet.png", "width": 820, "scale": 1.5 },
 
-    { "file": "motion-storyboard.html", "out": "26a-motion-storyboard-desktop.png", "width": 1440, "scale": 1.5 }
+    { "file": "motion-storyboard.html", "out": "26a-motion-storyboard-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "site-articles.html", "out": "27a-site-articles-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "site-articles.html", "out": "27b-site-articles-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "site-article-detail.html", "out": "28a-site-article-detail-desktop.png", "width": 1440, "scale": 1.5 },
+    { "file": "site-article-detail.html", "out": "28b-site-article-detail-mobile.png", "width": 390, "scale": 2 },
+
+    { "file": "site-tags.html", "out": "29a-site-tags-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-categories.html", "out": "30a-admin-categories-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-tags.html", "out": "31a-admin-tags-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-data.html", "out": "32a-admin-data-desktop.png", "width": 1440, "scale": 1.5 },
+
+    { "file": "admin-account.html", "out": "33a-admin-account-desktop.png", "width": 1440, "scale": 1.5 }
   ]
 }

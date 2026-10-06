@@ -14,7 +14,7 @@
 design/index.html          ← 双击用浏览器打开
 ```
 
-看板按「前台 / 后台 / 设计系统」三组列出全部 36 张设计图，每张附说明、视口标签，以及两个入口：**打开原图** 与 **查看 HTML 源稿**。
+看板按「前台 / 后台 / 设计系统」三组列出全部 45 张设计图，每张附说明、视口标签，以及两个入口：**打开原图** 与 **查看 HTML 源稿**。
 
 **第二步：按下面「设计图 ↔ 文档章节」表逐条对照**
 
@@ -33,9 +33,9 @@ design/
 ├─ README.md                 ← 本文件
 ├─ index.html                ← 评审看板（浏览器打开）
 │
-├─ shots/                    ← 36 张 PNG 设计图（评审对象）
+├─ shots/                    ← 45 张 PNG 设计图（评审对象）
 │
-├─ *.html                    ← 27 个设计稿源文件（可交互的真实 HTML）
+├─ *.html                    ← 31 个设计稿源文件（可交互的真实 HTML）
 │  ├─ site-*.html            前台页面
 │  ├─ admin-*.html           后台页面
 │  ├─ design-system.html     UI Kit 总览
@@ -57,7 +57,7 @@ design/
 
 ## 三、设计图 ↔ 文档章节对应表
 
-### 前台（17 张）
+### 前台（24 张）
 
 | 设计图 | 文件 | 规模 | 对应文档章节 |
 |---|---|:--:|---|
@@ -72,8 +72,11 @@ design/
 | `12a` | [site-search.html](site-search.html) | PC | [05 §4.10](../docs/05-frontend-ia.md) · [03 §3.10](../docs/03-api-spec.md) |
 | `13a` | [site-404.html](site-404.html) | PC | [05 §4.11](../docs/05-frontend-ia.md) |
 | `14a` | [site-login.html](site-login.html) | PC | [03 §4 认证接口](../docs/03-api-spec.md) · [01 §6 鉴权](../docs/01-architecture.md) |
+| `27a/b` | [site-articles.html](site-articles.html) | PC / 移动 | [05 §4.7](../docs/05-frontend-ia.md) · [06 §4 文章](../docs/06-modules.md) · 归档页见 [05 路由表](../docs/05-frontend-ia.md) |
+| `28a/b` | [site-article-detail.html](site-article-detail.html) | PC / 移动 | [05 §4.8](../docs/05-frontend-ia.md) · [06 §4.5](../docs/06-modules.md) · [03 §3.3](../docs/03-api-spec.md) |
+| `29a` | [site-tags.html](site-tags.html) | PC | [05 路由表 `/tags`](../docs/05-frontend-ia.md) · [03 §3.1](../docs/03-api-spec.md) |
 
-### 后台（17 张）
+### 后台（20 张）
 
 | 设计图 | 文件 | 规模 | 对应文档章节 |
 |---|---|:--:|---|
@@ -90,6 +93,10 @@ design/
 | `22a` | [admin-users.html](admin-users.html) | PC | [04 §10](../docs/04-admin-console.md) · [01 §6.4 权限矩阵](../docs/01-architecture.md) |
 | `23a` | [admin-audit.html](admin-audit.html) | PC | [04 §10 审计日志](../docs/04-admin-console.md) · [03 §5.7](../docs/03-api-spec.md) |
 | `25a/b` | [admin-motion.html](admin-motion.html) | PC / 平板 | **[08 动效系统](../docs/08-motion-system.md)** · [04 §15](../docs/04-admin-console.md) · [03 §5.8](../docs/03-api-spec.md) |
+| `30a` | [admin-categories.html](admin-categories.html) | PC | [04 §2 信息架构](../docs/04-admin-console.md) · [02 `Category` 树形设计](../docs/02-data-model.md) |
+| `31a` | [admin-tags.html](admin-tags.html) | PC | [04 §2 信息架构](../docs/04-admin-console.md) · [02 `Tag` 多对多设计](../docs/02-data-model.md) |
+| `32a` | [admin-data.html](admin-data.html) | PC | [02 §8 导出与备份](../docs/02-data-model.md) · [03 `admin/export` / `import`](../docs/03-api-spec.md) |
+| `33a` | [admin-account.html](admin-account.html) | PC | [03 §4.4 修改密码](../docs/03-api-spec.md) · [01 §6 会话与撤销](../docs/01-architecture.md) |
 
 ### 设计系统与规范（2 张）
 
@@ -104,9 +111,9 @@ design/
 
 | 端 | 宽度 | 覆盖的设计图 |
 |---|---|---|
-| **移动** | 390px | 首页、日志列表、作品集、时间戳、关于我、文章列表、文章编辑 |
+| **移动** | 390px | 首页、日志列表、作品集、时间戳、关于我、**文章列表**、**文章详情**、后台文章列表、后台文章编辑 |
 | **平板** | 820px | 模块开关中心、动效配置 |
-| **PC** | 1440px | 全部 24 个页面 |
+| **PC** | 1440px | 全部 31 个页面 |
 | **暗色主题** | 1440px | 首页（`01c`） |
 
 > **未逐个出图的页面并非不需要响应式**：`_assets/mock.css` 里的断点规则（`≤1023px` / `≤767px`）对所有页面统一生效，实现时按 [05 §2 三端布局策略矩阵](../docs/05-frontend-ia.md) 验收即可。
@@ -180,6 +187,6 @@ node _tools/build-index.mjs .
 
 | 项 | 状态 |
 |---|---|
-| 设计稿 | ✅ 24 个页面 / 36 张图，通过 lint 与布局自检 |
+| 设计稿 | ✅ 31 个页面 / 45 张图，通过 lint 与布局自检 |
 | 评审 | ✅ 已确认 |
 | 实现 | 🟡 M0 已完成并验证（`npm run build` 通过）—— 下一步 M1，见 [07-roadmap.md](../docs/07-roadmap.md) |

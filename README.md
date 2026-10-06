@@ -38,7 +38,7 @@
 | 6 | [06-modules.md](docs/06-modules.md) | 五大模块（日志/作品集/时间戳/文章/关于我）逐一详细设计 | 前端 |
 | 7 | [07-roadmap.md](docs/07-roadmap.md) | 里程碑拆解、工期估算、风险对策、上线检查清单 | 项目管理 |
 | 8 | [08-motion-system.md](docs/08-motion-system.md) | **动效系统**：三层实现策略、配置结构、8 个预设、六级降级链、性能预算、可访问性、后台配置界面 | 前端 / 全栈 |
-| 🎨 | [design/README.md](design/README.md) | **UI 设计稿**：36 张设计图 / 24 个页面，含「设计图 ↔ 文档章节」对应表与三端覆盖说明 | 前端 |
+| 🎨 | [design/README.md](design/README.md) | **UI 设计稿**：45 张设计图 / 32 个页面，含「设计图 ↔ 文档章节」对应表与三端覆盖说明 | 前端 |
 | 🖥 | [design/index.html](design/index.html) | 设计稿评审看板（用浏览器打开） | 所有人 |
 
 ---
@@ -212,7 +212,7 @@ Prisma schema 本身已通过 `prisma validate`；`seed.ts` 已通过 `tsc` 类�
 ### 设计稿怎么看
 
 ```bash
-# 用浏览器打开评审看板（36 张设计图）
+# 用浏览器打开评审看板（45 张设计图）
 design/index.html
 ```
 
@@ -224,7 +224,7 @@ design/index.html
 
 ```
 personal-site/
-├─ design/                      ← UI 设计稿（36 张图 + 24 个页面源稿 + 评审看板）
+├─ design/                      ← UI 设计稿（45 张图 + 32 个页面源稿 + 评审看板）
 │  ├─ README.md                 ← 设计图 ↔ 文档章节对应表
 │  ├─ index.html                ← 评审看板
 │  ├─ shots/ · _assets/ · _tools/

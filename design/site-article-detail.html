@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我为什么选择 Next.js · Puly</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>前台 · 文章详情</b>
+  <span class="spec-tag">/articles/:slug</span>
+  <span class="spec-tag blue">模块 article</span>
+  <span class="spec-tag violet">ISR 600s + generateStaticParams</span>
+  <span class="spacer">整站最复杂的展示页 · PC 双栏（正文 + sticky TOC）· 平板/移动 TOC 折叠 · 代码块服务端 Shiki 高亮</span>
+</div>
+
+<!-- 阅读进度条（滚动时推进，纯 CSS scroll-driven，0 KB JS） -->
+<div class="reading-progress" style="background:var(--bg-muted)"><i style="width:38%"></i></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand"><span class="brand-mark">P</span> Puly</a>
+    <nav class="site-nav">
+      <a href="#">首页</a>
+      <a href="#">日志</a>
+      <a href="#">作品集</a>
+      <a href="#">时间戳</a>
+      <a class="active" href="#">文章</a>
+      <a href="#">关于我</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn">🔍</button>
+      <button class="icon-btn">☾</button>
+      <button class="icon-btn" style="display:none" data-mobile-only>☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container" style="padding-top:34px">
+
+    <a class="text-sm text-muted" style="display:inline-flex;align-items:center;gap:6px">← 返回文章列表</a>
+
+    <!-- ============ 双栏：正文 + TOC ============ -->
+    <div class="grid-2-1" style="margin-top:26px;padding-bottom:48px">
+
+      <!-- ---------- 左：正文 ---------- -->
+      <article style="max-width:720px">
+
+        <div class="row gap-8 wrap">
+          <span class="badge badge-blue">技术</span>
+          <span class="badge badge-gray" style="background:var(--bg-muted)">📌 置顶</span>
+        </div>
+
+        <h1 style="font-size:38px;letter-spacing:-.028em;margin-top:14px;line-height:1.24">
+          我为什么选择 Next.js
+        </h1>
+
+        <p class="text-muted mt-12" style="font-size:16.5px;line-height:1.7">
+          从渲染模型到工程化的一次梳理，以及我在真实项目里踩过的坑。
+        </p>
+
+        <div class="row gap-16 wrap mt-20 text-sm text-subtle" style="padding-bottom:20px;border-bottom:1px solid var(--border)">
+          <span>2025-01-15</span>
+          <span>·</span>
+          <span>8 分钟阅读</span>
+          <span>·</span>
+          <span>3200 字</span>
+          <span>·</span>
+          <span>1024 次阅读</span>
+        </div>
+
+        <div class="cover cover-16x9 mt-24">封面 16:9 · 1200×675</div>
+
+        <!-- ---------- prose ---------- -->
+        <div class="prose mt-32">
+
+          <h2 id="h-起因">起因</h2>
+          <p>
+            在过去的项目里，我一直在用不同的渲染方案。每次换技术栈的时候，我都会问自己同一个问题：
+            这次换，是因为它真的解决了我的问题，还是因为我想学点新东西？
+          </p>
+          <p>
+            这个问题不好回答。因为大部分时候，答案是"两者都有"。所以这篇文章试着把判断依据写清楚 ——
+            不是布道，只是把当时的思考过程留下来，方便三年后的我回看。
+          </p>
+
+          <h2 id="h-渲染模型">渲染模型</h2>
+          <p>
+            RSC 带来的最大变化不是性能，而是<strong>心智模型</strong>。你得先接受一件事：
+            组件可以永远不进入浏览器。
+          </p>
+
+          <h3 id="h-服务端组件">服务端组件</h3>
+          <p>
+            一开始我很不适应。写惯了 <code>useState</code> 的人，突然要面对一个没有状态、没有副作用、
+            没有事件处理的世界，会觉得手脚被绑住了。
+          </p>
+          <p>但换个角度想：那些东西本来就不需要在服务端存在。你只是把边界画在了不同的地方。</p>
+
+          <div class="code-head">
+            <span>app/articles/[slug]/page.tsx</span>
+            <span style="cursor:pointer">⧉ 复制</span>
+          </div>
+<pre><code><span class="tok-com">// 这个组件永远不会进入浏览器</span>
+<span class="tok-key">export default async function</span> <span class="tok-fn">ArticlePage</span>({ params }) {
+  <span class="tok-key">const</span> article = <span class="tok-key">await</span> articleService.<span class="tok-fn">getBySlug</span>(params.slug)
+
+  <span class="tok-key">if</span> (!article) <span class="tok-fn">notFound</span>()
+
+  <span class="tok-key">return</span> (
+    &lt;<span class="tok-tag">article</span>&gt;
+      &lt;<span class="tok-tag">h1</span>&gt;{article.title}&lt;/<span class="tok-tag">h1</span>&gt;
+      &lt;<span class="tok-tag">MarkdownRenderer</span> content={article.content} /&gt;
+    &lt;/<span class="tok-tag">article</span>&gt;
+  )
+}</code></pre>
+
+          <p>
+            注意这里没有 <code>'use client'</code>，也没有任何数据请求的 <code>useEffect</code>。
+            数据在服务端拿到，HTML 直接吐出去。首屏 JS 里不含这个组件。
+          </p>
+
+          <h3 id="h-增量静态再生成">增量静态再生成</h3>
+          <p>
+            文章发布后需要马上可见，但文章内容又极少变动 —— 这两个需求看起来矛盾。ISR 加上缓存标签解决了它：
+          </p>
+
+          <blockquote>
+            发布文章时调 <code>revalidateTag('article')</code>，前台最长 5 秒生效。
+            既不是每次都查库，也不用等定时重建。
+          </blockquote>
+
+          <h2 id="h-踩过的坑">踩过的坑</h2>
+          <p>有几件事是我在真实项目里才搞明白的：</p>
+          <ul>
+            <li>
+              <strong>middleware 跑在 Edge Runtime，不能用 Prisma。</strong>
+              我一开始把会话校验写在 middleware 里，构建直接报错。正确做法是 middleware 只验 JWT 签名，
+              真正的授权放在 service 层。
+            </li>
+            <li>
+              <strong>Server 和 Client 的边界比想象中更容易搞错。</strong>
+              一个不小心 <code>'use client'</code> 加在了 layout 上，整棵子树就都变成了客户端组件。
+            </li>
+            <li>
+              <strong>缓存失效必须集中管理。</strong>
+              一开始 <code>revalidateTag</code> 散落在各个路由里，漏掉了两处，导致后台改了前台没更新。
+              后来统一挪到 service 层，问题就消失了。
+            </li>
+          </ul>
+
+          <h3 id="h-关于取舍">关于取舍</h3>
+          <p>
+            没有银弹。Next.js 解决了我的问题（SEO、首屏、前后端一体），但也带来了新的复杂度（心智模型、缓存）。
+            如果你的项目是一个内部后台，我大概率不会推荐它。
+          </p>
+
+          <h2 id="h-结论">结论</h2>
+          <p>
+            工具是手段，不是目的。我选它，是因为它让我一个人能维护一个完整的产品 ——
+            而不是因为它火。
+          </p>
+
+        </div>
+
+        <!-- ---------- 标签 + 分享 ---------- -->
+        <div class="row between wrap gap-16 mt-32" style="padding:20px 0;border-top:1px solid var(--border)">
+          <div class="chip-row" style="gap:12px">
+            <span class="tag">Next.js</span>
+            <span class="tag">架构</span>
+            <span class="tag">工程化</span>
+          </div>
+          <div class="row gap-8">
+            <a class="btn btn-sm">🔗 复制链接</a>
+            <a class="btn btn-sm">𝕏</a>
+          </div>
+        </div>
+
+        <!-- ---------- 上下篇 ---------- -->
+        <div class="prevnext mt-8">
+          <a>
+            <span class="lbl">← 上一篇</span>
+            <span class="ttl">关于远程办公的思考</span>
+          </a>
+          <a style="text-align:right">
+            <span class="lbl">下一篇 →</span>
+            <span class="ttl">Vite 构建优化实践</span>
+          </a>
+        </div>
+
+      </article>
+
+      <!-- ---------- 右：TOC（sticky） ---------- -->
+      <aside class="toc">
+        <div class="toc-title">目录</div>
+        <nav>
+          <a class="active" href="#h-起因">起因</a>
+          <a href="#h-渲染模型">渲染模型</a>
+          <a class="lvl3" href="#h-服务端组件">服务端组件</a>
+          <a class="lvl3" href="#h-增量静态再生成">增量静态再生成</a>
+          <a href="#h-踩过的坑">踩过的坑</a>
+          <a class="lvl3" href="#h-关于取舍">关于取舍</a>
+          <a href="#h-结论">结论</a>
+        </nav>
+
+        <div class="divider" style="margin:22px 0"></div>
+
+        <div class="toc-title">分享</div>
+        <div class="row gap-6">
+          <a class="btn btn-sm btn-icon">🔗</a>
+          <a class="btn btn-sm btn-icon">𝕏</a>
+          <a class="btn btn-sm btn-icon">📮</a>
+        </div>
+
+        <div class="divider" style="margin:22px 0"></div>
+
+        <div class="toc-title">作者</div>
+        <div class="row gap-10">
+          <div class="avatar" style="width:34px;height:34px;font-size:13px">P</div>
+          <div>
+            <div class="text-sm bold">Puly</div>
+            <div class="text-xs text-subtle">5 年经验前端工程师</div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- ============ 相关文章 ============ -->
+    <div style="padding:34px 0 60px;border-top:1px solid var(--border)">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Related</div>
+          <h2 style="font-size:20px">相关文章</h2>
+        </div>
+        <a class="more">全部文章 →</a>
+      </div>
+      <div class="grid-3">
+        <article class="post-card" style="flex-direction:column;padding:14px">
+          <div class="cover cover-16x9" style="width:100%">封面</div>
+          <h3 style="font-size:15.5px">Vite 构建优化实践</h3>
+          <div class="meta mt-4"><span>6 分钟阅读</span></div>
+        </article>
+        <article class="post-card" style="flex-direction:column;padding:14px">
+          <div class="cover cover-16x9" style="width:100%">封面</div>
+          <h3 style="font-size:15.5px">React Server Components 心智模型</h3>
+          <div class="meta mt-4"><span>10 分钟阅读</span></div>
+        </article>
+        <article class="post-card" style="flex-direction:column;padding:14px">
+          <div class="cover cover-16x9" style="width:100%">封面</div>
+          <h3 style="font-size:15.5px">我如何做技术选型</h3>
+          <div class="meta mt-4"><span>7 分钟阅读</span></div>
+        </article>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="col">
+        <a class="brand mb-8"><span class="brand-mark">P</span> Puly</a>
+        <p>前端工程师 · 写代码也写字。这里记录我做过的东西和想明白的事。</p>
+      </div>
+      <div class="col">
+        <h4>导航</h4>
+        <a href="#">日志</a><a href="#">作品集</a><a href="#">时间戳</a>
+        <a href="#">文章</a><a href="#">关于我</a>
+      </div>
+      <div class="col">
+        <h4>找到我</h4>
+        <a href="#">GitHub</a><a href="#">掘金</a><a href="#">RSS 订阅</a><a href="#">hi@example.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Puly · 保留所有权利</span>
+      <span>京ICP备12345678号</span>
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-tabbar" style="display:none" data-tabbar>
+  <a><span class="icon">🏠</span>首页</a>
+  <a><span class="icon">📓</span>日志</a>
+  <a><span class="icon">💼</span>作品</a>
+  <a class="active"><span class="icon">📄</span>文章</a>
+  <a><span class="icon">👤</span>关于</a>
+</nav>
+
+<style>
+  @media (max-width: 767px) {
+    [data-tabbar] { display: flex !important; }
+    .site-nav { display: none !important; }
+    .header-actions [data-mobile-btn] { display: flex !important; }
+    main { padding-bottom: 62px; }
+  }
+  /* 阅读进度条在移动端贴着安全区顶部 */
+  @media (max-width: 767px) {
+    .reading-progress { top: 0; }
+  }
+</style>
+
+</body>
+</html>

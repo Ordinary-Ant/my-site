@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 分类管理</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 分类管理</b>
+  <span class="spec-tag">/admin/categories</span>
+  <span class="spec-tag blue">树形 · 拖拽排序</span>
+  <span class="spec-tag amber">仅影响文章</span>
+  <span class="spacer">两层为上限 · 前台导航与 URL 都用 slug · 删除分类不删文章</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a class="active"><span class="icon">🗂</span>分类</a>
+      <a><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">🗂</span>
+      <div class="text-sm text-muted">内容管理 / <span class="bold" style="color:var(--fg)">分类</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">只作用于文章 · 日志与作品不使用分类</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>内容管理</span><span>/</span><span style="color:var(--fg-muted)">分类</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>分类</h1>
+          <div class="sub">3 个分类 · 42 篇文章</div>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-primary">+ 新建分类</a>
+        </div>
+      </div>
+
+      <div class="notice mb-20">
+        <span class="icon">ⓘ</span>
+        <div>
+          <strong>分类是一对多</strong>（一篇文章只属于一个分类），会出现在前台导航与 URL 里；<strong>标签是多对多</strong>，只用于检索与关联。
+          判断标准：这个维度会不会出现在导航里？会 → 分类，不会 → 标签。
+        </div>
+      </div>
+
+      <!-- ============ 分类树 + 编辑面板 ============ -->
+      <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start">
+
+        <!-- 左：分类树 -->
+        <div class="panel">
+
+          <div class="panel-head">
+            <div class="row gap-10">
+              <span class="bold text-sm">分类树</span>
+              <span class="badge badge-gray">3 个顶级 · 共 6 个</span>
+            </div>
+            <span class="text-xs text-subtle">拖拽调整前台导航顺序</span>
+          </div>
+
+          <!-- 表头 -->
+          <div style="display:grid;grid-template-columns:26px 20px 1fr 150px 90px 90px;align-items:center;gap:12px;padding:10px 18px;background:var(--bg-subtle);border-bottom:1px solid var(--border);border-left:4px solid transparent;font-size:12px;font-weight:650;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.05em">
+            <span></span>
+            <span></span>
+            <span>分类名称</span>
+            <span>Slug</span>
+            <span>文章</span>
+            <span>操作</span>
+          </div>
+
+          <!-- 技术（顶级，展开） -->
+          <div style="display:grid;grid-template-columns:26px 20px 1fr 150px 90px 90px;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);border-left:4px solid #3B82F6;background:var(--card)">
+            <span class="drag-handle" style="cursor:grab">⋮⋮</span>
+            <span class="text-subtle" style="font-size:11px">▾</span>
+            <div class="row gap-8" style="min-width:0">
+              <span class="icon">💻</span>
+              <span class="bold" style="font-size:14.5px">技术</span>
+              <span class="text-xs text-subtle">顶级分类</span>
+            </div>
+            <span class="badge badge-gray mono" style="font-size:11.5px">tech</span>
+            <span class="badge badge-blue">28 篇</span>
+            <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+          </div>
+
+          <!-- 前端（子级，正在编辑） -->
+          <div class="selected" style="display:grid;grid-template-columns:26px 20px 1fr 150px 90px 90px;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);border-left:4px solid #3B82F6;background:var(--accent-soft)">
+            <span class="drag-handle" style="cursor:grab">⋮⋮</span>
+            <span></span>
+            <div class="row gap-8" style="min-width:0;padding-left:26px">
+              <span class="icon">⚛️</span>
+              <span class="bold" style="font-size:14.5px;color:var(--accent)">前端</span>
+              <span class="badge badge-accent">编辑中</span>
+            </div>
+            <span class="badge badge-gray mono" style="font-size:11.5px">frontend</span>
+            <span class="badge badge-blue">18 篇</span>
+            <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+          </div>
+
+          <!-- 后端（子级） -->
+          <div style="display:grid;grid-template-columns:26px 20px 1fr 150px 90px 90px;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);border-left:4px solid #60A5FA">
+            <span class="drag-handle" style="cursor:grab">⋮⋮</span>
+            <span></span>
+            <div class="row gap-8" style="min-width:0;padding-left:26px">
+              <span class="icon">☕</span>
+              <span style="font-size:14.5px">后端</span>
+            </div>
+            <span class="badge badge-gray mono" style="font-size:11.5px">backend</span>
+            <span class="badge badge-gray">6 篇</span>
+            <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+          </div>
+
+          <!-- 工程化（子级） -->
+          <div style="display:grid;grid-template-columns:26px 20px 1fr 150px 90px 90px;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);border-left:4px solid #93C5FD">
+            <span class="drag-handle" style="cursor:grab">⋮⋮</span>
+            <span></span>
+            <div class="row gap-8" style="min-width:0;padding-left:26px">
+              <span class="icon">🛠</span>
+              <span style="font-size:14.5px">工程化</span>
+            </div>
+            <span class="badge badge-gray mono" style="font-size:11.5px">engineering</span>
+            <span class="badge badge-gray">4 篇</span>
+            <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+          </div>
+
+          <!-- 生活（顶级，无子级） -->
+          <div style="display:grid;grid-template-columns:26px 20px 1fr 150px 90px 90px;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);border-left:4px solid #8B5CF6">
+            <span class="drag-handle" style="cursor:grab">⋮⋮</span>
+            <span></span>
+            <div class="row gap-8" style="min-width:0">
+              <span class="icon">🌱</span>
+              <span class="bold" style="font-size:14.5px">生活</span>
+              <span class="text-xs text-subtle">顶级分类</span>
+            </div>
+            <span class="badge badge-gray mono" style="font-size:11.5px">life</span>
+            <span class="badge badge-violet">9 篇</span>
+            <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+          </div>
+
+          <!-- 随笔（顶级，无子级） -->
+          <div style="display:grid;grid-template-columns:26px 20px 1fr 150px 90px 90px;align-items:center;gap:12px;padding:13px 18px;border-left:4px solid #F59E0B">
+            <span class="drag-handle" style="cursor:grab">⋮⋮</span>
+            <span></span>
+            <div class="row gap-8" style="min-width:0">
+              <span class="icon">📝</span>
+              <span class="bold" style="font-size:14.5px">随笔</span>
+              <span class="text-xs text-subtle">顶级分类</span>
+            </div>
+            <span class="badge badge-gray mono" style="font-size:11.5px">essay</span>
+            <span class="badge badge-amber">5 篇</span>
+            <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+          </div>
+
+          <!-- 树脚注 -->
+          <div class="admin-filter" style="border-bottom:0;border-top:1px solid var(--border);background:var(--bg-subtle)">
+            <span class="text-xs text-subtle">拖拽 <b>⋮⋮</b> 调整顺序 · 最多两层 · <b>▾</b> / <b>▸</b> 是展开与折叠，当前只有「技术」带子分类</span>
+            <a class="btn btn-sm btn-ghost ml-auto">全部展开</a>
+            <a class="btn btn-sm btn-ghost">全部折叠</a>
+          </div>
+
+        </div>
+
+        <!-- 右：编辑面板 -->
+        <div class="panel">
+
+          <div class="panel-head">
+            <div class="bold text-sm">编辑分类 · 前端</div>
+            <span class="badge badge-blue">18 篇</span>
+          </div>
+
+          <div class="panel-body stack gap-16">
+
+            <div class="field">
+              <label>名称</label>
+              <div class="control">前端</div>
+            </div>
+
+            <div class="field">
+              <label>Slug</label>
+              <div class="control mono" style="font-size:13px">frontend</div>
+              <div class="hint">完整地址：<span class="mono">https://puly.dev/articles/category/frontend</span></div>
+            </div>
+
+            <div class="field">
+              <label>描述</label>
+              <div class="control control-area" style="font-size:13.5px;line-height:1.65">框架与运行时相关的实践记录：React 生态、状态管理、渲染性能与交互细节。</div>
+              <div class="hint">展示在分类归档页顶部，建议一句话说清收录范围。</div>
+            </div>
+
+            <div class="field">
+              <label>父级</label>
+              <div class="select" style="width:100%">技术</div>
+              <div class="hint">留空即顶级分类；已是最深一层，不能再选子分类作父级。</div>
+            </div>
+
+            <div class="field">
+              <label>颜色</label>
+              <div class="row gap-10">
+                <span class="color-chip" style="background:#3B82F6"></span>
+                <span class="color-hex">#3B82F6</span>
+              </div>
+              <div class="row gap-8 mt-4">
+                <span style="width:22px;height:22px;border-radius:6px;background:#3B82F6;border:2px solid var(--fg)"></span>
+                <span style="width:22px;height:22px;border-radius:6px;background:#8B5CF6;border:1px solid var(--border)"></span>
+                <span style="width:22px;height:22px;border-radius:6px;background:#F59E0B;border:1px solid var(--border)"></span>
+                <span style="width:22px;height:22px;border-radius:6px;background:#10B981;border:1px solid var(--border)"></span>
+                <span style="width:22px;height:22px;border-radius:6px;background:#EF4444;border:1px solid var(--border)"></span>
+                <span style="width:22px;height:22px;border-radius:6px;background:#EC4899;border:1px solid var(--border)"></span>
+              </div>
+              <div class="hint">色条显示在分类树左侧与前台分类徽标上。</div>
+            </div>
+
+            <div class="field">
+              <label>图标</label>
+              <div class="row gap-8">
+                <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1.5px solid var(--accent);background:var(--accent-soft)">⚛️</span>
+                <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">📦</span>
+                <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">🎨</span>
+                <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">☕</span>
+                <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">🛠</span>
+                <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">📝</span>
+              </div>
+              <div class="hint">用 emoji，不引入图标库。图标出现在前台导航与分类卡片上。</div>
+            </div>
+
+            <div class="field">
+              <label>排序</label>
+              <div class="row gap-10">
+                <div class="control mono" style="width:76px;justify-content:center;min-height:36px">1</div>
+                <span class="text-xs text-subtle">同一父级下按数字升序，数字小的排前面</span>
+              </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="notice notice-warn">
+              <span class="icon">!</span>
+              <div>该分类下有 18 篇文章。删除分类不会删除文章，文章会变成「未分类」。</div>
+            </div>
+
+          </div>
+
+          <div class="modal-foot" style="justify-content:space-between">
+            <a class="btn btn-danger">删除分类</a>
+            <div class="row gap-10">
+              <a class="btn">取消</a>
+              <a class="btn btn-primary">保存</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="row gap-12 mt-12 text-xs text-subtle wrap">
+        <span>分类只作用于文章 —— 日志与作品用标签组织</span><span>·</span>
+        <span>slug 改动会让旧链接 404，建议建好之后不再改</span><span>·</span>
+        <span>删除顶级分类前必须先把子分类移走</span>
+      </div>
+
+      <!-- ================================================================
+           以下为弹窗 / 状态稿（同一页面内的设计状态展示）
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- ① 删除受阻 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 删除受阻弹窗（有子分类时直接拦住，只给一个出口）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="modal" style="max-width:460px">
+                <div class="modal-head">
+                  <div>
+                    <h3>无法删除「技术」</h3>
+                    <div class="text-xs text-subtle mt-4 mono">/articles/category/tech</div>
+                  </div>
+                </div>
+                <div class="modal-body">
+                  <div class="text-sm text-muted mb-16">该分类下有 3 个子分类（前端 / 后端 / 工程化）。请先移动或删除子分类。</div>
+                  <div class="chip-row mb-16">
+                    <span class="chip chip-sm"><span style="color:#3B82F6">●</span> 前端 <span class="text-subtle">18 篇</span></span>
+                    <span class="chip chip-sm"><span style="color:#60A5FA">●</span> 后端 <span class="text-subtle">6 篇</span></span>
+                    <span class="chip chip-sm"><span style="color:#93C5FD">●</span> 工程化 <span class="text-subtle">4 篇</span></span>
+                  </div>
+                  <div class="text-xs text-subtle">先把这 3 个子分类的父级改成「生活」或「随笔」，再回来删除。</div>
+                </div>
+                <div class="modal-foot">
+                  <a class="btn btn-primary">知道了</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ② 新建分类 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 新建分类弹窗（与右侧编辑面板同一套字段，去掉删除）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="modal" style="max-width:460px">
+                <div class="modal-head">
+                  <div>
+                    <h3>新建分类</h3>
+                    <div class="text-xs text-subtle mt-4">保存后立即出现在前台导航</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+                <div class="modal-body stack gap-14">
+
+                  <div class="field">
+                    <label>名称</label>
+                    <div class="control">浏览器</div>
+                  </div>
+
+                  <div class="field">
+                    <label>Slug</label>
+                    <div class="control mono" style="font-size:13px">browser</div>
+                    <div class="hint row gap-6" style="color:var(--green)"><span class="bold">✓</span> 可用 · <span class="mono">/articles/category/browser</span> 尚未被占用</div>
+                  </div>
+
+                  <div class="field">
+                    <label>父级</label>
+                    <div class="select" style="width:100%">技术</div>
+                    <div class="hint">不选则建成顶级分类（前台导航多一个入口，谨慎）。</div>
+                  </div>
+
+                  <div class="field">
+                    <label>颜色</label>
+                    <div class="row gap-8">
+                      <span style="width:22px;height:22px;border-radius:6px;background:#3B82F6;border:1px solid var(--border)"></span>
+                      <span style="width:22px;height:22px;border-radius:6px;background:#8B5CF6;border:1px solid var(--border)"></span>
+                      <span style="width:22px;height:22px;border-radius:6px;background:#F59E0B;border:2px solid var(--fg)"></span>
+                      <span style="width:22px;height:22px;border-radius:6px;background:#10B981;border:1px solid var(--border)"></span>
+                      <span style="width:22px;height:22px;border-radius:6px;background:#EF4444;border:1px solid var(--border)"></span>
+                      <span style="width:22px;height:22px;border-radius:6px;background:#EC4899;border:1px solid var(--border)"></span>
+                      <span class="color-hex ml-4">#F59E0B</span>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label>图标</label>
+                    <div class="row gap-8">
+                      <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">⚛️</span>
+                      <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">📦</span>
+                      <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1.5px solid var(--accent);background:var(--accent-soft)">🎨</span>
+                      <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">☕</span>
+                      <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">🛠</span>
+                      <span style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--border);background:var(--card)">📝</span>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="modal-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-primary">创建</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ③ 空态 -->
+        <div class="mt-32" style="max-width:520px">
+          <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">③ 空态（还没建过任何分类）</div>
+          <div class="panel">
+            <div class="empty-state">
+              <div class="ic">🗂</div>
+              <h3>还没有分类</h3>
+              <p>分类用于组织长文。不确定要不要建？那就先用标签。</p>
+              <div class="row center mt-20">
+                <a class="btn btn-primary">+ 新建分类</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

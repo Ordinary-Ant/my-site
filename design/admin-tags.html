@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台 · 标签管理</title>
+<link rel="stylesheet" href="_assets/mock.css">
+<script>if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark'</script>
+</head>
+<body>
+
+<div class="spec">
+  <b>后台 · 标签管理</b>
+  <span class="spec-tag">/admin/tags</span>
+  <span class="spec-tag violet">支持合并重复标签</span>
+  <span class="spec-tag amber">文章 / 日志 / 作品共用</span>
+  <span class="spacer">多对多 · 不做层级 · slug 一经建立不再变动</span>
+</div>
+
+<div class="admin-shell">
+
+  <!-- ============ 侧边栏 ============ -->
+  <aside class="admin-sidebar">
+    <a class="brand"><span class="brand-mark">P</span> Puly 后台</a>
+    <nav class="admin-nav">
+      <a><span class="icon">📊</span>仪表盘</a>
+      <div class="group">内容管理</div>
+      <a><span class="icon">📄</span>文章<span class="count">42</span></a>
+      <a><span class="icon">📓</span>日志<span class="count">86</span></a>
+      <a><span class="icon">💼</span>作品集<span class="count">15</span></a>
+      <a><span class="icon">🕐</span>时间戳<span class="count">9</span></a>
+      <a><span class="icon">👤</span>关于我</a>
+      <a><span class="icon">🗂</span>分类</a>
+      <a class="active"><span class="icon">🏷</span>标签</a>
+      <div class="group">站点设置</div>
+      <a><span class="icon">🧩</span>模块开关</a>
+      <a><span class="icon">⚙️</span>基础信息</a>
+      <a><span class="icon">🎨</span>外观主题</a>
+      <a><span class="icon">✨</span>动效</a>
+      <a><span class="icon">🔍</span>SEO</a>
+      <a><span class="icon">🔗</span>社交链接</a>
+      <a><span class="icon">📃</span>页脚 / 备案</a>
+      <div class="group">系统</div>
+      <a><span class="icon">🖼</span>媒体库<span class="count">214</span></a>
+      <a><span class="icon">👥</span>用户管理</a>
+      <a><span class="icon">📋</span>审计日志</a>
+      <a><span class="icon">💾</span>数据导入 / 导出</a>
+    </nav>
+  </aside>
+
+  <!-- ============ 主区 ============ -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <span class="icon" style="font-size:17px">🏷</span>
+      <div class="text-sm text-muted">内容管理 / <span class="bold" style="color:var(--fg)">标签</span></div>
+      <div class="ml-auto row gap-12">
+        <span class="text-xs text-subtle">文章 / 日志 / 作品共用同一套标签</span>
+        <div class="divider-v"></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px">P</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div class="breadcrumb">
+        <span>内容管理</span><span>/</span><span style="color:var(--fg-muted)">标签</span>
+      </div>
+
+      <div class="page-head">
+        <div>
+          <h1>标签</h1>
+          <div class="sub">42 个标签 · 覆盖 3 类内容</div>
+        </div>
+        <div class="btn-row">
+          <div class="chip-row">
+            <span class="chip">标签云视图</span>
+            <span class="chip chip-active">表格</span>
+          </div>
+          <a class="btn btn-primary">+ 新建标签</a>
+        </div>
+      </div>
+
+      <div class="notice mb-20">
+        <span class="icon">ⓘ</span>
+        <div>
+          标签在文章、日志、作品之间共用。用久了必然出现同义标签（比如 <span class="mono">Next.js</span> 和 <span class="mono">nextjs</span>），所以提供了<strong>合并</strong>功能。
+        </div>
+      </div>
+
+      <!-- ============ 标签列表 ============ -->
+      <div class="panel">
+
+        <!-- 筛选栏 -->
+        <div class="admin-filter">
+          <div class="input input-search">
+            <span>🔍</span>
+            <span class="ph">搜索标签名…</span>
+          </div>
+          <div class="select">按使用次数</div>
+          <div class="select">全部内容</div>
+          <a class="btn btn-sm btn-outline">重置</a>
+          <a class="btn btn-sm btn-ghost ml-auto">⚙ 列设置</a>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="width:40px"><span class="cbx"></span></th>
+                <th style="width:200px" class="sorted">标签名 ▾</th>
+                <th style="width:150px">Slug</th>
+                <th style="width:170px">使用次数</th>
+                <th>分布</th>
+                <th style="width:112px">创建时间</th>
+                <th style="width:104px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr class="selected">
+                <td data-label="选择"><span class="cbx checked">✓</span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:var(--fg);flex:none"></span>
+                    Next.js
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">nextjs</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">16</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:var(--fg);width:100%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 13 · 日志 2 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2024-01-18</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr class="selected">
+                <td data-label="选择"><span class="cbx checked">✓</span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#06B6D4;flex:none"></span>
+                    React
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">react</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">14</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#06B6D4;width:88%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 12 · 日志 1 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2023-11-02</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;flex:none"></span>
+                    性能
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">performance</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">11</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#F59E0B;width:69%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 8 · 日志 2 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2024-03-11</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#8B5CF6;flex:none"></span>
+                    工程化
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">engineering</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">9</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#8B5CF6;width:56%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 7 · 日志 1 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2024-04-26</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#3B82F6;flex:none"></span>
+                    TypeScript
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">typescript</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">8</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#3B82F6;width:50%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 6 · 日志 1 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2024-02-09</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#10B981;flex:none"></span>
+                    重构
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">refactor</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">6</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#10B981;width:38%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 4 · 日志 2 · 作品 0</td>
+                <td data-label="创建时间" class="mono text-xs">2024-06-14</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#EF4444;flex:none"></span>
+                    踩坑
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">pitfalls</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">5</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#EF4444;width:31%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 4 · 日志 0 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2024-07-30</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#EC4899;flex:none"></span>
+                    设计系统
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">design-system</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">4</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#EC4899;width:25%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 2 · 日志 1 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2024-09-05</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#F97316;flex:none"></span>
+                    算法
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">algorithm</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">3</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#F97316;width:19%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 2 · 日志 0 · 作品 1</td>
+                <td data-label="创建时间" class="mono text-xs">2025-01-07</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+              <tr>
+                <td data-label="选择"><span class="cbx"></span></td>
+                <td data-label="标签名">
+                  <div class="cell-title">
+                    <span style="width:8px;height:8px;border-radius:50%;background:#64748B;flex:none"></span>
+                    工具链
+                  </div>
+                </td>
+                <td data-label="Slug"><span class="badge badge-gray mono" style="font-size:11.5px">toolchain</span></td>
+                <td data-label="使用次数">
+                  <div class="row gap-10">
+                    <span class="bold mono" style="width:22px;text-align:right">2</span>
+                    <div style="flex:1;max-width:96px;height:4px;border-radius:999px;background:var(--bg-muted)"><i style="display:block;height:100%;border-radius:999px;background:#64748B;width:12%"></i></div>
+                  </div>
+                </td>
+                <td data-label="分布" class="text-sm text-muted">文章 1 · 日志 1 · 作品 0</td>
+                <td data-label="创建时间" class="mono text-xs">2025-02-16</td>
+                <td data-label="操作">
+                  <div class="row-actions"><a class="btn btn-sm">编辑</a><a class="btn btn-sm btn-ghost">⋯</a></div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 批量操作栏 -->
+        <div class="bulk-bar">
+          <span class="bold">☑ 已选 2 项</span>
+          <div class="divider-v"></div>
+          <a class="btn btn-sm btn-primary">合并标签</a>
+          <a class="btn btn-sm">删除</a>
+          <a class="btn btn-sm btn-ghost ml-auto">取消选择</a>
+        </div>
+
+      </div>
+
+      <!-- 分页与统计 -->
+      <div class="pagination">
+        <a>‹</a>
+        <a class="active">1</a>
+        <a>2</a>
+        <a>3</a>
+        <a>›</a>
+        <span class="text-xs text-subtle" style="margin-left:12px">每页 10 条 · 共 42 条</span>
+      </div>
+
+      <div class="row gap-12 text-xs text-subtle wrap">
+        <span>按使用次数降序 —— 用得最多的排最前</span><span>·</span>
+        <span>11 个标签只被用过 1 次，是合并与清理的主要候选</span><span>·</span>
+        <span>删除标签只解除关联，不删除内容</span>
+      </div>
+
+      <!-- ================================================================
+           以下为弹窗 / 状态稿（同一页面内的设计状态展示）
+           ================================================================ -->
+      <div class="mt-64">
+        <div class="row gap-12 mb-16">
+          <div class="divider" style="flex:1"></div>
+          <span class="text-xs text-subtle bold" style="letter-spacing:.08em">状态与弹窗稿</span>
+          <div class="divider" style="flex:1"></div>
+        </div>
+
+        <div class="grid-2" style="align-items:start;gap:32px">
+
+          <!-- ① 合并标签 -->
+          <div>
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">① 合并标签弹窗（本页最重的操作，先把后果写清楚）</div>
+            <div class="overlay" style="border-radius:var(--radius);padding:24px">
+              <div class="modal">
+                <div class="modal-head">
+                  <div>
+                    <h3>合并 2 个标签</h3>
+                    <div class="text-xs text-subtle mt-4">目标标签将接收全部关联</div>
+                  </div>
+                  <button class="icon-btn">✕</button>
+                </div>
+
+                <div class="modal-body stack gap-16">
+
+                  <div class="notice notice-warn">
+                    <span class="icon">!</span>
+                    <div>合并<strong>不可撤销</strong>。被合并标签下的所有内容会转移到目标标签，源标签将被删除。</div>
+                  </div>
+
+                  <div class="field">
+                    <label>待合并的标签</label>
+                    <div class="stack gap-8">
+                      <div class="row gap-10" style="border:1px solid var(--border);border-radius:9px;padding:9px 12px;background:var(--card)">
+                        <span style="width:8px;height:8px;border-radius:50%;background:var(--fg);flex:none"></span>
+                        <span class="bold text-sm">Next.js</span>
+                        <span class="text-xs text-subtle">16 次</span>
+                        <a class="btn btn-sm btn-ghost ml-auto">✕</a>
+                      </div>
+                      <div class="row gap-10" style="border:1px solid var(--border);border-radius:9px;padding:9px 12px;background:var(--card)">
+                        <span style="width:8px;height:8px;border-radius:50%;background:#06B6D4;flex:none"></span>
+                        <span class="bold text-sm">React</span>
+                        <span class="text-xs text-subtle">14 次</span>
+                        <a class="btn btn-sm btn-ghost ml-auto">✕</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label>合并到</label>
+                    <div class="select" style="width:100%">nextjs</div>
+                    <div class="hint">将保留目标标签的名称与 slug</div>
+                  </div>
+
+                  <div class="field">
+                    <label>合并结果预览</label>
+                    <div class="diff">
+                      <div><span class="add">+ 新增关联</span>  文章 25 · 日志 3 · 作品 2（合计 30 次）</div>
+                      <div><span class="del">− 将删除标签</span>  Next.js、React</div>
+                      <div><span class="add">✓ 保留</span>  nextjs</div>
+                    </div>
+                    <div class="hint">合并会写入审计日志，事后可查到是谁在什么时候合的。</div>
+                  </div>
+
+                </div>
+
+                <div class="modal-foot">
+                  <a class="btn">取消</a>
+                  <a class="btn btn-danger">确认合并</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ② 重命名提示 + ③ 标签云 -->
+          <div>
+
+            <div class="text-xs text-subtle mb-12 bold" style="letter-spacing:.06em">② 重命名提示（改显示名之前先说清 slug 不动）</div>
+            <div class="toast" style="max-width:none">
+              <span class="icon">✏️</span>
+              <span>重命名只会改显示名，slug 保持不变，避免已收录的链接失效。</span>
+              <a class="undo">知道了</a>
+            </div>
+            <div class="text-xs text-subtle mt-12">
+              要把 <span class="mono">nextjs</span> 改成 <span class="mono">Next.js</span> 这类「只是写法不同」的调整，用重命名；要真的换一个 slug，只能新建标签再合并过去。
+            </div>
+
+            <div class="text-xs text-subtle mt-32 mb-12 bold" style="letter-spacing:.06em">③ 标签云视图（按使用次数分字号，点击即筛选）</div>
+            <div class="panel">
+              <div class="panel-head">
+                <div class="row gap-10">
+                  <span class="bold text-sm">标签云</span>
+                  <span class="badge badge-gray">当前筛选 · nextjs</span>
+                </div>
+                <a class="btn btn-sm btn-ghost">切回表格</a>
+              </div>
+              <div class="panel-body">
+                <div class="row wrap" style="align-items:baseline;gap:8px 16px">
+                  <span style="font-size:26px;font-weight:650;color:var(--fg);background:var(--bg-muted);padding:4px 12px;border-radius:10px">Next.js</span>
+                  <span style="font-size:24px;font-weight:650;color:#06B6D4">React</span>
+                  <span style="font-size:21px;font-weight:600;color:#F59E0B">性能</span>
+                  <span style="font-size:19px;font-weight:600;color:#8B5CF6">工程化</span>
+                  <span style="font-size:18px;font-weight:600;color:#3B82F6">TypeScript</span>
+                  <span style="font-size:17px;color:#7C3AED">Vite</span>
+                  <span style="font-size:16px;color:#10B981">重构</span>
+                  <span style="font-size:16px;color:#14B8A6">CSS</span>
+                  <span style="font-size:15px;color:#EF4444">踩坑</span>
+                  <span style="font-size:15px;color:#60A5FA">浏览器</span>
+                  <span style="font-size:14px;color:#EC4899">设计系统</span>
+                  <span style="font-size:14px;color:#D97706">源码阅读</span>
+                  <span style="font-size:13px;color:#F97316">算法</span>
+                  <span style="font-size:13px;color:#0EA5E9">无障碍</span>
+                  <span style="font-size:12px;color:#64748B">工具链</span>
+                  <span style="font-size:12px;color:#94A3B8">归档</span>
+                </div>
+                <div class="row gap-10 mt-20">
+                  <span class="chip chip-sm chip-active">#nextjs</span>
+                  <span class="chip chip-sm">#react</span>
+                  <span class="chip chip-sm">#性能</span>
+                  <span class="text-xs text-subtle ml-auto">点击标签查看关联内容</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

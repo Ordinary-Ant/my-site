@@ -51,6 +51,10 @@ design/
    └─ patch-sidebar.mjs      批量同步后台侧边栏导航（一次性迁移工具）
 ```
 
+> **与《设计规范》的关系**：`docs/设计规范.md` 是**视觉与动效的唯一权威**（具体用什么值）；本目录的设计图是它的**可视化呈现**（长什么样）。两者冲突时以规范为准。
+>
+> **v1.1 变更（2026-10）**：动效接入 **Anime.js v4.5.0**；风格基准改为 **[Clay Showreel 2023](https://showreel.design/videos/clay-showreel-2023/) / [clay.global](https://clay.global/)（Minimal / Clean）**。极光 / 光斑 / 星空 / 粒子从"主角"降为**默认关闭**的可选装饰。`motion-storyboard.html` 已重写为 v2。
+>
 > **设计稿是可运行的 HTML**，不是静态图片。用浏览器打开任意 `*.html`，**悬停、动效、响应式都会真实生效** —— 比如打开 `admin-motion.html` 能看到背景渐变真的在流动。
 
 ---
@@ -103,7 +107,7 @@ design/
 | 设计图 | 文件 | 规模 | 对应文档章节 |
 |---|---|:--:|---|
 | `24a` | [design-system.html](design-system.html) | PC | [05 §7 主题与视觉令牌](../docs/05-frontend-ia.md) · [01 §2 分层架构](../docs/01-architecture.md) · [README ADR D13](../README.md) |
-| `26a` | [motion-storyboard.html](motion-storyboard.html) | PC | [08 动效系统](../docs/08-motion-system.md)（分镜、性能预算、六级降级链） |
+| `26a` | [motion-storyboard.html](motion-storyboard.html) | PC | **[设计规范.md §3](../docs/设计规范.md)** · [08 动效系统](../docs/08-motion-system.md)（缓动曲线 / 编排时间轴 / 实测体积 / 降级链） |
 
 ---
 

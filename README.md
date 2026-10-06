@@ -172,13 +172,31 @@ npm run dev
 
 ### 如果构建报错
 
+按「最可能先出问题」排序：
+
 | 现象 | 原因与处理 |
 |---|---|
-| `@source` / `@utility` 报错 | Tailwind v4 语法问题。检查 `src/app/globals.css`，确认 `tailwindcss` 装的是 4.x |
+| `Failed to resolve @import "tw-animate-css"` | 该包只在 shadcn 组件（Dialog/Select/Tooltip）的进场动画里用到。**直接从 `src/app/globals.css` 顶部删掉那一行 `@import 'tw-animate-css';` 即可**，其余功能不受影响，只是弹窗没有淡入动画。之后想恢复就 `npm i tw-animate-css` |
+| `@source` / `source()` 报错 | 这一行 `@import 'tailwindcss' source('../');` 限制了 Tailwind 的扫描范围（避免把 `design/**/*.html` 里的同名 class 误当工具类）。若你的 Tailwind 版本不认识它，改成 `@import 'tailwindcss';` —— 构建能过，只是 CSS 会大一些 |
 | `Cannot find module '@prisma/client'` | 没跑 `prisma generate`。执行 `npm run db:generate` |
 | `DATABASE_URL 校验失败` | 没跑 `npm run db:up`，或 `.env.local` 缺失 |
 | `JWT_SECRET 至少 32 位` | `.env.local` 里的占位值被改短了。重新生成长随机串 |
+| `Environment variable not found: DATABASE_URL` | 在 `prisma` 命令下生效但 Next 读不到 → 确认文件名是 `.env.local`（不是 `.env.local.txt`） |
 | 端口 5432 被占用 | 本机已有 Postgres。改 `docker-compose.yml` 的宿主端口并同步 `.env.local` |
+| `Component ... cannot be a client component` | 把 `'use client'` 加到了含 `import { env } from '@/lib/env'` 的文件上。`env.ts` 带 `server-only`，只能服务端用 |
+
+### 关于「我无法验证构建」这件事
+
+我写这套脚手架时，构建环境的出站 HTTPS 被拦截（`ERR_TLS_CERT_ALTNAME_INVALID`），`npm install` 与 `npm run build` 都跑不了。所以：
+
+- ✅ **已做**：依赖声明完整性、import 路径解析、设计令牌引用、Prisma 关系反向字段、环境变量覆盖 —— 全部用离线脚本验证通过（0 问题）
+- ⚠️ **未做**：任何编译、类型检查、运行时验证
+
+为此我做了两处**主动降低风险**的取舍：
+1. `container-*` 等自定义类用标准 CSS 的 `@layer components` 实现，而不是 Tailwind v4 的 `@utility` 指令（避免把构建成败押在较新语法上）
+2. 依赖版本一律用 `^X.0.0` 下限（不指定具体小版本），因为我无法查 registry 确认哪个小版本存在
+
+首次构建大概率能过；如果不过，把完整错误贴给我。
 
 ### 设计稿怎么看
 

@@ -107,10 +107,8 @@ html[data-motion-bg-scope='home'] body:not([data-page='home'])::before {
   display: none;
 }
 
-/* 后台一律不加载站点动效 */
-html[data-motion-bg]:has(body[data-section='admin'])::before {
-  display: none;
-}
+/* 后台由 (admin)/layout.tsx 自行决定不注入 data-motion-* 属性，
+   因此这里不需要额外的排除规则。 */
 
 /* ----------------------------------------------------------------------------
    4. 悬停动效（M4.5 补齐 4 种）

@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint",
+    "verify": "node scripts/verify-scaffold.mjs .",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "db:generate": "prisma generate",

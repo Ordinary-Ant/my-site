@@ -238,46 +238,50 @@
 }
 
 /* ============================================================================
-   工具层：项目级复用类
+   组件层：项目级复用类
+
+   说明：这里刻意用标准 CSS 的 @layer components + 普通媒体查询，而不是 Tailwind v4
+   的 @utility 指令。原因是 @utility 里的嵌套 @media 属于较新的语法，为了不把
+   首次构建的成败押在一个无法本地验证的语法上，选择用 100% 标准 CSS 表达。
+   放在 components 层意味着 utilities 层仍可覆盖它们（符合预期）。
    ========================================================================== */
 
-@utility container-page {
-  width: 100%;
-  max-width: 1200px;
-  margin-inline: auto;
-  padding-inline: 16px;
-
-  @media (width >= 768px) {
-    padding-inline: 24px;
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 16px;
   }
-}
 
-@utility container-prose {
-  width: 100%;
-  max-width: 720px;
-  margin-inline: auto;
-  padding-inline: 16px;
-
-  @media (width >= 768px) {
-    padding-inline: 24px;
+  .container-prose {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+    padding-inline: 16px;
   }
-}
 
-/* 隐藏滚动条但保留滚动（移动端横向滑动区） */
-@utility no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  &::-webkit-scrollbar {
+  /* 隐藏滚动条但保留滚动（移动端横向滑动区） */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* 刘海屏安全区 */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
 }
 
-/* 刘海屏安全区 */
-@utility pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-@utility pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
+@media (width >= 768px) {
+  .container-page,
+  .container-prose {
+    padding-inline: 24px;
+  }
 }

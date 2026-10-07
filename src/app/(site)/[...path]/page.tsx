@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { prisma } from '@/lib/prisma'
 import { ApiError } from '@/lib/api/errors'
 import { getPublicArticle, listPublicArticles } from '@/lib/services/article'
+import { applyPublicPrivacy, requirePageModule } from '@/lib/services/public-site'
 import { Markdown } from '@/components/site/markdown'
 import { excerpt, formatDate } from '@/lib/utils'
 
@@ -16,9 +16,14 @@ type Props = {
 /** 栏目从数据库路径解析，固定系统路由由独立页面处理。 */
 async function resolve(path: string[]) {
   const route = `/${path.join('/')}`
-  const modules = await prisma.module.findMany({ where: { enabled: true } })
-  const matched = modules.find((item) => route === item.route || route.startsWith(`${item.route}/`))
-  if (!matched || matched.key !== 'article') notFound()
+  // 页面与metadata复用公开DTO，栏目文字和配置也受联系方式开关约束。
+  const matched = await requirePageModule(path)
+    .then(applyPublicPrivacy)
+    .catch((error: unknown) => {
+      if (error instanceof ApiError && error.status === 404) notFound()
+      throw error
+    })
+  if (matched.key !== 'article') notFound()
   const suffix = route.slice(matched.route.length).replace(/^\//, '')
   if (suffix.includes('/')) notFound()
   return { matched, suffix }
@@ -81,7 +86,7 @@ export default async function ContentPage({ params, searchParams }: Props) {
             ))}
           </div>
         </header>
-        {article.toc.length > 0 && (
+        {matched.config.showToc !== false && article.toc.length > 0 && (
           <details className="mb-8 rounded-xl border p-4">
             <summary className="cursor-pointer">文章目录</summary>
             <ol className="mt-3 space-y-2 text-sm">
@@ -114,7 +119,7 @@ export default async function ContentPage({ params, searchParams }: Props) {
       <header className="mb-10">
         <p className="text-brand mb-3 text-sm font-medium">WRITING</p>
         <h1 className="text-4xl font-bold">{matched.name}</h1>
-        <p className="text-muted-foreground mt-4">{matched.description}</p>
+        <p className="text-muted-foreground mt-4">{matched.config.intro ?? matched.description}</p>
       </header>
       <form className="mb-8 flex gap-2">
         <input
@@ -145,7 +150,9 @@ export default async function ContentPage({ params, searchParams }: Props) {
           </article>
         ))}
         {!data.length && (
-          <p className="text-muted-foreground py-12 text-center">暂无文章，稍后再来看看。</p>
+          <p className="text-muted-foreground py-12 text-center">
+            {matched.config.emptyText ?? '暂无文章，稍后再来看看。'}
+          </p>
         )}
       </div>
       <nav aria-label="分页" className="mt-8 flex justify-between">

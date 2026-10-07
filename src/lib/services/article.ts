@@ -10,6 +10,7 @@ import { ApiError } from '@/lib/api/errors'
 import { requirePermission } from './auth'
 import { writeAudit } from './audit'
 import { invalidateContent } from './cache'
+import { applyPublicPrivacy } from './public-site'
 
 const include = {
   category: true,
@@ -79,8 +80,8 @@ export async function listPublicArticles(params: URLSearchParams = new URLSearch
     prisma.article.count({ where }),
   ])
   return {
-    data: items.map(
-      ({ content: _content, deletedAt: _deleted, authorId: _authorId, ...item }) => item,
+    data: await applyPublicPrivacy(
+      items.map(({ content: _content, deletedAt: _deleted, authorId: _authorId, ...item }) => item),
     ),
     meta: {
       page,
@@ -100,7 +101,9 @@ export async function getPublicArticle(slug: string) {
     include,
   })
   if (!article) throw missing()
-  return { ...article, toc: getToc(article.content) }
+  // 先脱敏正文，再生成目录，锚点与阅读页实际标题保持一致。
+  const publicArticle = await applyPublicPrivacy(article)
+  return { ...publicArticle, toc: getToc(publicArticle.content) }
 }
 
 export async function listAdminArticles(params: URLSearchParams, request?: Request) {

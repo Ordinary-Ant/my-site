@@ -29,6 +29,7 @@ export const useAdminUser = () => useContext(UserContext)
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const path = usePathname()
   const [user, setUser] = useState<SessionUser | null>(null)
+  const [modules, setModules] = useState<Record<string, boolean>>({})
   useEffect(() => {
     let active = true
     void (async () => {
@@ -44,6 +45,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       active = false
     }
   }, [path])
+  useEffect(() => {
+    if (!user) return
+    let active = true
+    const load = () =>
+      void api<{ key: string; enabled: boolean }[]>('/api/v1/admin/modules')
+        .then(({ data }) => {
+          if (active) setModules(Object.fromEntries(data.map((item) => [item.key, item.enabled])))
+        })
+        .catch(() => {})
+    load()
+    window.addEventListener('site-modules-updated', load)
+    return () => {
+      active = false
+      window.removeEventListener('site-modules-updated', load)
+    }
+  }, [user, path])
   if (!user)
     return (
       <main className="p-8" aria-live="polite">
@@ -70,6 +87,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className={`shrink-0 rounded-lg px-3 py-2 text-sm ${path === href ? 'bg-brand-soft text-brand font-medium' : 'text-muted-foreground hover:bg-muted'}`}
             >
               {label}
+              {modules[
+                (
+                  {
+                    '/admin/articles': 'article',
+                    '/admin/logs': 'log',
+                    '/admin/projects': 'portfolio',
+                    '/admin/timeline': 'timeline',
+                    '/admin/profile': 'about',
+                  } as Record<string, string>
+                )[href]
+              ] === false && <span className="ml-2 text-xs opacity-60">已关闭</span>}
             </Link>
           ))}
         </nav>

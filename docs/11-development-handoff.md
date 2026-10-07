@@ -1,53 +1,55 @@
 # 11 · 开发交接与恢复
 
-更新：2026-10-07 18:39。A（66dca93）、B已完成，C–G待开始。52真实PG、16unit、check/verify/build和gzip通过；三端文章/角色/延迟保存/60秒任务均实际通过。所有规格和质量复审批准；B按本次提交保存，随后开始C。R2真实云验证及生产部署未完成；禁止自动push。详见 verification/phase-b.md。
+更新：2026-10-07 23:50。A（66dca93）、B（c5fe0c6）、C（本次本地提交）已验收；D–G待开始。当前分支codex/full-site，保留master，origin已配置，禁止自动push。全站一期尚未完成。
 
 ## 恢复顺序
-1. 在C:/Users/ordinaryPuly/Desktop/personal-site执行git status --short、git log -5 --oneline，确认HEAD和未提交文件归属。
-2. 读AGENTS.md、README、10台账、12批准计划及当前阶段规范。09为历史评估快照。
-3. 检查Node/npm、Docker Desktop与数据库容器；复用既有环境，避免重复迁移/reset生产库。
-4. 按台账依赖继续；运行检查后填证据/退出码/限制。阶段验收后本地提交，禁止自动push，公开生产发布最终确认。
 
-## 环境启动
+1. 在C:/Users/ordinaryPuly/Desktop/personal-site读AGENTS.md，核对git status --short与git log -5 --oneline，确认未提交变化归属。
+2. 读10台账、12批准计划及本交接，查当前阶段verification证据；09仅是修订前历史快照。
+3. 检查Docker PostgreSQL健康，已有.env不可输出/覆盖/提交；迁移先查状态，不reset开发/生产库。
+4. 开始功能前登记，实际验收后填证据，阶段通过后本地提交。公开生产发布最终确认。
+
+## 环境与启动
+
+Node24.19/npm11.17，PostgreSQL16容器personal-site-db。首次迁移和seed已经完成，不重复初始化。Node>=24/npm>=11为工程基线。
+
 ```powershell
-node -v
-npm -v
 npm install
-Copy-Item .env.example .env  # 仅当.env不存在；已有私密值不可覆盖
 npm run db:up
-npm run db:migrate
-npm run db:seed
+npm run db:deploy
 npm run dev
 ```
-Docker可执行文件如未在PATH，通过Docker Desktop安装位置调用；不要把本机缺PATH误写成没有Docker。迁移首次已执行，继续前查status。测试用独立PostgreSQL测试库；test脚本以当前package.json为准。常规门禁npm run check、npm run verify、npm run build，真实PG集成和E2E按阶段补全。
 
-.env不得提交/输出；生产密码/RT/rotationReply不得日志输出。Windows下删除、移动必须先验证绝对目标位于指定工作区，使用LiteralPath。
+Docker如缺PATH，使用Docker Desktop安装路径；不要据此认定Docker不存在。.env仅当不存在时从example复制。Windows文件操作使用LiteralPath，删除/移动前核对目标位于工作区。
 
-## 当前接续工作
-B已验收并本地提交，下一步进入C模块开关/配置/路由/导航聚合/审计撤销。C–G尚未实现，不能称全站完成。
+独立测试库：
 
-## 阶段交接必填
-实际命令/退出码、功能证据、Git提交hash、数据库迁移名、未完成/受阻项及下一可执行步骤。构建成功只说明构建，不声明登录/发布/缓存/媒体/部署成功。
-
-## 依赖审查交接
-本轮Tiptap3.31.4，官方@tiptap/markdown替代tiptap-markdown；tailwind-merge3，lint-staged17.6；overrides为postcss8.5.29、deepmerge-ts8.0.2、selector-parser7.1.6。npm audit --omit=dev 已实际通过：0漏洞。已知剩余braces<=3.0.3→micromatch→fast-glob→eslint-config-next传递链5条high，暂无上游修复；拒绝force降级Next14。只用受信任固定glob、生产不带devDependencies，发布前复核公告；不能称所有audit为零。
-
-## 独立测试数据库与Node基线
-Node>=24 / npm>=11（.node-version为24.19.0），不再支持旧Node20基线。测试显式独立URL：
 ```powershell
 $env:TEST_DATABASE_URL = 'postgresql://dev:dev@localhost:5432/personal_site_test?schema=public'
 npm run test:db
-npm run test
+npm test
 npm run test:integration
 npm run test:e2e
 ```
-test:db使用目标URL同一服务器的/postgres管理连接创建/迁移测试库，拒绝非_test后缀；禁止测试重置开发/生产库。集成测试与E2E显式读取TEST_DATABASE_URL。E2E自动启动使用测试库的新服务，不复用可能连接开发库的已有3000服务；测试setup只在_test库seed并清理测试登录桶。
 
-本轮真实证据（执行者协调结果）：开发/测试两库migrate deploy通过；第二迁移20261007044400_publication_backfill仅回填已发布Log/Project的空publishedAt，不改草稿或已有时间；seed重复执行计数不增加，新增日志发布时间取logDate。5unit+3真实PGintegration通过，含seed幂等和publication回填。最终复跑及A验收已通过，详见 verification/phase-a.md。
+测试只允许_test后缀，禁止重置开发/生产库。E2E自动启动测试库新服务，不复用已有开发服务器；Chrome headless shell已可用。Windows Prisma DLL在数据库测试期间可能被锁：PG与prisma generate/build顺序执行，不并发。
 
-## B接续实测
-52项PG（认证17、文章3、媒体27、发布2、基础3）和16unit通过。UploadIntent迁移20261007133500_media_upload_intents已部署开发与测试库。Local真实浏览器上传/引用保护/删除通过；R2仅本地对象协议＋真实PG，云凭据缺失，G须另验ACL/CORS/公网直传。
+## 已验收与证据
 
-分钟runner真实两次成功调用间隔60秒；生产外部调度未配置。gzip登录107.59KB、文章109.86KB（KB=1000字节）。默认TRUST_PROXY=false，公网需可信代理覆盖转发头才开启，否则unknown桶共享限额。
+- A：规范/设计统一、依赖/CI/测试环境、基础迁移/seed。见verification/phase-a.md。
+- B：认证/会话原子轮转与重放/角色、文章编辑预览发布阅读回收、Local媒体与R2隔离协议、真实分钟runner。52PG、16unit及三端/角色浏览器已通过；见verification/phase-b.md。
+- C：模块关闭恢复/5秒撤销、嵌套配置/null/严格键、历史301动态路由、首页真实聚合/导航/设置/审计、全站既有出口隐私边界。见verification/phase-c.md和phase-c-backend.md。
+- 最终C代码：43unit（14files）、68真实PG（12files）、check/verify/build退出0；Playwright article/foundation/modules/roles 9passed/6skipped，三端文章和首页实际通过。只有既有Markdown外链图片lint警告。
+- gzip登录107.65KB<=110、文章117.60KB<=135（decimal KB）。动效预算与Lighthouse待F/G。
+- home_default_order迁移20261007185500已部署开发/测试库，仅完整等于旧seed默认的配置回填；幂等/自定义保留真实PG通过。此前3个迁移foundation/publication_backfill/media_upload_intents已部署。
+- 最新隐私修复含格式化电话、percent/entity/CommonMark转义、强调/link/inlineCode可见文字拆分、长文/Unicode位置；TOC从脱敏后正文生成。规格和质量复审均批准，实际HTTP夹具无本人邮箱/电话/mailto/tel。feed兼容路由共用首页过滤且关闭模块数组为空。
 
-Windows Prisma DLL在并发generate与PG测试时会被锁，构建/生成与数据库测试顺序运行。Playwright使用独立_test库和Chrome headless shell，禁止复用现有开发服务。暗色代码及三角色UI已验收。媒体百分号/Markdown转义/实体引用先复现错误删除，修复后52PG全绿；规格与质量复审批准。格式化引出的verify多行默认值误报已修复，verify通过。
+## 下一步
+
+进入D，按台账登记日志、作品、时间线、About、分类标签、用户与数据管理；保留中文关键注释、revision409、公开过滤、媒体引用和权限规则。C新增的配置必须被后续模块页面实际消费。D阶段功能验收后本地提交；不要把现有栏目导航链接或静态稿当作D实现。
+
+## 未验证及环境边界
+
+R2云ACL/CORS/公网直传、生产托管/域名/数据库和备份凭据未提供，G须记录实际阻塞并验证；B仅本地对象协议与真实PG，不是R2云验收。实际分钟runner60秒证据在B；生产外部调度尚未配置。默认TRUST_PROXY=false，可信代理正确覆盖头后才开启。
+
+主题自定义强调色的暗色/文字对比度、完整三端/无JS/reduce、搜索/RSS/sitemap、动效、生产CSP/备份恢复均留D–G实际验收，不宣称已通过。生产npm audit --omit=dev已0漏洞；开发链braces→micromatch→fast-glob→eslint-config-next仍5high，无上游修复，禁止force降级Next14，G复核。密钥/RT/rotationReply不得日志输出。

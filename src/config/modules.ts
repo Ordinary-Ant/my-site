@@ -97,7 +97,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
       pageSize: 10,
       intro: '记录每天发生的事，以及偶尔的顿悟',
       emptyText: '还没有日志',
-      home: { enabled: true, limit: 5, order: 3 },
+      home: { enabled: true, limit: 5, order: 4 },
       defaultView: 'list',
       types: { DAILY: true, EVENT: true, SUMMARY: true },
     },
@@ -152,7 +152,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
       pageSize: 10,
       intro: '认真写的一些东西',
       emptyText: '还没有文章',
-      home: { enabled: true, limit: 5, order: 4 },
+      home: { enabled: true, limit: 5, order: 3 },
       showToc: true,
       showViewCount: true,
       relatedCount: 3,
@@ -189,4 +189,4 @@ export const RESERVED_PATHS = [
 ] as const
 
 /** 首页区块的默认顺序（越小越靠前），用于后台拖拽排序的初始值 */
-export const DEFAULT_HOME_ORDER: ModuleKey[] = ['portfolio', 'log', 'article', 'timeline']
+export const DEFAULT_HOME_ORDER: ModuleKey[] = ['portfolio', 'article', 'log', 'timeline']

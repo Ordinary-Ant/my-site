@@ -429,7 +429,7 @@
   }
 }
 ```
-**关键行为**：**被关闭的模块对应的字段返回空数组**，前端据此自动隐藏整块区域。
+**关键行为**：**被关闭或禁止首页露出的模块对应字段返回空数组**。各字段数量使用当前模块的home.limit，不固定为示例条数。该接口与首页RSC、`GET /api/v1/home`共用公开过滤与联系方式边界；`/home`另外返回profile、按home.order排序的sections及局部错误信息。
 
 ---
 
@@ -474,6 +474,7 @@
 }
 // Set-Cookie: at=...; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=900
 // Set-Cookie: rt=...; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth; Max-Age=604800
+// Set-Cookie: session_hint=1; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800
 ```
 
 **错误**
@@ -621,7 +622,7 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
       "enabled": true, "navVisible": true, "navLabel": "日志", "navOrder": 1,
       "icon": "notebook-pen", "route": "/logs", "isBuiltin": true,
       "config": { "pageSize": 10, "intro": "记录每天发生的事", "defaultView": "list",
-                  "home": { "enabled": true, "limit": 5, "order": 3 },
+                  "home": { "enabled": true, "limit": 5, "order": 4 },
                   "types": { "DAILY": true, "EVENT": true, "SUMMARY": true } },
       "stats": { "totalItems": 86, "publishedItems": 80, "draftItems": 6 },
       "updatedAt": "2025-01-10T…"
@@ -644,6 +645,8 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
 }
 ```
 > `config` PATCH：已知嵌套键按层合并，数组整体替换，可空字段null清空；严格拒绝未知键及危险对象键，合并后重新校验完整配置。
+
+`intro=null`清除自定义导语，页面回退到模块description；`emptyText=null`清除自定义空态，回退到页面默认文案。`showToc=false`隐藏文章目录。页面与metadata使用过滤后的公共模块配置，不能重新读取原始字段绕过联系方式隐藏。
 
 **响应**
 ```jsonc

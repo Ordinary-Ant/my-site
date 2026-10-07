@@ -1,52 +1,115 @@
 import Link from 'next/link'
-
-import { MODULE_REGISTRY } from '@/config/modules'
-import { siteConfig } from '@/config/site'
-
-/**
- * 前台路由组布局
- *
- * M0 阶段先搭出 Header / Footer 骨架，真实内容在 M3 补齐。
- * 导航项最终由 moduleService.listVisible() 动态生成（M2 之后接入），
- * 现在先用静态注册表，保证骨架可跑。
- */
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
-  const navItems = Object.values(MODULE_REGISTRY)
-    .filter((m) => m.navVisible && m.key !== 'home')
-    .sort((a, b) => a.navOrder - b.navOrder)
-
+import Image from 'next/image'
+import { getPublicSite } from '@/lib/services/public-site'
+import { safeContentUrl } from '@/lib/markdown'
+import { SiteNavigation } from '@/components/site/navigation'
+export const dynamic = 'force-dynamic'
+/** 页脚与导航复用已过滤的公开配置，不另读私密联系方式。 */
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const data = await getPublicSite()
+  const name = data.site.name || '个人网站'
+  const logo = typeof data.site.logo === 'string' ? safeContentUrl(data.site.logo) : null
+  const links = Array.isArray(data.site.footer.links)
+    ? (data.site.footer.links as { label?: string; url?: string | null }[])
+    : []
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur-md">
-        <div className="container-page flex h-16 items-center gap-7">
-          <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
-            <span className="from-brand grid size-7 place-items-center rounded-lg bg-gradient-to-br to-[#a855f7] text-[13px] font-bold text-white">
-              P
-            </span>
-            {siteConfig.shortName}
+    <div className="flex min-h-dvh flex-col pb-16 md:pb-0">
+      <header className="bg-background/90 sticky top-0 z-40 border-b backdrop-blur-md">
+        <div className="container-page flex h-16 items-center gap-4">
+          <Link
+            href="/"
+            className="flex shrink-0 items-center gap-2 font-semibold"
+            aria-label={name + '首页'}
+          >
+            {logo ? (
+              <Image unoptimized src={logo} width={30} height={30} alt="" className="rounded-lg" />
+            ) : (
+              <span className="bg-primary text-primary-foreground grid size-7 place-items-center rounded-lg">
+                P
+              </span>
+            )}
+            <span className="max-w-32 truncate">{name}</span>
           </Link>
-
-          <nav className="ml-auto hidden items-center gap-1 md:flex">
-            {navItems.map((m) => (
-              <Link
-                key={m.key}
-                href={m.route}
-                className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
-              >
-                {m.name}
-              </Link>
-            ))}
-          </nav>
+          <SiteNavigation items={data.modules} />
         </div>
       </header>
-
       <main className="flex-1">{children}</main>
-
-      <footer className="bg-surface-subtle mt-10 border-t">
+      <footer className="bg-surface-subtle mt-16 border-t">
         <div className="container-page py-10">
-          <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-4 text-[13px]">
-            <span>© {new Date().getFullYear()} {siteConfig.author.name} · 保留所有权利</span>
-            <span className="text-fg-subtle">M0 骨架 · 内容待 M3 补齐</span>
+          <div className="grid gap-8 text-sm md:grid-cols-3">
+            <div>
+              <Link href="/" className="text-base font-semibold">
+                {name}
+              </Link>
+              <p className="text-muted-foreground mt-3 leading-relaxed">{data.site.description}</p>
+            </div>
+            <div>
+              <h2 className="font-semibold">导航</h2>
+              <nav aria-label="页脚导航" className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+                {data.modules
+                  .filter((m) => m.navVisible && m.key !== 'home')
+                  .map((m) => (
+                    <Link key={m.key} href={m.route}>
+                      {m.navLabel || m.name}
+                    </Link>
+                  ))}
+              </nav>
+            </div>
+            <div>
+              <h2 className="font-semibold">找到我</h2>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {Object.entries(data.site.social).map(([key, value]) => {
+                  if (typeof value !== 'string' || !value) return null
+                  const url =
+                    key === 'email'
+                      ? 'mailto:' + value
+                      : key === 'phone'
+                        ? 'tel:' + value
+                        : safeContentUrl(value)
+                  return url ? (
+                    <a key={key} href={url} rel="noopener noreferrer" className="text-brand">
+                      {(
+                        {
+                          github: 'GitHub',
+                          email: '邮箱',
+                          phone: '电话',
+                          twitter: 'X',
+                          juejin: '掘金',
+                        } as Record<string, string>
+                      )[key] ?? key}
+                    </a>
+                  ) : null
+                })}
+                {data.modules.some((m) => ['article', 'log'].includes(m.key)) && (
+                  <Link href="/rss.xml">RSS订阅</Link>
+                )}
+              </div>
+            </div>
+          </div>
+          {!!links.length && (
+            <nav aria-label="页脚附加链接" className="mt-6 flex flex-wrap gap-4 text-sm">
+              {links.map((link, index) => {
+                const url = safeContentUrl(link.url)
+                return url ? (
+                  <a key={index} href={url} rel="noopener noreferrer">
+                    {link.label || '链接'}
+                  </a>
+                ) : null
+              })}
+            </nav>
+          )}
+          <div className="text-muted-foreground mt-8 flex flex-wrap justify-between gap-4 border-t pt-6 text-xs">
+            <span>
+              {String(
+                data.site.footer.copyright ??
+                  '© ' + new Date().getFullYear() + ' ' + name + ' · 保留所有权利',
+              )}
+            </span>
+            {!!data.site.footer.icp && (
+              <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+                {String(data.site.footer.icp)}
+              </a>
+            )}
           </div>
         </div>
       </footer>

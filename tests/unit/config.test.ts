@@ -5,7 +5,7 @@ import { MODULE_REGISTRY } from '@/config/modules'
 test('局部更新保留嵌套字段并允许清空导语', () => {
   const original = MODULE_REGISTRY.article.defaultConfig
   const merged = mergeModuleConfig('article', original, { home: { enabled: false }, intro: null })
-  expect(merged.home).toEqual({ enabled: false, limit: 5, order: 4 })
+  expect(merged.home).toEqual({ enabled: false, limit: 5, order: 3 })
   expect(merged.intro).toBeNull()
   expect(merged.pageSize).toBe(10)
   expect(original.home?.enabled).toBe(true)

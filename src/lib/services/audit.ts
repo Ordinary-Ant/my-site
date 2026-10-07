@@ -41,3 +41,65 @@ export async function writeAudit(
     },
   })
 }
+
+export async function listAuditLogs(
+  params: URLSearchParams = new URLSearchParams(),
+  request?: Request,
+) {
+  const { requirePermission } = await import('./auth')
+  const { prisma } = await import('@/lib/prisma')
+  const { z } = await import('zod')
+  await requirePermission('audit:read', request)
+  const query = z
+    .object({
+      resource: z.string().max(80).optional(),
+      action: z.string().max(80).optional(),
+      userId: z.string().max(80).optional(),
+      from: z.string().datetime({ offset: true }).optional(),
+      to: z.string().datetime({ offset: true }).optional(),
+      page: z.coerce.number().int().min(1).max(100000).default(1),
+      pageSize: z.coerce.number().int().min(1).max(100).default(20),
+    })
+    .strict()
+    .parse(Object.fromEntries(params))
+  const { resource, action, userId, from, to, page, pageSize } = query
+  const where: Prisma.AuditLogWhereInput = {
+    resource,
+    action,
+    userId,
+    ...(from || to
+      ? {
+          createdAt: {
+            ...(from ? { gte: new Date(from) } : {}),
+            ...(to ? { lte: new Date(to) } : {}),
+          },
+        }
+      : {}),
+  }
+  const [items, total] = await prisma.$transaction([
+    prisma.auditLog.findMany({
+      where,
+      include: { user: { select: { id: true, name: true } } },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.auditLog.count({ where }),
+  ])
+  return {
+    data: items.map((item) => ({
+      ...item,
+      before: safe(item.before),
+      after: safe(item.after),
+      createdAt: item.createdAt.toISOString(),
+    })),
+    meta: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+      hasNext: page * pageSize < total,
+      hasPrev: page > 1,
+    },
+  }
+}

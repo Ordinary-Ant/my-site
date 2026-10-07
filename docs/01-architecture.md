@@ -198,6 +198,7 @@ service写库事务返回失效事件，由Next适配层执行revalidateTag；�
 
 ### 6.1 Token与会话
 AT为HS256 JWT，15分钟，载荷包含sub/sid/role/name/iat/exp。httpOnly at Cookie，Secure（生产）、SameSite=Lax、Path=/。RT随机32字节、哈希入Session、7天；httpOnly rt，SameSite=Strict、Path=/api/v1/auth。
+登录与刷新同时设置非敏感 `session_hint=1`（HttpOnly、Secure沿上述逻辑、SameSite=Lax、Path=/、7天），所有清凭证出口同步清除。它仅供middleware判断可能仍可刷新，任何客户端可伪造且不代表认证；AT过期而RT仍在时不提前挡住管理壳。API不使用此标记或Cookie存在门禁，service仍验证真实AT sid会话及用户权限。
 
 AT并非仅靠短过期撤销：每次管理数据访问在service校验sid对应会话未撤销/过期且用户存在、isActive=true；权限从当前用户读取。Session具有rotatedAt/successorId/rotationReply（加密后继凭证）支持轮转。
 

@@ -1,6 +1,6 @@
 # 10 · 开发状态台账
 
-更新：2026-10-07。A、B已完成，C–G待开始；阶段B验收通过。状态仅用待开始/开发中/待验证/已完成；已完成须有证据和提交，阶段通过后才本地提交，禁止自动push。
+更新：2026-10-07。A、B、C已完成，D–G待开始；阶段B验收通过。状态仅用待开始/开发中/待验证/已完成；已完成须有证据和提交，阶段通过后才本地提交，禁止自动push。
 
 | 编号 | 细功能 | 依赖 | 验收 | 状态 | 代码/文档入口（规划或现有） | 证据 | 提交 |
 |---|---|---|---|---|---|---|---|
@@ -10,23 +10,23 @@
 | A04 | 动效/模块配置校验统一 | A01 | v2/嵌套patch/数组/null/未知字段测试 | 已完成 | src/config、src/lib/validators | [阶段A实测](verification/phase-a.md) | 66dca93 |
 | A05 | CI/测试基线/阶段证据 | A02,A03 | check/verify/build、真实PG基础测试 | 已完成 | tests、.github、scripts | [阶段A实测](verification/phase-a.md) | 66dca93 |
 | A06 | 台账/恢复交接/本地提交规则 | A01 | 细功能、依赖、证据、提交可追溯 | 已完成 | docs/10、11、AGENTS.md | [阶段A实测](verification/phase-a.md) | 66dca93 |
-| B01 | 登录/AT sid/用户停用 | A | 登录、有效会话、停用立即拦截 | 已完成 | src/lib/auth、services | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B02 | RT原子轮转/10秒宽限/重放 | A | 并发同后继、超时重放撤销全会话 | 已完成 | auth、Session | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B03 | 登出/密码/会话管理 | A | 撤销立即生效、安全next/草稿恢复 | 已完成 | auth API | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B04 | 三角色/Origin/service授权 | A | 每入口按权限、VIEWER可读、写越权拒绝 | 已完成 | rbac、services、middleware | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B05 | 共享PG限流/审计 | A | 多实例窗口一致、敏感日志脱敏 | 已完成 | RateLimit、AuditLog | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B06 | 后台壳/登录/仪表盘 | A | 三角色入口与错误状态可用 | 已完成 | admin UI | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B07 | 文章CRUD/分类标签关联 | A | 创建编辑读取、字段清空与slug约束 | 已完成 | article service/API/UI | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B08 | revision并发/软删恢复 | A | 旧revision409，回收站/恢复/purge授权 | 已完成 | article service | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B09 | 发布/分钟调度/24h预览 | A | 未来不公开，到期失效；preview隔离 | 已完成 | publish job、PreviewToken | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B10 | 文章列表详情/Markdown阅读 | A | 真实文/TOC/代码/SEO与公共过滤 | 已完成 | site articles、renderer | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B11 | Local/R2直传确认/媒体库 | A | 隔离、magic/大小/归属、临时清理 | 已完成 | storage、media API/UI | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B12 | 媒体引用保护/编辑器往返 | A | 引用阻止删除，真实Markdown不丢语义 | 已完成 | renderer、editor、reference scanner | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| B13 | 预览/slug完整UI | A | 24h到期、不缓存不索引、最终唯一约束 | 已完成 | preview UI/API | [阶段B实测](verification/phase-b.md) | 本次阶段B提交 |
-| C01 | 模块关闭恢复/缓存5秒 | B | 新请求全部入口隐藏/恢复，数据保留 | 待开始 | module service、cache | 待补实际运行证据 | 未提交 |
-| C02 | 动态路由/唯一/历史别名 | B | 301直达当前、详情query保留、无抢占循环 | 待开始 | middleware、RouteAlias | 待补实际运行证据 | 未提交 |
-| C03 | 配置/开关中心/设置 | B | 已知嵌套合并/数组替换/null/拒绝未知 | 待开始 | module/settings service/UI | 待补实际运行证据 | 未提交 |
-| C04 | 导航/首页聚合/审计/撤销 | B,C01–03 | 开关导航首页联动、排序条数、审计可回溯和撤销 | 待开始 | home/module/audit | 待实现证据 | 未提交 |
+| B01 | 登录/AT sid/用户停用 | A | 登录、有效会话、停用立即拦截 | 已完成 | src/lib/auth、services | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B02 | RT原子轮转/10秒宽限/重放 | A | 并发同后继、超时重放撤销全会话 | 已完成 | auth、Session | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B03 | 登出/密码/会话管理 | A | 撤销立即生效、安全next/草稿恢复 | 已完成 | auth API | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B04 | 三角色/Origin/service授权 | A | 每入口按权限、VIEWER可读、写越权拒绝 | 已完成 | rbac、services、middleware | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B05 | 共享PG限流/审计 | A | 多实例窗口一致、敏感日志脱敏 | 已完成 | RateLimit、AuditLog | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B06 | 后台壳/登录/仪表盘 | A | 三角色入口与错误状态可用 | 已完成 | admin UI | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B07 | 文章CRUD/分类标签关联 | A | 创建编辑读取、字段清空与slug约束 | 已完成 | article service/API/UI | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B08 | revision并发/软删恢复 | A | 旧revision409，回收站/恢复/purge授权 | 已完成 | article service | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B09 | 发布/分钟调度/24h预览 | A | 未来不公开，到期失效；preview隔离 | 已完成 | publish job、PreviewToken | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B10 | 文章列表详情/Markdown阅读 | A | 真实文/TOC/代码/SEO与公共过滤 | 已完成 | site articles、renderer | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B11 | Local/R2直传确认/媒体库 | A | 隔离、magic/大小/归属、临时清理 | 已完成 | storage、media API/UI | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B12 | 媒体引用保护/编辑器往返 | A | 引用阻止删除，真实Markdown不丢语义 | 已完成 | renderer、editor、reference scanner | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| B13 | 预览/slug完整UI | A | 24h到期、不缓存不索引、最终唯一约束 | 已完成 | preview UI/API | [阶段B实测](verification/phase-b.md) | c5fe0c6 |
+| C01 | 模块关闭恢复/缓存5秒 | B | 新请求全部入口隐藏/恢复，数据保留 | 已完成 | module service、cache | [阶段C证据](verification/phase-c.md) | 本次阶段C提交 |
+| C02 | 动态路由/唯一/历史别名 | B | 301直达当前、详情query保留、无抢占循环 | 已完成 | middleware、RouteAlias | [阶段C证据](verification/phase-c.md) | 本次阶段C提交 |
+| C03 | 配置/开关中心/设置 | B | 已知嵌套合并/数组替换/null/拒绝未知 | 已完成 | module/settings service/UI | [阶段C证据](verification/phase-c.md) | 本次阶段C提交 |
+| C04 | 导航/首页聚合/审计/撤销 | B,C01–03 | 开关导航首页联动、排序条数、审计可回溯和撤销 | 已完成 | home/module/audit | [阶段C证据](verification/phase-c.md) | 本次阶段C提交 |
 | D01 | 日志CRUD/日历/图集 | C | 日期、类型、发布、软删、开关 | 待开始 | log API/UI | 待补实际运行证据 | 未提交 |
 | D02 | 作品CRUD/筛选/详情 | C | 类型、外链、图集、发布与开关 | 待开始 | project API/UI | 待补实际运行证据 | 未提交 |
 | D03 | 时间线/日期精度/排序/软删 | C | 当前/日期/同日期order/id，年/月/日保存 | 待开始 | timeline API/UI | 待补实际运行证据 | 未提交 |

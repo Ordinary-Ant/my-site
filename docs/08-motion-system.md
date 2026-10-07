@@ -57,7 +57,7 @@ version1：minimal转static，其余旧预设转editorial；移除连续背景/�
 GET /api/v1/admin/settings/motion返回config、四预设及明确标注的估算；PATCH限ADMIN、审计、失效setting与前台关联缓存。公开GET /api/v1/site仅含渲染配置。普通后台不加载站点动效；动效预览页按需加载同一运行时；预览不落库，保存才写入，取消恢复最近保存值。
 
 ## 7. 验收与性能
-文章详情首屏≤135KB gzip、登录≤110KB gzip、动效≤28KB gzip（库/运行时/fallback合计）。Next First Load构建口径不能替代真实gzip传输量。static不下载库，editorial不承诺零JS。
+文章详情首屏≤135KB gzip、登录≤110KB gzip、动效≤28KB gzip（库/运行时/fallback合计）；KB统一为1000字节。按页面、父布局及错误边界实际JS文件去重，逐文件gzip后累计；Next First Load构建口径不能替代真实gzip传输量。static不下载库，editorial不承诺零JS。
 
 - [ ] 四预设保存/刷新/恢复默认及version1升级。
 - [ ] none/tint静态装饰不挡正文或点击，无连续背景。

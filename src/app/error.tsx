@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-html-link-for-pages -- 登录返回与错误恢复使用完整导航，避免依赖失败的客户端路由。 */
 'use client'
 
 import { useEffect } from 'react'
-import Link from 'next/link'
 
 /**
  * 全局错误边界
@@ -18,7 +18,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // TODO(M4)：接入 Sentry
-    console.error('[app error]', error)
+    console.error({ code: 'RENDER_ERROR', requestId: error.digest })
   }, [error])
 
   return (
@@ -46,12 +46,12 @@ export default function GlobalError({
           >
             重试
           </button>
-          <Link
+          <a
             href="/"
             className="border-border-strong hover:bg-muted rounded-[10px] border px-5 py-2.5 text-sm font-medium transition-colors"
           >
             回首页
-          </Link>
+          </a>
         </div>
       </div>
     </div>

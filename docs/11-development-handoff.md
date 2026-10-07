@@ -1,6 +1,6 @@
 # 11 · 开发交接与恢复
 
-更新：2026-10-07。A已完成，B–G待开始；业务页面/API/鉴权/动效运行时尚未实现，不能以设计稿或构建替代功能状态。当前本地PostgreSQL已healthy且首migration完成；真实_test迁移和seed幂等已通过，check/verify/build、5unit+3PGintegration及三视口首页冒烟通过，最终复跑已通过，详见 verification/phase-a.md。远端可连但为空，不自动推送。
+更新：2026-10-07 18:39。A（66dca93）、B已完成，C–G待开始。52真实PG、16unit、check/verify/build和gzip通过；三端文章/角色/延迟保存/60秒任务均实际通过。所有规格和质量复审批准；B按本次提交保存，随后开始C。R2真实云验证及生产部署未完成；禁止自动push。详见 verification/phase-b.md。
 
 ## 恢复顺序
 1. 在C:/Users/ordinaryPuly/Desktop/personal-site执行git status --short、git log -5 --oneline，确认HEAD和未提交文件归属。
@@ -24,7 +24,7 @@ Docker可执行文件如未在PATH，通过Docker Desktop安装位置调用；�
 .env不得提交/输出；生产密码/RT/rotationReply不得日志输出。Windows下删除、移动必须先验证绝对目标位于指定工作区，使用LiteralPath。
 
 ## 当前接续工作
-A已完成规范、设计图、工程/数据与测试基线；下一步进入B，先做会话权限。动效默认值详见src/config/motion.ts与08；Schema文档随迁移同步。下阶段B完成文章纵向闭环（含会话权限/编辑器/媒体/预览/发布/阅读/软删），随后C模块闭环，不先堆全站静态外观。
+B已验收并本地提交，下一步进入C模块开关/配置/路由/导航聚合/审计撤销。C–G尚未实现，不能称全站完成。
 
 ## 阶段交接必填
 实际命令/退出码、功能证据、Git提交hash、数据库迁移名、未完成/受阻项及下一可执行步骤。构建成功只说明构建，不声明登录/发布/缓存/媒体/部署成功。
@@ -41,6 +41,13 @@ npm run test
 npm run test:integration
 npm run test:e2e
 ```
-test:db使用目标URL同一服务器的/postgres管理连接创建/迁移测试库，拒绝非_test后缀；禁止测试重置开发/生产库。集成测试显式读取TEST_DATABASE_URL。
+test:db使用目标URL同一服务器的/postgres管理连接创建/迁移测试库，拒绝非_test后缀；禁止测试重置开发/生产库。集成测试与E2E显式读取TEST_DATABASE_URL。E2E自动启动使用测试库的新服务，不复用可能连接开发库的已有3000服务；测试setup只在_test库seed并清理测试登录桶。
 
 本轮真实证据（执行者协调结果）：开发/测试两库migrate deploy通过；第二迁移20261007044400_publication_backfill仅回填已发布Log/Project的空publishedAt，不改草稿或已有时间；seed重复执行计数不增加，新增日志发布时间取logDate。5unit+3真实PGintegration通过，含seed幂等和publication回填。最终复跑及A验收已通过，详见 verification/phase-a.md。
+
+## B接续实测
+52项PG（认证17、文章3、媒体27、发布2、基础3）和16unit通过。UploadIntent迁移20261007133500_media_upload_intents已部署开发与测试库。Local真实浏览器上传/引用保护/删除通过；R2仅本地对象协议＋真实PG，云凭据缺失，G须另验ACL/CORS/公网直传。
+
+分钟runner真实两次成功调用间隔60秒；生产外部调度未配置。gzip登录107.59KB、文章109.86KB（KB=1000字节）。默认TRUST_PROXY=false，公网需可信代理覆盖转发头才开启，否则unknown桶共享限额。
+
+Windows Prisma DLL在并发generate与PG测试时会被锁，构建/生成与数据库测试顺序运行。Playwright使用独立_test库和Chrome headless shell，禁止复用现有开发服务。暗色代码及三角色UI已验收。媒体百分号/Markdown转义/实体引用先复现错误删除，修复后52PG全绿；规格与质量复审批准。格式化引出的verify多行默认值误报已修复，verify通过。

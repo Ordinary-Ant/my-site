@@ -16,7 +16,8 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
+    // 生产错误由API包装器仅记录错误码/requestId，避免SQL参数进入原始日志。
+    log: env.NODE_ENV === 'development' ? ['warn', 'error'] : [],
   })
 
 if (env.NODE_ENV !== 'production') {

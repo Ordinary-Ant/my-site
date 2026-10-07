@@ -285,3 +285,10 @@
     padding-inline: 24px;
   }
 }
+
+/* 服务端生成双主题高亮，跟随站点主题切换，不再加载浏览器高亮器。 */
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}

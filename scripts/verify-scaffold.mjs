@@ -11,6 +11,7 @@
 
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs'
 import { join, resolve, dirname, extname } from 'node:path'
+import { isBuiltin } from 'node:module'
 
 const root = resolve(process.argv[2] ?? '.')
 const srcDir = join(root, 'src')
@@ -103,7 +104,11 @@ const NODE_BUILTINS = new Set([
 const ALIAS_PREFIXES = ['@/']
 
 const undeclared = [...bareImports].filter(
-  (p) => !declared.has(p) && !NODE_BUILTINS.has(p) && !ALIAS_PREFIXES.some((a) => p.startsWith(a)),
+  (p) =>
+    !declared.has(p) &&
+    !isBuiltin(p) &&
+    !NODE_BUILTINS.has(p) &&
+    !ALIAS_PREFIXES.some((a) => p.startsWith(a)),
 )
 for (const p of undeclared) problems.push(`[B] 使用了未声明的依赖: ${p}`)
 console.log(`B. 依赖覆盖：用到 ${bareImports.size} 个裸包，未声明 ${undeclared.length} 个`)
@@ -238,6 +243,13 @@ if (existsSync(schemaPath)) {
 const envTs = readFileSync(join(srcDir, 'lib', 'env.ts'), 'utf8')
 const envKeys = new Set()
 for (const m of envTs.matchAll(/^\s{2}([A-Z][A-Z0-9_]*)\s*:/gm)) envKeys.add(m[1])
+// 格式化会把Zod链拆成多行；字段定义读到下个同级键或schema结束，不能只查首行。
+const envDefinitions = new Map()
+for (const match of envTs.matchAll(
+  /^ {2}([A-Z][A-Z0-9_]*)\s*:([\s\S]*?)(?=^ {2}[A-Z][A-Z0-9_]*\s*:|^\}\))/gm,
+)) {
+  if (!envDefinitions.has(match[1])) envDefinitions.set(match[1], match[2])
+}
 
 const exampleTxt = existsSync(join(root, '.env.example'))
   ? readFileSync(join(root, '.env.example'), 'utf8')
@@ -258,8 +270,8 @@ const notInLocal = [...envKeys].filter((k) => !localKeys.has(k) && !process.env[
 for (const k of notDocumented) problems.push(`[F] ${k} 在 env.ts 里要求，但 .env.example 没写`)
 for (const k of notInLocal) {
   // 只有带 .default() 或 .optional() 的才允许缺失
-  const line = envTs.split('\n').find((l) => l.trim().startsWith(`${k}:`)) ?? ''
-  const hasDefault = /\.default\(|\.optional\(/.test(line)
+  const definition = envDefinitions.get(k) ?? ''
+  const hasDefault = /\.default\(|\.optional\(/.test(definition)
   if (!hasDefault) problems.push(`[F] ${k} 是必填且没有默认值，本地环境文件里缺失 → 启动即崩`)
 }
 console.log(

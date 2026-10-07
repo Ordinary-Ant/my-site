@@ -118,7 +118,7 @@
 
 **行为**
 - 滚动超过 80px 后：背景加毛玻璃 + 阴影，高度从 72px 收窄到 60px
-- 当前路由高亮：文字变强调色 + 底部 2px 指示条（用 `layoutId` 做平滑移动动画）
+- 当前路由高亮：文字变强调色 + 底部 2px 指示条（CSS短过渡，减弱动态时立即切换）
 - 模块关闭后该项自动消失（数据来自 `moduleService.listVisible()`）
 - 平板（`md`–`lg`）隐藏搜索框文字只留图标，节省空间
 
@@ -685,7 +685,7 @@ layout.tsx (site)
 ├── Header
 │   ├── Logo
 │   ├── DesktopNav          ← 读 moduleService.listVisible()
-│   │   └── NavItem[]       ← layoutId 指示条动画
+│   │   └── NavItem[]       ← CSS 指示条短过渡
 │   ├── SearchTrigger
 │   ├── ThemeToggle
 │   └── MobileMenuButton    ← 仅 < md 显示

@@ -16,6 +16,10 @@ const eslintConfig = [
       '.next/**',
       'out/**',
       'build/**',
+      'playwright-report/**',
+      'test-results/**',
+      'coverage/**',
+      '.storage/**',
       'next-env.d.ts',
       'design/**', // 设计稿是独立静态 HTML，不参与应用 lint
     ],

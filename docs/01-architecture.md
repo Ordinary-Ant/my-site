@@ -329,9 +329,9 @@ if (!mod.enabled) notFound()
 ---
 
 ## 8. 文件存储与上传
-本地LocalDriver仅开发环境；生产R2Driver隔离bucket/prefix与密钥，生产禁止写应用public目录。开发POST /api/v1/admin/media/upload接收multipart；生产POST /api/v1/admin/media/upload-intent申请私有临时key和限时直传凭证，浏览器直传R2，POST /api/v1/admin/media/confirm确认。
+本地LocalDriver仅开发部署（包含localhost的next start验收），文件落地私有`.storage/media`，经`GET /api/v1/media/:id`按已登记Media读取；公网生产拒绝Local写入，绝不写应用public目录。生产R2Driver公开桶S3_BUCKET与临时私有桶S3_PRIVATE_BUCKET必须不同，开发/预览/生产各自隔离桶与密钥。私有桶禁止公网访问，公开桶只存校验通过的media前缀；前缀命名本身不提供私有权限。开发POST /api/v1/admin/media/upload接收multipart；生产POST /api/v1/admin/media/upload-intent申请10分钟临时票据和限时直传凭证，浏览器直传私有桶，POST /api/v1/admin/media/confirm确认。
 
-confirm必须核验用户归属、对象magic/真实MIME、实际大小、sha256和对象key，SVG需清洗/安全规则；通过后登记Media和公开URL，失败不公开并清理临时对象。图片10MB、视频50MB、文档20MB；生产文件不经过Vercel函数大请求体。删除前扫描所有正文、封面、图集、Profile与Setting引用，引用中拒绝删除。
+confirm必须核验用户归属、对象magic/真实MIME、实际大小、sha256和对象key，并原子消费票据；SVG/HTML等主动类型明确拒绝，避免脚本和外链执行。允许PNG/JPEG/WebP/GIF/AVIF、MP4/WebM、PDF，图片完整解码所有帧，动画最多500帧且全帧合计≤4000万像素；校验后的字节另写公开随机key，防止临时对象被覆盖的竞态。公开写入前独立提交COMPENSATE补偿票据，登记Media成功时在同一事务移除；DB回滚/进程中断/存储删除失败也保留公开key供清理。失败清理临时对象；清理失败保留UploadIntent供POST /api/v1/admin/media/cleanup重试并记录审计。图片10MB、视频50MB、文档20MB；生产文件不经过浏览器到Vercel函数的大请求体。删除前扫描所有正文、封面、图集、Profile与Setting引用，含软删内容，引用中拒绝删除。DB删除和持久清理队列原子提交；存储删除失败返回cleanupPending=true，保留key重试。
 
 
 ## 9. 安全清单
@@ -346,7 +346,7 @@ confirm必须核验用户归属、对象magic/真实MIME、实际大小、sha256
 | SQL 注入 | 全部走 Prisma 参数化查询；`$queryRaw` 必须用模板字面量占位 |
 | 上传攻击 | 校验 MIME + 魔数（file-type）；文件名重命名为随机值；不落到可执行目录 |
 | 依赖漏洞 | `npm audit` + Dependabot；锁定 lockfile |
-| 敏感信息泄露 | 环境变量只走 `.env`（`.env` 入 `.gitignore`）；客户端代码禁止 import `lib/env.server.ts` |
+| 敏感信息泄露 | 环境变量只走 `.env`（`.env` 入 `.gitignore`）；客户端代码禁止 import `lib/env.ts`（server-only强制边界） |
 | 后台被爬 | `/admin` 加 `X-Robots-Tag: noindex`；`robots.txt` Disallow |
 | 数据丢失 | 托管数据库备份或独立任务运行pg_dump，另备份媒体并演练恢复；JSON不是完整备份 |
 
@@ -406,6 +406,7 @@ STORAGE_DRIVER=local                 # local | s3
 S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com
 S3_REGION=auto
 S3_BUCKET=personal-site
+S3_PRIVATE_BUCKET=personal-site-private
 S3_ACCESS_KEY_ID=
 S3_SECRET_ACCESS_KEY=
 S3_PUBLIC_BASE_URL=https://cdn.example.com

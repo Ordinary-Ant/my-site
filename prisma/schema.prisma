@@ -31,7 +31,7 @@ enum Role {
 enum ContentStatus {
   DRAFT // 草稿，仅后台可见
   PUBLISHED // 已发布，前台可见
-  ARCHIVED // 已归档，前台隐藏但返回 410
+  ARCHIVED // 已归档，公开入口统一返回404
 }
 
 /// 日志类型
@@ -433,6 +433,27 @@ model Profile {
 // ============================================================
 //  媒体库
 // ============================================================
+
+/// 私有直传票据；原子状态转换防止并发confirm与重复消费。
+model UploadIntent {
+  id           String   @id @default(cuid())
+  userId       String
+  key          String   @unique
+  originalName String
+  mimeType     String
+  size         Int
+  hash         String
+  alt          String?
+  folder       String   @default("/")
+  status       String   @default("PENDING")
+  mediaId      String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, expiresAt])
+  @@map("upload_intents")
+}
 
 model Media {
   id           String    @id @default(cuid())

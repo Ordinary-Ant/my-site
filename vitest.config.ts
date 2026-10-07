@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 /** 单元与数据库测试分开，默认检查绝不修改开发数据。 */
 export default defineConfig({
+  oxc: { jsx: { runtime: 'automatic' } },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

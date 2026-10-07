@@ -19,11 +19,16 @@ const serverSchema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET 至少 32 位。生成方式：openssl rand -base64 48'),
   JWT_ACCESS_TTL: z.string().default('15m'),
   JWT_REFRESH_TTL: z.string().default('7d'),
+  TRUST_PROXY: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
 
   STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
   S3_ENDPOINT: z.string().optional(),
   S3_REGION: z.string().optional(),
   S3_BUCKET: z.string().optional(),
+  S3_PRIVATE_BUCKET: z.string().optional(),
   S3_ACCESS_KEY_ID: z.string().optional(),
   S3_SECRET_ACCESS_KEY: z.string().optional(),
   S3_PUBLIC_BASE_URL: z.string().optional(),
@@ -84,7 +89,13 @@ export const isDevelopment = env.NODE_ENV === 'development'
 export function assertS3Configured(): void {
   if (env.STORAGE_DRIVER !== 's3') return
 
-  const required = ['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY'] as const
+  const required = [
+    'S3_ENDPOINT',
+    'S3_BUCKET',
+    'S3_PRIVATE_BUCKET',
+    'S3_ACCESS_KEY_ID',
+    'S3_SECRET_ACCESS_KEY',
+  ] as const
   const missing = required.filter((k) => !env[k])
 
   if (missing.length > 0) {

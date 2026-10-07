@@ -27,6 +27,7 @@ prisma/*.db
 
 # uploads（本地存储驱动的落地目录）
 public/uploads/
+.storage/
 
 # logs
 npm-debug.log*

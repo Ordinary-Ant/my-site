@@ -1,4 +1,4 @@
-import Link from 'next/link'
+/* eslint-disable @next/next/no-html-link-for-pages -- 登录返回与错误恢复使用完整导航，避免依赖失败的客户端路由。 */
 
 /**
  * 404
@@ -16,23 +16,21 @@ export default function NotFound() {
         <h1 className="mt-4 text-xl font-semibold tracking-tight">
           这个页面不存在，或者已被我藏起来了
         </h1>
-        <p className="text-muted-foreground mt-2.5 text-sm">
-          检查一下地址，或者从下面走。
-        </p>
+        <p className="text-muted-foreground mt-2.5 text-sm">检查一下地址，或者从下面走。</p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-2.5">
-          <Link
+          <a
             href="/"
             className="bg-primary text-primary-foreground hover:bg-brand-hover rounded-[10px] px-5 py-2.5 text-sm font-medium transition-colors"
           >
             回首页
-          </Link>
-          <Link
+          </a>
+          <a
             href="/articles"
             className="border-border-strong hover:bg-muted rounded-[10px] border px-5 py-2.5 text-sm font-medium transition-colors"
           >
             看看文章
-          </Link>
+          </a>
         </div>
       </div>
     </div>

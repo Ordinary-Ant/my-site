@@ -168,7 +168,7 @@
 | PATCH ★ | `/api/v1/admin/modules/reorder` | 导航排序 |
 | GET | `/api/v1/admin/settings` | 全部设置（按 group 分组） |
 | PATCH ★ | `/api/v1/admin/settings/:group` | 批量更新某组设置 |
-| GET ★ | `/api/v1/admin/settings/motion` | **动效配置**：返回 config + 8 个预设 + 性能预估（见 §5.8） |
+| GET ★ | `/api/v1/admin/settings/motion` | **动效配置**：返回 config + 4 个预设 + 性能预估（见 §5.8） |
 | PATCH ★ | `/api/v1/admin/settings/motion` | 保存动效配置（Zod + 交叉规则，可能带 `warnings`） |
 | GET | `/api/v1/admin/media` | 媒体列表 |
 | POST | `/api/v1/admin/media/upload` | 上传 |
@@ -576,7 +576,7 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
 **PATCH语义**：不传不变，仅nullable字段传null清空，必填字段不接受null；未知键拒绝。必须带revision，事务条件更新revision匹配并加1，否则409 REVISION_CONFLICT，不覆盖新内容。Log/Project/Timeline/Profile同样执行。
 
 **副作用（service 层自动处理）**
-- 计算 `wordCount`（中文按字符数、英文按单词数）与 `readingTime = ceil(wordCount / 300)`
+- 计算 `wordCount`（中文按字符数、英文按单词数）与 `readingTime = ceil(中文字符数 / 300 + 英文单词数 / 200)`
 - `status` 从非 PUBLISHED 变为 PUBLISHED 且 `publishedAt` 为空 → 自动填 `now()`
 - `publishedAt`变动或到期发布 → 失效首页/列表/详情/RSS/sitemap；分钟调度负责到期事件
 - 写 `AuditLog`（记录变更字段的 before/after 差异）
@@ -669,6 +669,10 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
 - `home` 模块的 `enabled` 不可为 false（否则站点没有首页）
 - 修改 `route` 时，旧路径自动保留 301 重定向（写入RouteAlias，永久保留全部历史路径，直接301到当前路径，保留详情后缀与query）
 
+并发配置写入：PATCH 可携带 `expectedUpdatedAt`（上一响应的 ISO 时间）；传入时不匹配返回 409，后台编辑与撤销必须携带，避免覆盖其他管理员变更。模块改路由/排序/撤销统一持有数据库事务锁，保证当前路径与历史别名的跨表约束。
+
+开关撤销：响应提供 `undo: {auditId,expiresAt}`，关闭成功后 5 秒内，ADMIN 可 `POST /api/v1/admin/modules/:key/undo {auditId}`。服务只接受该模块最近匹配的开关审计，当前状态/updatedAt 必须仍等于原操作结果；过期或期间有其他修改返回 409。撤销恢复开关前状态，另写审计，不删除历史记录或内容。已失效的撤销操作不能覆盖新配置。
+
 **`PATCH /api/v1/admin/modules/reorder`**
 ```jsonc
 { "items": [ { "key": "article", "navOrder": 1 }, { "key": "log", "navOrder": 2 } ] }
@@ -702,7 +706,11 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
 
 ### 5.5 媒体上传
 
-`POST /api/v1/admin/media/upload`仅本地开发multipart；生产使用POST /media/upload-intent → R2私有临时区直传 → POST /media/confirm。intent限定key/大小/类型/有效期，confirm验证magic、实际大小、sha256、归属后登记公开；失败不公开。开发/预览/生产bucket与密钥隔离，删除前检查全站引用。
+`POST /api/v1/admin/media/upload`仅本地开发部署multipart（localhost next start允许）；生产使用POST /media/upload-intent → 独立R2私有桶直传 → POST /media/confirm。intent限定随机key/大小/类型/10分钟有效期，confirm原子消费票据并验证magic、实际大小、sha256、归属后将验证过的字节写入公开桶；失败不公开。开发/预览/生产bucket与密钥隔离，私有临时桶和公开桶必须不同，私有桶禁止公网访问，删除前检查全站引用（含软删内容）。
+
+后台GET `/media`（page/pageSize/q/folder/kind）与GET `/media/:id`、GET `/media/:id/references`需要content:read；POST上传、PATCH `/media/:id`（仅alt可空、folder）、DELETE `/media/:id`及POST `/media/cleanup`需要media:write。GET `/media/config`仅返回driver。上传20次/小时/用户，PostgreSQL共享桶；所有变更记录审计，引用删除返回409 MEDIA_IN_USE及引用清单。删除返回`{id,cleanupPending}`，true表示持久清理队列待重试。公开Local GET `/api/v1/media/:id`只读取已登记对象，nosniff/sandbox，PDF下载处理。
+
+intent JSON：`{originalName,mimeType,size,hash,alt?,folder?}`（hash为64位小写SHA256）；返回`{intentId,expiresAt,uploadUrl,method:"PUT",headers}`。浏览器计算hash并用返回headers直传；confirm JSON仅`{intentId}`，不接受客户端key。重复/并发/过期消费409；归属不符404。清理接口每批最多100项，删除过期1小时以上票据及对象，也重试DELETE/COMPENSATE队列；单项失败保留票据并移至队尾，继续后续项，以updatedAt/id稳定排序防止失败项饿死后续批次。返回`{cleaned,failed,pending}`（pending为仍满足清理条件的票据数），记录单项成功/失败与汇总审计；需定期调用并配置私有桶对象生命周期兜底。
 
 | 字段 | 说明 |
 |---|---|
@@ -725,11 +733,13 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
 ```
 > `deduplicated: true` 表示 sha256 命中已有文件，直接复用（秒传），不重复占用存储。
 
-**限制**：图片 ≤ 10MB（`image/jpeg|png|webp|avif|gif|svg`）、视频 ≤ 50MB（`video/mp4|webm`）、文档 ≤ 20MB（`application/pdf`）。校验 MIME **与文件魔数**双重确认，防止改扩展名绕过。
+**限制**：图片 ≤ 10MB（`image/jpeg|png|webp|avif|gif`，所有帧完整解码、动画≤500帧且全帧合计≤4000万像素）、视频 ≤ 50MB（`video/mp4|webm`）、文档 ≤ 20MB（`application/pdf`）。拒绝SVG/HTML等可执行主动类型以防脚本/外链；校验 MIME **与文件魔数**双重确认，防止改扩展名绕过。文件名和key由服务端随机生成，原始名仅展示。
 
 ---
 
 ### 5.6 仪表盘统计
+
+阶段 B 的 `GET /api/v1/admin/dashboard` 需要 dashboard:read，返回当前真实基础计数 `{articles,drafts,logs,projects,media,recent}`；recent 为最近更新的五篇未删除文章（id/title/status/updatedAt）。此入口不提供尚未建立的访问统计或备份状态。下述完整 `stats` 在阶段 D/E/G 接入相应统计和备份来源后实现，不能填模拟数字。
 
 `GET /api/v1/admin/stats`
 
@@ -796,6 +806,8 @@ GET /api/v1/admin/settings/motion返回08的完整config、static/editorial/narr
 POST /api/v1/admin/articles/:id/preview-token需content:write，创建24h随机token（哈希入PreviewToken）；GET /preview/:token仅授权有效token读取对应草稿，no-store及noindex，不进RSS/sitemap/搜索。过期或撤销404。GET /api/v1/admin/articles/slug-available?slug=&excludeId=需content:read，仅给后台校验；最终写入仍由数据库唯一约束兜底。
 
 ### 5.10 发布与公共边界
+`GET /api/v1/jobs/publication`为外部分钟调度入口，仅接受`Authorization: Bearer <REVALIDATE_SECRET>`独立机器密钥（至少32位），不接受后台Cookie替代；未配置503、错误凭据401。任务使用PostgreSQL事务级锁和`jobs.publication.cursor`内部Setting游标，扫描上次游标至本次时间的公开文章/日志/作品并失效依赖tag；失效失败不推进游标，支持重试。清理到期预览token。正常公开读取始终检查publishedAt，不依赖任务把草稿或未来内容提前公开。本地`npm run jobs:publication`每60秒调用一次；托管环境必须配置外部分钟调度，当前尚未验证生产调度。
+模块关闭时公开列表API返回200及空数组/零总数；页面与详情API返回404 MODULE_DISABLED。首页聚合关闭模块字段返回空数组。
 公开查询统一检查模块及子类型开关、status=PUBLISHED、publishedAt<=now、deletedAt=null；所有首页/feed/详情/搜索/RSS/sitemap使用相同公开过滤器。
 时间线无PUBLISHED状态，用visible/showOnAbout分别控制页面，并过滤deletedAt；日期年/月/日精度独立保存。排序当前项DESC、日期按direction、同日期order ASC、id ASC。所有新请求5秒内反映保存结果，已有页面刷新；预览和管理接口no-store。
 

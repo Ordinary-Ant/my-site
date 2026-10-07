@@ -92,8 +92,8 @@
 > **合并查询范式**：
 > ```ts
 > const [logs, articles] = await Promise.all([
->   prisma.log.findMany({ where: { status: 'PUBLISHED' }, take: 10, orderBy: { logDate: 'desc' } }),
->   prisma.article.findMany({ where: { status: 'PUBLISHED' }, take: 10, orderBy: { publishedAt: 'desc' } }),
+>   logService.listPublic({ limit: 10 }) // service检查模块/类型/PUBLISHED/publishedAt<=now/deletedAt,
+>   articleService.listPublic({ limit: 10 }) // 同一公开边界,
 > ])
 > const feed = [...logs.map(toFeed('log')), ...articles.map(toFeed('article'))]
 >   .sort((a, b) => +b.date - +a.date).slice(0, 10)
@@ -116,26 +116,8 @@
 
 代价：失去列级类型约束。对策是 `lib/validators/settings.ts` 里用 Zod 为每个已知 key 定义 schema，读写时校验，既有灵活性又有类型安全。
 
-**典型受益案例：动效配置。** 动效系统需要一份 ~40 个字段的嵌套配置（背景类型、配色、速度、模糊、悬停效果、入场动画、六级降级参数…），见 [08-motion-system.md](08-motion-system.md)。如果用固定列：
+**动效配置**：Setting以motion.config存version2对象，默认editorial、decoration.none；只允许08的已知字段，JSON存储不等于接受任意扩展。API/默认值/升级需同步类型与校验。
 
-- 加一种背景动效类型 → 改表结构 + 发版 + 迁移
-- 加一个参数（如 `noiseOverlay`）→ 又一次迁移
-- 40 个 nullable 列，绝大多数时候是 NULL
-
-用 KV 存一条 `{ key: 'motion.config', group: 'motion', value: MotionConfigJSON }`，**动效系统后续怎么加参数都不需要动数据库**。这正是 §2.3 开头说的"零迁移扩展"最有价值的兑现场景。
-
-```jsonc
-// settings 表里的一行
-{
-  "key": "motion.config",
-  "group": "motion",
-  "value": { "version": 1, "preset": "breath", "intensity": "standard", "background": { /* … */ } },
-  "updatedAt": "2025-01-15T10:23:00.000Z",
-  "updatedBy": "clx..."
-}
-```
-
-> `Setting` 表已建 `@@index([group])`，后台设置页按 group 一次查出整组配置，无额外查询成本。
 
 ### 2.4 为什么用软删除（`deletedAt`）
 
@@ -145,42 +127,33 @@
 - 后台默认过滤，提供「回收站」视图，可恢复或彻底删除；
 - 跨表引用（如文章引用的图片）不会因删除立即断链。
 
-**全局 Prisma 中间件**自动注入过滤条件，避免每处手写：
+Prisma6使用service统一显式过滤（或经验证的$extends），不使用已移除的$use。Article/Log/Project/TimelineItem均软删除；公开入口排除deletedAt，管理回收站显式includeDeleted；恢复和purge单独授权。关联、批量、嵌套读取不能假设扩展自动覆盖。
 
-```ts
-prisma.$use(async (params, next) => {
-  const softDeleteModels = ['Article', 'Log', 'Project']
-  if (softDeleteModels.includes(params.model ?? '')) {
-    if (params.action === 'findMany' || params.action === 'findFirst') {
-      params.args.where = { ...params.args.where, deletedAt: null }
-    }
-    if (params.action === 'delete') {
-      params.action = 'update'
-      params.args.data = { deletedAt: new Date() }
-    }
-  }
-  return next(params)
-})
-```
+Article/Log/Project公开还必须PUBLISHED且publishedAt<=now；时间线按visible/showOnAbout分别过滤。所有内容（含Profile）有revision，条件更新冲突409。Article.order支持排序；Timeline保留start/end日期精度，不因默认月日伪装输入精度。
+
 
 ### 2.5 为什么内容存 Markdown 而不是富文本 JSON
 
 Markdown 是**纯文本**：可 Git diff、可脚本批量处理、可随时换渲染器、AI 读写友好、数据库迁移零风险。Tiptap JSON 会把数据锁死在特定编辑器版本上。
 
-方案：后台用 Tiptap 编辑（所见即所得），保存时序列化为 Markdown 存储（`tiptap-markdown` 扩展）；前台用 `react-markdown` 渲染。**存储格式与编辑器解耦。**
+方案：后台用 Tiptap 编辑（所见即所得），保存时序列化为 Markdown 存储（官方 `@tiptap/markdown` 扩展（Tiptap3））；前台用 `react-markdown` 渲染。**存储格式与编辑器解耦。**
 
 ---
 
 ## 3. 完整 Prisma Schema
 
 > 文件位置：`prisma/schema.prisma`
-> 目标数据库：**PostgreSQL**（含 `enum` 与 `String[]`）。SQLite 降级改造见 §7。
+> 目标数据库：开发、测试、生产均为**PostgreSQL**；真实迁移及并发测试是验收条件。
 
 ```prisma
 // ============================================================
 //  Personal Site · Prisma Schema
 //  Target: PostgreSQL 16
-//  ============================================================
+//
+//  设计说明见 docs/02-data-model.md
+//  ⚠ 不要改用 SQLite：它不支持 enum 与标量数组，会导致 schema 分叉。
+//     见 docs/02-data-model.md §7
+// ============================================================
 
 generator client {
   provider = "prisma-client-js"
@@ -197,40 +170,40 @@ datasource db {
 
 /// 后台用户角色
 enum Role {
-  ADMIN   // 全部权限，含模块开关与用户管理
-  EDITOR  // 内容增删改与发布，不可改站点配置
-  VIEWER  // 只读，可看仪表盘与审计日志
+  ADMIN // 全部权限，含模块开关与用户管理
+  EDITOR // 内容增删改与发布，不可改站点配置
+  VIEWER // 只读，可看仪表盘与审计日志
 }
 
 /// 内容发布状态（Article / Log / Project 共用）
 enum ContentStatus {
-  DRAFT      // 草稿，仅后台可见
-  PUBLISHED  // 已发布，前台可见
-  ARCHIVED   // 已归档，前台隐藏但保留（不占用 404）
+  DRAFT // 草稿，仅后台可见
+  PUBLISHED // 已发布，前台可见
+  ARCHIVED // 已归档，前台隐藏但返回 410
 }
 
 /// 日志类型
 enum LogType {
-  DAILY    // 每日随笔
-  EVENT    // 大事件
-  SUMMARY  // 阶段总结
+  DAILY // 每日随笔
+  EVENT // 大事件
+  SUMMARY // 阶段总结
 }
 
 /// 作品类型
 enum ProjectType {
-  GAME     // 游戏
-  REPO     // 代码库
-  SKILL    // Skills / 技术能力展示
-  OTHER    // 个人制作的其他东西
+  GAME // 游戏
+  REPO // 代码库
+  SKILL // Skills / 技术能力展示
+  OTHER // 个人制作的其他东西
 }
 
 /// 时间戳条目类型
 enum TimelineType {
-  WORK       // 工作经历
-  EDUCATION  // 教育经历
-  PROJECT    // 项目经历
-  AWARD      // 荣誉奖项
-  MILESTONE  // 个人里程碑
+  WORK // 工作经历
+  EDUCATION // 教育经历
+  PROJECT // 项目经历
+  AWARD // 荣誉奖项
+  MILESTONE // 个人里程碑
 }
 
 /// 媒体类型
@@ -239,6 +212,13 @@ enum MediaKind {
   VIDEO
   DOCUMENT
   OTHER
+}
+
+/// 经历日期的展示精度，存储仍使用完整日期
+enum DatePrecision {
+  YEAR
+  MONTH
+  DAY
 }
 
 // ============================================================
@@ -269,15 +249,18 @@ model User {
 
 /// 刷新令牌会话（可撤销）
 model Session {
-  id           String    @id @default(cuid())
-  userId       String
-  refreshHash  String    @unique          // 只存哈希，明文永不落库
-  userAgent    String?
-  ip           String?
-  expiresAt    DateTime
-  revokedAt    DateTime?
-  rotatedFrom  String?                    // 轮转来源，用于重放检测
-  createdAt    DateTime  @default(now())
+  id            String    @id @default(cuid())
+  userId        String
+  refreshHash   String    @unique // 只存哈希，明文永不落库
+  userAgent     String?
+  ip            String?
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  rotatedFrom   String? // 轮转来源，用于重放检测
+  rotatedAt     DateTime?
+  successorId   String?
+  rotationReply String?   @db.Text // 加密后的后继令牌，仅供十秒并发宽限
+  createdAt     DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -290,11 +273,11 @@ model Session {
 model AuditLog {
   id         String   @id @default(cuid())
   userId     String?
-  action     String   // create | update | delete | restore | publish | unpublish | login | logout | toggle | upload
-  resource   String   // article | log | project | timeline | module | setting | media | user
+  action     String // create | update | delete | restore | publish | unpublish | login | logout | toggle | upload
+  resource   String // article | log | project | timeline | module | setting | media | user
   resourceId String?
-  before     Json?    // 变更前快照（仅存差异字段）
-  after      Json?    // 变更后快照
+  before     Json? // 变更前快照（仅存差异字段）
+  after      Json? // 变更后快照
   ip         String?
   userAgent  String?
   createdAt  DateTime @default(now())
@@ -313,10 +296,10 @@ model AuditLog {
 
 /// 站点配置（KV，按 group 分组渲染后台设置页）
 model Setting {
-  key       String   @id            // 如 "site.name" / "seo.defaultTitle"
+  key       String   @id // 如 "site.name" / "seo.defaultTitle" / "motion.config"
   value     Json
-  group     String   @default("general")  // general | theme | seo | social | footer | motion | integration | feature
-  label     String?                 // 后台显示名
+  group     String   @default("general") // general | theme | seo | social | footer | motion | integration | feature
+  label     String? // 后台显示名
   updatedAt DateTime @updatedAt
   updatedBy String?
 
@@ -326,21 +309,54 @@ model Setting {
 
 /// 功能模块注册表 —— 决定前台哪些栏目存在
 model Module {
-  key         String   @id            // home | log | portfolio | timeline | article | about
-  name        String                  // 中文名，可在后台改（"日志" → "随笔"）
+  key         String       @id // home | log | portfolio | timeline | article | about
+  name        String // 中文名，可在后台改
   description String?
-  enabled     Boolean  @default(true) // 总开关
-  navVisible  Boolean  @default(true) // 是否出现在导航
-  navLabel    String?                 // 导航文案，空则用 name
-  navOrder    Int      @default(0)    // 导航排序
-  icon        String?                 // lucide 图标名
-  route       String                  // /logs（可在后台改）
-  config      Json?                   // 模块级配置，结构见 01-architecture §7
-  isBuiltin   Boolean  @default(true) // 内置模块不可删除
-  updatedAt   DateTime @updatedAt
+  enabled     Boolean      @default(true) // 总开关
+  navVisible  Boolean      @default(true) // 是否出现在导航
+  navLabel    String? // 导航文案，空则用 name
+  navOrder    Int          @default(0) // 导航排序
+  icon        String? // lucide 图标名
+  route       String       @unique // /logs（可在后台改）
+  config      Json? // 模块级配置，结构见 docs/01-architecture.md §7
+  isBuiltin   Boolean      @default(true) // 内置模块不可删除
+  updatedAt   DateTime     @updatedAt
+  aliases     RouteAlias[]
 
   @@index([enabled, navOrder])
   @@map("modules")
+}
+
+/// 历史地址永久保留，重定向时解析模块的最新地址
+model RouteAlias {
+  path      String   @id
+  moduleKey String
+  createdAt DateTime @default(now())
+  module    Module   @relation(fields: [moduleKey], references: [key], onDelete: Cascade)
+
+  @@map("route_aliases")
+}
+
+/// 所有进程共用的固定窗口限流计数
+model RateLimit {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("rate_limits")
+}
+
+/// 草稿预览只存令牌摘要，不能作为公开内容查询入口
+model PreviewToken {
+  hash      String   @id
+  kind      String
+  contentId String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+  @@map("preview_tokens")
 }
 
 // ============================================================
@@ -349,16 +365,16 @@ model Module {
 
 /// 文章分类（支持树形）
 model Category {
-  id          String     @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
-  slug        String     @unique
+  slug        String   @unique
   description String?
   icon        String?
   color       String?
   parentId    String?
-  order       Int        @default(0)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryTree")
@@ -393,14 +409,16 @@ model Article {
   id             String        @id @default(cuid())
   slug           String        @unique
   title          String
-  summary        String?       // 摘要，用于卡片与 SEO description
-  content        String        @db.Text  // Markdown 正文
+  summary        String? // 摘要，用于卡片与 SEO description
+  content        String        @db.Text // Markdown 正文
   coverImage     String?
   status         ContentStatus @default(DRAFT)
   publishedAt    DateTime?
-  isTop          Boolean       @default(false)  // 置顶
-  allowComment   Boolean       @default(true)   // 一期不实现评论，预留
-  readingTime    Int           @default(0)      // 预计阅读分钟数
+  isTop          Boolean       @default(false)
+  order          Int           @default(0)
+  revision       Int           @default(1) // 乐观锁，旧自动保存返回409
+  allowComment   Boolean       @default(true) // 一期不实现评论，预留
+  readingTime    Int           @default(0) // 预计阅读分钟数
   wordCount      Int           @default(0)
   viewCount      Int           @default(0)
   likeCount      Int           @default(0)
@@ -430,24 +448,26 @@ model Article {
 
 /// 日志（每日随笔 / 大事件 / 总结）
 model Log {
-  id         String        @id @default(cuid())
-  title      String
-  summary    String?
-  content    String        @db.Text          // Markdown
-  type       LogType       @default(DAILY)
-  logDate    DateTime      @db.Date          // 记录的是哪一天
-  mood       String?                         // happy | calm | tired | excited | down
-  weather    String?                         // sunny | cloudy | rain | snow
-  location   String?
-  coverImage String?
-  images     String[]      @default([])      // 图集
-  status     ContentStatus @default(PUBLISHED) // 日志默认直接发布
-  isPinned   Boolean       @default(false)
-  viewCount  Int           @default(0)
-  authorId   String?
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  deletedAt  DateTime?
+  id          String        @id @default(cuid())
+  title       String
+  summary     String?
+  content     String        @db.Text // Markdown
+  type        LogType       @default(DAILY)
+  logDate     DateTime      @db.Date // 记录的是哪一天
+  publishedAt DateTime?
+  revision    Int           @default(1)
+  mood        String? // happy | excited | calm | tired | down | angry
+  weather     String? // sunny | cloudy | overcast | rain | snow | fog
+  location    String?
+  coverImage  String?
+  images      String[]      @default([]) // 图集
+  status      ContentStatus @default(PUBLISHED) // 日志默认直接发布
+  isPinned    Boolean       @default(false)
+  viewCount   Int           @default(0)
+  authorId    String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
 
   author User? @relation("LogAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   tags   Tag[] @relation("LogTags")
@@ -464,19 +484,21 @@ model Project {
   slug        String        @unique
   title       String
   subtitle    String?
-  description String        @db.Text          // 卡片简介
-  content     String?       @db.Text          // 详情页 Markdown（可选）
+  description String        @db.Text // 卡片简介
+  content     String?       @db.Text // 详情页 Markdown（可选）
   coverImage  String?
   gallery     String[]      @default([])
   type        ProjectType   @default(REPO)
   techStack   String[]      @default([])
-  role        String?                         // 担任角色
-  highlights  String[]      @default([])      // 亮点 bullets
-  links       Json?                           // { github, demo, video, docs, article }
+  role        String? // 担任角色
+  highlights  String[]      @default([]) // 亮点 bullets
+  links       Json? // { github, demo, video, docs, article }
   startDate   DateTime?
   endDate     DateTime?
   status      ContentStatus @default(PUBLISHED)
-  featured    Boolean       @default(false)   // 首页精选
+  featured    Boolean       @default(false) // 首页精选
+  publishedAt DateTime?
+  revision    Int           @default(1)
   order       Int           @default(0)
   viewCount   Int           @default(0)
   createdAt   DateTime      @default(now())
@@ -494,24 +516,28 @@ model Project {
 
 /// 时间戳 / 经历（同时供「时间戳」页与「关于我」页使用）
 model TimelineItem {
-  id           String       @id @default(cuid())
-  title        String                          // 如 "高级前端工程师 @ 某公司"
-  subtitle     String?                         // 如 "核心业务组"
-  description  String?      @db.Text           // Markdown
-  type         TimelineType
-  organization String?
-  location     String?
-  startDate    DateTime
-  endDate      DateTime?                       // null = 至今
-  isCurrent    Boolean      @default(false)
-  logo         String?
-  tags         String[]     @default([])
-  highlights   String[]     @default([])       // 关键成果 bullets
-  order        Int          @default(0)
-  visible      Boolean      @default(true)     // 是否在「时间戳」页显示
-  showOnAbout  Boolean      @default(true)     // 是否在「关于我」页显示
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id             String        @id @default(cuid())
+  title          String // 如 "高级前端工程师 @ 某公司"
+  subtitle       String? // 如 "核心业务组"
+  description    String?       @db.Text // Markdown
+  type           TimelineType
+  organization   String?
+  location       String?
+  startDate      DateTime
+  endDate        DateTime? // null = 至今
+  isCurrent      Boolean       @default(false)
+  startPrecision DatePrecision @default(MONTH)
+  endPrecision   DatePrecision @default(MONTH)
+  revision       Int           @default(1)
+  logo           String?
+  tags           String[]      @default([])
+  highlights     String[]      @default([]) // 关键成果 bullets
+  order          Int           @default(0)
+  visible        Boolean       @default(true) // 是否在「时间戳」页显示
+  showOnAbout    Boolean       @default(true) // 是否在「关于我」页显示
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
 
   @@index([type, startDate(sort: Desc)])
   @@index([visible, startDate(sort: Desc)])
@@ -524,11 +550,11 @@ model TimelineItem {
 
 /// 关于我（全表仅一行，id 固定为 "default"）
 model Profile {
-  id             String   @id @default("default")
+  id             String    @id @default("default")
   name           String
-  headline       String                        // 一句话定位，如 "5 年经验前端工程师"
+  headline       String // 一句话定位，如 "5 年经验前端工程师"
   avatar         String?
-  bio            String   @db.Text             // Markdown 自我介绍
+  bio            String    @db.Text // Markdown 自我介绍
   email          String?
   phone          String?
   location       String?
@@ -537,16 +563,17 @@ model Profile {
   company        String?
   yearsOfExp     Int?
   /// [{ platform, label, url, icon }]
-  socials        Json     @default("[]")
+  socials        Json      @default("[]")
   /// [{ title, description, icon }]  个人优势
-  advantages     Json     @default("[]")
+  advantages     Json      @default("[]")
   /// [{ category, items: [{ name, level(1-5), years }] }]  技能矩阵
-  skills         Json     @default("[]")
+  skills         Json      @default("[]")
   /// [{ title, description, icon }]  我能提供什么
-  services       Json     @default("[]")
+  services       Json      @default("[]")
   resumeUrl      String?
-  contactVisible Boolean  @default(true)       // 是否公开联系方式
-  updatedAt      DateTime @updatedAt
+  contactVisible Boolean   @default(true) // 是否公开联系方式
+  updatedAt      DateTime  @updatedAt
+  revision       Int       @default(1)
 
   @@map("profiles")
 }
@@ -557,18 +584,18 @@ model Profile {
 
 model Media {
   id           String    @id @default(cuid())
-  filename     String                          // 存储名（随机）
-  originalName String                          // 原始文件名
+  filename     String // 存储名（随机）
+  originalName String // 原始文件名
   url          String
-  key          String    @unique               // 存储驱动中的路径
+  key          String    @unique // 存储驱动中的路径
   kind         MediaKind @default(IMAGE)
   mimeType     String
-  size         Int                             // 字节
+  size         Int // 字节
   width        Int?
   height       Int?
   alt          String?
-  folder       String    @default("/")         // 逻辑目录
-  hash         String?   @unique               // sha256，用于秒传与去重
+  folder       String    @default("/") // 逻辑目录
+  hash         String?   @unique // sha256，用于秒传与去重
   uploadedBy   String?
   createdAt    DateTime  @default(now())
 
@@ -578,7 +605,7 @@ model Media {
 }
 
 // ============================================================
-//  统计（可选，二期）
+//  一期仪表盘与公开页面统计
 // ============================================================
 
 /// 页面访问按天聚合
@@ -593,6 +620,7 @@ model DailyStat {
   @@index([date(sort: Desc)])
   @@map("daily_stats")
 }
+
 ```
 
 ---
@@ -639,12 +667,12 @@ model DailyStat {
 | `organization` | String? | 公司 / 学校 / 主办方 |
 | `location` | String? | 城市 |
 | `startDate` / `endDate` | DateTime | `endDate` 为 null 表示"至今" |
-| `isCurrent` | Boolean | 为 true 时前台显示脉动圆点 |
+| `isCurrent` | Boolean | 为true时前台显示静态高亮圆点，不作循环动画 |
 | `highlights` | String[] | 关键成果，前台渲染为 bullet 列表 |
 | `visible` | Boolean | 是否在「时间戳」页出现 |
 | `showOnAbout` | Boolean | 是否在「关于我」页出现 |
 
-**排序规则**：`startDate DESC`，同 startDate 时按 `order ASC`，再按 `createdAt DESC`。`isCurrent=true` 的条目始终最前。
+**排序规则**：isCurrent DESC，startDate按direction，同startDate时order ASC，最后id ASC稳定兜底。日期精度startPrecision/endPrecision独立保存，公开过滤deletedAt。
 
 ### `Log` — 日志
 
@@ -738,7 +766,7 @@ npx prisma studio
 ```
 1. 创建管理员用户（邮箱/密码从环境变量读，首次登录强制改密码）
 2. 插入 6 条 Module 记录（见 §4 表格）
-3. 插入默认 Setting（site.name、seo.*、theme.*、footer.*、**motion.config** —— 动效默认用 `breath` 预设，见 [08-motion-system.md](08-motion-system.md)）
+3. 插入默认 Setting（site.name、seo.*、theme.*、footer.*、**motion.config** —— 动效默认version2 `editorial` + decoration.none，见 [08-motion-system.md](08-motion-system.md)）
 4. 插入 Profile 单例行（占位文案）
 5. 插入示例 Category（技术 / 生活 / 随笔）
 6. 插入 2 条示例 Article + 3 条示例 Log + 2 条 Project + 3 条 TimelineItem
@@ -751,64 +779,11 @@ npx prisma db seed
 
 ---
 
-## 7. SQLite 降级方案
+## 7. 数据库环境
+一期统一PostgreSQL16，不维护SQLite分叉。开发Docker Compose，测试独立数据库，生产托管PostgreSQL；测试reset不得指向生产。应用连接和迁移连接按托管池合同配置。实际迁移、seed、事务/唯一约束与并发测试必须记录真实数据库证据。
 
-你在选型时选了 **SQLite（开发）/ Postgres（生产）**。必须知道：**SQLite 不支持 `enum` 和标量数组 `String[]`**，直接套用上面的 schema 会失败。
+新增RouteAlias持久历史路径；RateLimit共享窗口；PreviewToken保存哈希/24h有效期；Session保存rotatedAt/successorId/加密rotationReply用于10秒轮转宽限。完整字段以上述Schema为准。
 
-两条路线：
-
-### 路线 A（推荐）· 开发也用 Postgres
-
-一个 `docker-compose.yml` 解决，schema 完全一致，无分叉风险：
-
-```yaml
-# docker-compose.yml
-services:
-  db:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev
-      POSTGRES_DB: personal_site
-    ports: ["5432:5432"]
-    volumes: ["pgdata:/var/lib/postgresql/data"]
-volumes:
-  pgdata:
-```
-```bash
-docker compose up -d db
-# DATABASE_URL="postgresql://dev:dev@localhost:5432/personal_site?schema=public"
-```
-
-**这是唯一能保证"本地跑通 = 线上跑通"的方案。** 强烈建议采纳。
-
-### 路线 B · 坚持 SQLite
-
-需要以下改造，代价是类型安全下降 + 未来切换要做数据迁移：
-
-| 原设计 | SQLite 改造 |
-|---|---|
-| `enum Role` | 改为 `String`，Zod 层校验取值：`z.enum(['ADMIN','EDITOR','VIEWER'])` |
-| `String[]`（如 `images`、`tags`、`techStack`、`highlights`） | 改为 `String @default("[]")`，存 JSON 字符串，读写用 helper 转换 |
-| `Json` 字段 | Prisma 对 SQLite 支持 `Json`，但底层是 TEXT，注意不要存超长嵌套 |
-| `@db.Date` | 改为 `DateTime`，日期语义靠应用层保证 |
-| `@db.Text` | 移除（SQLite 无长度限制） |
-| `case-insensitive` 查询 | SQLite 的 `mode: 'insensitive'` 不支持，需用 `LIKE` + `lower()` 或存小写冗余列 |
-| 并发写入 | SQLite 单写锁，后台批量操作可能 `SQLITE_BUSY`，需设置 `busy_timeout` |
-
-**双表兼容写法（Prisma 不支持 datasource 条件切换）**：实际做法是维护 `prisma/schema.prisma`（PG）与 `prisma/schema.sqlite.prisma`（SQLite），用 `--schema` 参数切换：
-
-```bash
-# 开发
-npx prisma migrate dev --schema prisma/schema.sqlite.prisma
-# 生产
-npx prisma migrate deploy --schema prisma/schema.prisma
-```
-
-**代价**：每次改字段要改两份，两份会漂移，漂移会在上线时爆炸。**因此不推荐。选路线 A。**
-
----
 
 ## 8. 数据导出与备份
 
@@ -839,7 +814,7 @@ npx prisma migrate deploy --schema prisma/schema.prisma
 ### 数据库备份
 
 ```bash
-# 每日定时（Vercel Cron 或服务器 crontab）
+# 每日定时（独立任务环境或托管备份能力）
 pg_dump "$DATABASE_URL" --format=custom --file="backup-$(date +%F).dump"
 # 上传到对象存储，保留 30 天
 ```
@@ -853,3 +828,16 @@ pg_dump "$DATABASE_URL" --format=custom --file="backup-$(date +%F).dump"
 - 接口如何暴露这些数据 → [03-api-spec.md](03-api-spec.md)
 - 后台如何管理这些数据 → [04-admin-console.md](04-admin-console.md)
 - 前台如何呈现这些数据 → [05-frontend-ia.md](05-frontend-ia.md)、[06-modules.md](06-modules.md)
+
+## 独立测试数据库与Node基线
+Node>=24 / npm>=11（.node-version为24.19.0），不再支持旧Node20基线。测试显式独立URL：
+```powershell
+$env:TEST_DATABASE_URL = 'postgresql://dev:dev@localhost:5432/personal_site_test?schema=public'
+npm run test:db
+npm run test
+npm run test:integration
+npm run test:e2e
+```
+test:db使用目标URL同一服务器的/postgres管理连接创建/迁移测试库，拒绝非_test后缀；禁止测试重置开发/生产库。集成测试显式读取TEST_DATABASE_URL。
+
+本轮真实证据（执行者协调结果）：开发/测试两库migrate deploy通过；第二迁移20261007044400_publication_backfill仅回填已发布Log/Project的空publishedAt，不改草稿或已有时间；seed重复执行计数不增加，新增日志发布时间取logDate。5unit+3真实PGintegration通过，含seed幂等和publication回填。最终复跑与整阶段验收待台账确认。

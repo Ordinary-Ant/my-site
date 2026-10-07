@@ -42,33 +42,6 @@ const eslintConfig = [
       'no-console': 'off',
     },
   },
-
-  {
-    // 铁律：middleware 运行在 Edge Runtime，禁止引入 Prisma
-    // 见 docs/01-architecture.md §6.3
-    files: ['src/middleware.ts'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: '@/lib/prisma',
-              message:
-                'middleware 运行在 Edge Runtime，不能使用 Prisma。请只做轻量 JWT 校验，授权在 service 层完成。见 docs/01-architecture.md §6.3',
-            },
-          ],
-          patterns: [
-            {
-              group: ['**/lib/prisma', '@prisma/client'],
-              message:
-                'middleware 运行在 Edge Runtime，不能使用 Prisma。请只做轻量 JWT 校验，授权在 service 层完成。见 docs/01-architecture.md §6.3',
-            },
-          ],
-        },
-      ],
-    },
-  },
 ]
 
 export default eslintConfig

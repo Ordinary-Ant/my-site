@@ -64,7 +64,7 @@ export default function HomePage() {
               '深色模式 class 策略（next-themes）',
               '路径别名 @/* 生效',
               '三端断点 xs / md / lg 已定义',
-              'ESLint 禁止 middleware 引入 Prisma',
+              'Middleware 使用 Node Runtime，服务层执行授权',
               'Prettier + husky + commitlint 已配置',
             ].map((item) => (
               <div key={item} className="flex items-center gap-2">

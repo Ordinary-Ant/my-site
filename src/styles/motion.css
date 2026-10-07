@@ -1,162 +1,55 @@
-/* ============================================================================
-   动效系统 · M0 阶段仅建立骨架与安全兜底
-   完整实现见 docs/08-motion-system.md，排期在 M4.5（docs/07-roadmap.md §7）
-
-   铁律：所有动画只写在这个文件里，组件内不写动画代码。
-   ========================================================================== */
-
-/* ----------------------------------------------------------------------------
-   1. 安全兜底（M0 就要生效，不能等到 M4.5）
-   ----------------------------------------------------------------------------
-   任何动效失败时，内容必须可见。这是 docs/08-motion-system.md §7 的硬性要求。
-   -------------------------------------------------------------------------- */
-
-html[data-motion] .reveal,
+/* 一期动效基础：默认内容可读，编排运行时在阶段 F 按需接入。 */
 .reveal {
-  /* 默认可见 —— 动效是"增强"，不是"前提" */
   opacity: 1;
   transform: none;
 }
 
-/* 只有在客户端标记就绪后才允许隐藏起来播动画 */
-html[data-motion][data-js-ready] .reveal {
-  opacity: 0;
-  transform: translate3d(0, 16px, 0);
+/* 静态淡色底只作用于当前站点容器，不创建全局连续背景。 */
+.site-motion[data-decoration='tint'] {
+  background: color-mix(in srgb, var(--brand) 6%, var(--background));
 }
 
-html[data-motion][data-js-ready] .reveal.is-visible {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity var(--motion-reveal-duration, 600ms) var(--motion-reveal-easing, ease-out),
-    transform var(--motion-reveal-duration, 600ms) var(--motion-reveal-easing, ease-out);
-  transition-delay: calc(var(--i, 0) * var(--motion-reveal-stagger, 80ms));
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .site-motion[data-card-hover='lift']:not([data-motion='off']) .motion-card {
+    transition:
+      transform 200ms ease,
+      box-shadow 200ms ease;
+  }
+  .site-motion[data-card-hover='lift']:not([data-motion='off']) .motion-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+  }
 }
 
-/* JS 完全不可用时的兜底 */
-@media (scripting: none) {
-  html[data-motion] .reveal,
+/* 键盘焦点即时呈现，不能等待入场动画。 */
+.motion-card:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
   .reveal {
     opacity: 1 !important;
     transform: none !important;
   }
 }
 
-/* ----------------------------------------------------------------------------
-   2. 用户系统偏好 —— 优先级高于后台配置，不可被覆盖
-   -------------------------------------------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-motion] *,
-  html[data-motion] *::before,
-  html[data-motion] *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  /* 背景动效层直接移除，而不只是停下 */
-  html[data-motion]::before,
-  html[data-motion] .motion-bg {
-    display: none !important;
-  }
-
-  .reveal,
-  html[data-motion][data-js-ready] .reveal {
+@media (scripting: none) {
+  .reveal {
     opacity: 1 !important;
     transform: none !important;
   }
 }
 
-/* 减少透明度偏好 → 关闭所有模糊类背景（省电，见 docs/08-motion-system.md §6.2 第 ⑤ 级） */
-@media (prefers-reduced-transparency: reduce) {
-  html[data-motion]::before,
-  html[data-motion] .motion-bg {
-    filter: none !important;
-  }
-}
-
-/* ----------------------------------------------------------------------------
-   3. 背景动效层的基础定位
-   ----------------------------------------------------------------------------
-   生产实现为 position: fixed + z-index: -1 + pointer-events: none：
-   不占文档流、不遮挡点击、不阻塞 LCP。
-   具体的 6 种背景类型在 M4.5 补齐（gradient-flow / aurora / blur-blob /
-   grid / stars / particles）。
-   -------------------------------------------------------------------------- */
-
-html[data-motion-bg]:not([data-motion-bg='none'])::before {
-  content: '';
-  position: fixed;
-  inset: -20%;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(
-    var(--motion-bg-angle, 135deg),
-    var(--motion-bg-c1, #6366f1),
-    var(--motion-bg-c2, #a855f7),
-    var(--motion-bg-c3, #ec4899)
-  );
-  filter: blur(var(--motion-bg-blur, 80px));
-  opacity: var(--motion-bg-opacity, 0.35);
-}
-
-/* 非首页 + scope=home 时不渲染背景层 */
-html[data-motion-bg-scope='home'] body:not([data-page='home'])::before {
-  display: none;
-}
-
-/* 后台由 (admin)/layout.tsx 自行决定不注入 data-motion-* 属性，
-   因此这里不需要额外的排除规则。 */
-
-/* ----------------------------------------------------------------------------
-   4. 悬停动效（M4.5 补齐 4 种）
-   ----------------------------------------------------------------------------
-   必须包在能力查询里 —— 触屏设备不能出现"粘住的 hover 态"。
-   -------------------------------------------------------------------------- */
-
-@media (hover: hover) and (pointer: fine) {
-  html[data-motion-card='lift'] .motion-card {
-    transition:
-      transform 280ms cubic-bezier(0.2, 0.7, 0.3, 1),
-      box-shadow 280ms ease;
-  }
-  html[data-motion-card='lift'] .motion-card:hover {
-    transform: translate3d(0, -4px, 0);
-    box-shadow: var(--shadow-card-hover);
-  }
-
-  /* 键盘等价：Tab 到卡片时给与 hover 相同的反馈 */
-  html[data-motion-card='lift'] .motion-card:focus-visible {
-    transform: translate3d(0, -4px, 0);
-    box-shadow: var(--shadow-card-hover);
-  }
-}
-
-/* ----------------------------------------------------------------------------
-   5. 微交互
-   -------------------------------------------------------------------------- */
-
-/* 按钮按下反馈（80ms，不打断操作） */
-.btn-press:active {
-  transform: scale(0.98);
-}
-
-/* 阅读进度条 */
-.reading-progress {
-  position: fixed;
-  inset-inline: 0;
-  top: 0;
-  height: 2px;
-  z-index: 60;
-  background: transparent;
-  pointer-events: none;
-}
-.reading-progress > i {
-  display: block;
-  height: 100%;
-  transform-origin: left;
-  transform: scaleX(var(--progress, 0));
-  background: var(--brand);
+.site-motion[data-motion='off'] .reveal {
+  opacity: 1 !important;
+  transform: none !important;
 }

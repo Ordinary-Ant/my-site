@@ -66,6 +66,13 @@ enum MediaKind {
   OTHER
 }
 
+/// 经历日期的展示精度，存储仍使用完整日期
+enum DatePrecision {
+  YEAR
+  MONTH
+  DAY
+}
+
 // ============================================================
 //  认证与权限
 // ============================================================
@@ -94,15 +101,18 @@ model User {
 
 /// 刷新令牌会话（可撤销）
 model Session {
-  id          String    @id @default(cuid())
-  userId      String
-  refreshHash String    @unique // 只存哈希，明文永不落库
-  userAgent   String?
-  ip          String?
-  expiresAt   DateTime
-  revokedAt   DateTime?
-  rotatedFrom String? // 轮转来源，用于重放检测
-  createdAt   DateTime  @default(now())
+  id            String    @id @default(cuid())
+  userId        String
+  refreshHash   String    @unique // 只存哈希，明文永不落库
+  userAgent     String?
+  ip            String?
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  rotatedFrom   String? // 轮转来源，用于重放检测
+  rotatedAt     DateTime?
+  successorId   String?
+  rotationReply String?   @db.Text // 加密后的后继令牌，仅供十秒并发宽限
+  createdAt     DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -151,21 +161,54 @@ model Setting {
 
 /// 功能模块注册表 —— 决定前台哪些栏目存在
 model Module {
-  key         String   @id // home | log | portfolio | timeline | article | about
+  key         String       @id // home | log | portfolio | timeline | article | about
   name        String // 中文名，可在后台改
   description String?
-  enabled     Boolean  @default(true) // 总开关
-  navVisible  Boolean  @default(true) // 是否出现在导航
+  enabled     Boolean      @default(true) // 总开关
+  navVisible  Boolean      @default(true) // 是否出现在导航
   navLabel    String? // 导航文案，空则用 name
-  navOrder    Int      @default(0) // 导航排序
+  navOrder    Int          @default(0) // 导航排序
   icon        String? // lucide 图标名
-  route       String // /logs（可在后台改）
+  route       String       @unique // /logs（可在后台改）
   config      Json? // 模块级配置，结构见 docs/01-architecture.md §7
-  isBuiltin   Boolean  @default(true) // 内置模块不可删除
-  updatedAt   DateTime @updatedAt
+  isBuiltin   Boolean      @default(true) // 内置模块不可删除
+  updatedAt   DateTime     @updatedAt
+  aliases     RouteAlias[]
 
   @@index([enabled, navOrder])
   @@map("modules")
+}
+
+/// 历史地址永久保留，重定向时解析模块的最新地址
+model RouteAlias {
+  path      String   @id
+  moduleKey String
+  createdAt DateTime @default(now())
+  module    Module   @relation(fields: [moduleKey], references: [key], onDelete: Cascade)
+
+  @@map("route_aliases")
+}
+
+/// 所有进程共用的固定窗口限流计数
+model RateLimit {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("rate_limits")
+}
+
+/// 草稿预览只存令牌摘要，不能作为公开内容查询入口
+model PreviewToken {
+  hash      String   @id
+  kind      String
+  contentId String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+  @@map("preview_tokens")
 }
 
 // ============================================================
@@ -224,6 +267,8 @@ model Article {
   status         ContentStatus @default(DRAFT)
   publishedAt    DateTime?
   isTop          Boolean       @default(false)
+  order          Int           @default(0)
+  revision       Int           @default(1) // 乐观锁，旧自动保存返回409
   allowComment   Boolean       @default(true) // 一期不实现评论，预留
   readingTime    Int           @default(0) // 预计阅读分钟数
   wordCount      Int           @default(0)
@@ -255,24 +300,26 @@ model Article {
 
 /// 日志（每日随笔 / 大事件 / 总结）
 model Log {
-  id         String        @id @default(cuid())
-  title      String
-  summary    String?
-  content    String        @db.Text // Markdown
-  type       LogType       @default(DAILY)
-  logDate    DateTime      @db.Date // 记录的是哪一天
-  mood       String? // happy | excited | calm | tired | down | angry
-  weather    String? // sunny | cloudy | overcast | rain | snow | fog
-  location   String?
-  coverImage String?
-  images     String[]      @default([]) // 图集
-  status     ContentStatus @default(PUBLISHED) // 日志默认直接发布
-  isPinned   Boolean       @default(false)
-  viewCount  Int           @default(0)
-  authorId   String?
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  deletedAt  DateTime?
+  id          String        @id @default(cuid())
+  title       String
+  summary     String?
+  content     String        @db.Text // Markdown
+  type        LogType       @default(DAILY)
+  logDate     DateTime      @db.Date // 记录的是哪一天
+  publishedAt DateTime?
+  revision    Int           @default(1)
+  mood        String? // happy | excited | calm | tired | down | angry
+  weather     String? // sunny | cloudy | overcast | rain | snow | fog
+  location    String?
+  coverImage  String?
+  images      String[]      @default([]) // 图集
+  status      ContentStatus @default(PUBLISHED) // 日志默认直接发布
+  isPinned    Boolean       @default(false)
+  viewCount   Int           @default(0)
+  authorId    String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
 
   author User? @relation("LogAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   tags   Tag[] @relation("LogTags")
@@ -302,6 +349,8 @@ model Project {
   endDate     DateTime?
   status      ContentStatus @default(PUBLISHED)
   featured    Boolean       @default(false) // 首页精选
+  publishedAt DateTime?
+  revision    Int           @default(1)
   order       Int           @default(0)
   viewCount   Int           @default(0)
   createdAt   DateTime      @default(now())
@@ -319,24 +368,28 @@ model Project {
 
 /// 时间戳 / 经历（同时供「时间戳」页与「关于我」页使用）
 model TimelineItem {
-  id           String       @id @default(cuid())
-  title        String // 如 "高级前端工程师 @ 某公司"
-  subtitle     String? // 如 "核心业务组"
-  description  String?      @db.Text // Markdown
-  type         TimelineType
-  organization String?
-  location     String?
-  startDate    DateTime
-  endDate      DateTime? // null = 至今
-  isCurrent    Boolean      @default(false)
-  logo         String?
-  tags         String[]     @default([])
-  highlights   String[]     @default([]) // 关键成果 bullets
-  order        Int          @default(0)
-  visible      Boolean      @default(true) // 是否在「时间戳」页显示
-  showOnAbout  Boolean      @default(true) // 是否在「关于我」页显示
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id             String        @id @default(cuid())
+  title          String // 如 "高级前端工程师 @ 某公司"
+  subtitle       String? // 如 "核心业务组"
+  description    String?       @db.Text // Markdown
+  type           TimelineType
+  organization   String?
+  location       String?
+  startDate      DateTime
+  endDate        DateTime? // null = 至今
+  isCurrent      Boolean       @default(false)
+  startPrecision DatePrecision @default(MONTH)
+  endPrecision   DatePrecision @default(MONTH)
+  revision       Int           @default(1)
+  logo           String?
+  tags           String[]      @default([])
+  highlights     String[]      @default([]) // 关键成果 bullets
+  order          Int           @default(0)
+  visible        Boolean       @default(true) // 是否在「时间戳」页显示
+  showOnAbout    Boolean       @default(true) // 是否在「关于我」页显示
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
 
   @@index([type, startDate(sort: Desc)])
   @@index([visible, startDate(sort: Desc)])
@@ -372,6 +425,7 @@ model Profile {
   resumeUrl      String?
   contactVisible Boolean   @default(true) // 是否公开联系方式
   updatedAt      DateTime  @updatedAt
+  revision       Int       @default(1)
 
   @@map("profiles")
 }
@@ -403,7 +457,7 @@ model Media {
 }
 
 // ============================================================
-//  统计（二期）
+//  一期仪表盘与公开页面统计
 // ============================================================
 
 /// 页面访问按天聚合

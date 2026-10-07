@@ -14,62 +14,12 @@ import { PrismaClient, type Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 import { MODULE_KEYS, MODULE_REGISTRY } from '../src/config/modules'
+import { DEFAULT_MOTION } from '../src/config/motion'
 
 const prisma = new PrismaClient()
 
-/** 动效默认配置 —— breath（呼吸渐变）预设，见 docs/08-motion-system.md §5 */
-const MOTION_CONFIG: Prisma.InputJsonValue = {
-  version: 1,
-  preset: 'breath',
-  intensity: 'standard',
-  respectReducedMotion: true,
-  mobileIntensity: 'subtle',
-  autoDegrade: true,
-  background: {
-    enabled: true,
-    type: 'gradient-flow',
-    scope: 'home',
-    angle: 135,
-    speed: 36,
-    blur: 90,
-    opacity: 0.3,
-    noiseOverlay: true,
-    parallax: false,
-    light: { colors: ['#6366F1', '#A855F7', '#EC4899'] },
-    dark: { colors: ['#1E1B4B', '#4C1D95', '#0F172A'] },
-  },
-  interaction: {
-    cardHover: 'lift',
-    buttonHover: 'color',
-    linkHover: 'underline',
-    imageHover: 'zoom',
-    navIndicator: 'slide',
-    cursor: 'none',
-    magneticButtons: false,
-  },
-  reveal: {
-    enabled: true,
-    type: 'fade-up',
-    range: 0.4,
-    duration: 600,
-    stagger: 80,
-    easing: 'ease-out',
-  },
-  text: { heroType: 'none', countUp: false, gradientHeadings: false },
-  micro: {
-    themeTransition: 'fade',
-    copyFeedback: 'check',
-    pageTransition: 'fade',
-    scrollProgress: true,
-  },
-  performance: {
-    maxParticles: 60,
-    fpsGuard: true,
-    degradeBelowFps: 45,
-    pauseWhenHidden: true,
-    disableOnBattery: false,
-  },
-}
+/** 新版编排默认无装饰，seed 不覆盖后台已有配置。 */
+const MOTION_CONFIG = DEFAULT_MOTION as Prisma.InputJsonValue
 
 const SETTINGS: { key: string; value: Prisma.InputJsonValue; group: string; label: string }[] = [
   { key: 'site.name', value: 'Puly 的站', group: 'general', label: '站点名称' },
@@ -150,6 +100,11 @@ async function seedAdmin() {
   const email = process.env.SEED_ADMIN_EMAIL ?? 'admin@example.com'
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'ChangeMe123'
   const name = process.env.SEED_ADMIN_NAME ?? 'Puly'
+  if (
+    process.env.NODE_ENV === 'production' &&
+    (!process.env.SEED_ADMIN_PASSWORD || password === 'ChangeMe123')
+  )
+    throw new Error('生产 seed 必须提供独立管理员密码')
 
   const passwordHash = await bcrypt.hash(password, 12)
 
@@ -350,7 +305,7 @@ async function seedContent(authorId: string) {
 
   for (const l of logs) {
     const exists = await prisma.log.findFirst({ where: { title: l.title } })
-    if (!exists) await prisma.log.create({ data: { ...l, authorId } })
+    if (!exists) await prisma.log.create({ data: { ...l, authorId, publishedAt: l.logDate } })
   }
 
   const projects: Prisma.ProjectCreateInput[] = [
@@ -388,7 +343,11 @@ async function seedContent(authorId: string) {
   ]
 
   for (const p of projects) {
-    await prisma.project.upsert({ where: { slug: p.slug }, update: {}, create: p })
+    await prisma.project.upsert({
+      where: { slug: p.slug },
+      update: {},
+      create: { ...p, publishedAt: p.startDate ?? new Date() },
+    })
   }
   console.log(
     `  ✓ Article × ${articles.length} · Log × ${logs.length} · Project × ${projects.length}`,

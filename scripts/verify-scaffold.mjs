@@ -253,7 +253,7 @@ const localKeys = new Set()
 for (const m of localTxt.matchAll(/^([A-Z][A-Z0-9_]*)=/gm)) localKeys.add(m[1])
 
 const notDocumented = [...envKeys].filter((k) => !exampleKeys.has(k))
-const notInLocal = [...envKeys].filter((k) => !localKeys.has(k))
+const notInLocal = [...envKeys].filter((k) => !localKeys.has(k) && !process.env[k])
 
 for (const k of notDocumented) problems.push(`[F] ${k} 在 env.ts 里要求，但 .env.example 没写`)
 for (const k of notInLocal) {

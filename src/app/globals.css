@@ -23,7 +23,7 @@
   --popover: #ffffff;
   --popover-foreground: #0a0a0a;
 
-  --primary: #6366f1;
+  --primary: #4f46e5;
   --primary-foreground: #ffffff;
 
   --secondary: #f4f4f5;
@@ -36,7 +36,7 @@
   --accent: #f4f4f5;
   --accent-foreground: #18181b;
 
-  --destructive: #ef4444;
+  --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
 
   --border: #e5e7eb;
@@ -46,7 +46,7 @@
   --radius: 12px;
 
   /* ---- 项目扩展令牌 ---- */
-  --brand: #6366f1;
+  --brand: #4f46e5;
   --brand-hover: #4f46e5;
   --brand-soft: #eef2ff;
   --brand-border: #c7d2fe;
@@ -54,7 +54,7 @@
   --surface: #ffffff;
   --surface-subtle: #fafafa;
   --border-strong: #d4d4d8;
-  --fg-subtle: #a1a1aa;
+  --fg-subtle: #71717a;
 
   /* 内容类型配色（时间戳 / 作品集 / 日志） */
   --type-work: #3b82f6;
@@ -93,7 +93,7 @@
   --accent: #18181b;
   --accent-foreground: #fafafa;
 
-  --destructive: #ef4444;
+  --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
 
   --border: #27272a;
@@ -108,7 +108,7 @@
   --surface: #121215;
   --surface-subtle: #111113;
   --border-strong: #3f3f46;
-  --fg-subtle: #71717a;
+  --fg-subtle: #a1a1aa;
 }
 
 /* ============================================================================

@@ -24,13 +24,13 @@
 | `/tags` | 标签云（可选） | ISR | 3600s | — |
 | `/404` (`not-found.tsx`) | 未找到 | Static | — | — |
 | `/error.tsx` | 错误 | Static | — | — |
-| `/sitemap.xml` | 站点地图 | Dynamic | 3600s | — |
-| `/rss.xml` | RSS 订阅 | Dynamic | 3600s | — |
+| `/sitemap.xml` | 站点地图 | Dynamic | no-store | — |
+| `/rss.xml` | RSS 订阅 | Dynamic | no-store | — |
 | `/robots.txt` | 爬虫规则 | Static | — | — |
-| `/manifest.webmanifest` | PWA 清单 | Static | — | — |
+| `/manifest.webmanifest` | PWA清单（二期，一期不实现） | 二期 | — | — |
 | `/api/health` | 健康检查 | Dynamic | no-store | — |
 
-**路由与模块绑定**：`(site)/logs/**` 全部归属 `log` 模块。该模块被关闭时，`logs/layout.tsx` 调用 `notFound()`，整棵子树 404。
+**动态路由绑定**：表中路径为默认当前路径，Module.route可改；Node middleware按当前路径分发，RouteAlias全部历史路径301直达新路径，保留详情后缀和query，metadata/sitemap/RSS/搜索统一当前路径。service校验开关，关闭当前/别名详情均不可绕过。保存后5秒指新请求，已有/预取页面刷新。
 
 ### 模块关闭时的路由行为
 
@@ -49,7 +49,7 @@
 ## 2. 三端断点定义
 
 ```ts
-// tailwind.config.ts → theme.screens
+// Tailwind v4：src/app/globals.css @theme定义断点（示意）
 {
   xs:  '380px',   // 小屏手机（iPhone SE）
   sm:  '640px',   // 大屏手机横屏 / 小平板竖屏
@@ -69,7 +69,7 @@
 | **列表布局** | 单列卡片 | 双列网格 | 文章单列 / 作品三列 / 日志双列 |
 | **文章详情** | 单栏，目录折叠为顶部分段导航 | 单栏 + 抽屉 TOC | **双栏**：正文 + 右侧 sticky TOC |
 | **作品详情** | 图集横向滑动 + 信息纵向堆叠 | 图集网格 + 信息两栏 | 左图右信息（sticky） |
-| **时间轴** | 左侧单线，内容右对齐 | 中线对称（左右交替） | 中线对称 + 年份吸附 |
+| **时间轴** | 左侧单线，内容右对齐 | 左侧单线、单列 | 中线对称 + 年份吸附 |
 | **关于我** | 全部分区纵向堆叠，技能用进度条 | 优势 2 列，技能 2 列 | 优势 3 列，技能 2 列 + 经历侧栏 |
 | **页脚** | 精简（版权 + 社交图标） | 两栏 | 三栏（简介 / 导航 / 社交） |
 | **搜索** | 全屏浮层 | 全屏浮层 | 顶部下拉面板 |
@@ -594,7 +594,7 @@
 
 **区块受 `about.config.sections` 控制**：`advantages` / `skills` / `experience` / `contact` 各自可独立关闭。
 **`experience` 区块的特殊依赖**：当 `timeline` 模块被关闭时，此区块一并隐藏（数据同源）。
-**`contactVisible = false`** 时，「联系我」区块不显示邮箱与电话，只保留社交链接。
+**`contactVisible = false`** 时，「联系我」区块不显示邮箱与电话，只保留不含mailto/tel或公开邮箱电话的社交链接；公共DTO、首页页脚及JSON-LD统一过滤。
 
 **移动端**：优势卡片单列；技能用紧凑条形图（名字 + 条 + 年限压缩到一行）；经历区块只显示最近 2 条 + 「查看完整时间轴」。
 
@@ -716,10 +716,6 @@ layout.tsx (site)
 └── motion/                 ← 动效运行时（默认不加载任何重动效）
     ├── MotionRuntime       ← 客户端调度器，按配置与设备能力决定加载什么
     ├── Reveal              ← 入场动画降级实现（CSS animation-timeline 不支持时）
-    ├── Particles           ← Canvas 粒子（仅 particles/stars 预设 + 设备达标）
-    ├── CursorGlow          ← 光标光晕（触屏自动禁用）
-    ├── Parallax / Magnetic ← 视差 / 磁吸
-    ├── CountUp             ← 数字滚动
     └── MotionPreferenceToggle  ← 页脚的三档访客开关
 
 模块组件 (components/site)
@@ -813,83 +809,11 @@ layout.tsx (site)
 
 ---
 
-## 7.1 动效层（Motion Layer）
+## 7.1 动效层（一期version2）
+站点layout是根html/body内部容器，不重复输出html/body。服务端取得08合法配置并在站点容器注入强度/装饰/交互属性；默认editorial+none，只允许none/tint静态装饰。首屏Hero全部CSS，首屏正文可读；离屏区块按需MotionRuntime，卸载清理。后台普通页不加载，动效预览页按需使用同一运行时。
 
-动效是**跨所有页面的横切能力**，由后台 `Setting.motion.config` 配置，完整设计见 [08-motion-system.md](08-motion-system.md)。这里只说明它在前台信息架构中的位置。
+系统reduce最高优先，移动按mobileIntensity；访客关闭立即生效，完整档不能覆盖系统偏好。无连续背景/Canvas/光标。字段及合法值见08，不下发预设工具。JS失败/关闭不能隐藏内容。
 
-### 注入位置
-
-```tsx
-// app/(site)/layout.tsx  (Server Component)
-const motion = await settingService.getMotionConfig()
-
-return (
-  <html
-    lang="zh-CN"
-    data-motion={motion.intensity}
-    data-motion-bg={motion.background.enabled ? motion.background.type : 'none'}
-    data-motion-bg-scope={motion.background.scope}
-    data-motion-card={motion.interaction.cardHover}
-    data-motion-btn={motion.interaction.buttonHover}
-    data-motion-reveal={motion.reveal.enabled ? motion.reveal.type : 'none'}
-    data-motion-cursor={motion.interaction.cursor}
-    style={buildMotionCssVars(motion)}     // --motion-bg-speed / --motion-bg-c1 …
-  >
-    <body>
-      {children}
-      <MotionRuntime config={motion} />    {/* 默认不加载任何重动效 */}
-    </body>
-  </html>
-)
-```
-
-**要点**：动效在 **SSR 阶段**就确定并写进 HTML。首屏 HTML 一到，CSS 动画立即开始 —— 无 FOUC、无客户端配置请求、不依赖 hydration。
-
-### 背景动效层的作用范围
-
-| `scope` | 行为 |
-|---|---|
-| `home` | 只在 `/` 渲染背景动效层（**默认，最省性能**） |
-| `site` | 全站（含文章详情等长文页）都渲染 |
-| `none` | 不渲染 |
-
-背景层实现为 `position: fixed; inset: -20%; z-index: -1; pointer-events: none`，**不占文档流、不参与首屏关键路径、不遮挡任何可点击元素**。
-
-### 各页面对动效的响应
-
-| 页面 | 背景层 | 入场动画 | 悬停 | 备注 |
-|---|:--:|:--:|:--:|---|
-| 首页 | ✅（默认唯一开启处） | ✅ 区块级 stagger | ✅ 卡片 lift | 动效主舞台 |
-| 列表页（日志/文章/作品集） | 继承 `scope` 设置 | ✅ 列表项 stagger | ✅ 卡片 | |
-| 详情页（文章/日志/作品） | 继承 `scope` 设置 | ❌ **首屏正文不做入场**（保护 LCP 观感） | ✅ 图片 zoom | 正文可读性优先 |
-| 时间戳 | 继承 | ✅ 时间轴条目逐条浮现 | ✅ | 逐条浮现与"时间流动"语义契合 |
-| 关于我 | 继承 | ✅ 技能条进入视口时填充 | ✅ | 技能条动画属于内容本身，见 [06 §5.5](06-modules.md) |
-| 搜索 / 404 | 继承 | ❌ | ✅ | 结果页不做入场，避免闪烁 |
-| 登录页（后台） | ❌ 后台不加载任何站点动效 | ❌ | 最小 | 后台优先效率与稳定 |
-
-### 强制排除
-
-以下情况**无论后台怎么配都不生效**：
-
-1. `prefers-reduced-motion: reduce` → 全局关闭
-2. 移动端 `< 768px` → 降档到 `mobileIntensity`，重动效不加载
-3. 后台 `/admin/**` → 完全不加载（后台要的是效率，不是好看）
-4. 页面不在前台（`visibilitychange: hidden`）→ 暂停所有 rAF 与 Canvas 绘制
-5. 首屏 above-the-fold 内容 → 不做入场动画
-
-### 页脚的访客开关
-
-页脚放一个极小的图标按钮（`✨`），点击在三档间循环：**跟随系统 → 完整动效 → 关闭动效**，状态写 `localStorage`。
-
-```
-┌───────────────────────────────────────────────────────────────┐
-│  © 2025 Puly · 京ICP备xxx号          GitHub · 掘金 · RSS  [✨] │
-└───────────────────────────────────────────────────────────────┘
-```
-
-这是给访客的最终兜底，也满足 WCAG 2.2.2（暂停/停止/隐藏）。默认「跟随系统」时按钮为半透明，用户主动选择后变为实心。
-
----
 
 ## 8. 可访问性（A11y）
 
@@ -935,12 +859,12 @@ return (
 
 ---
 
-## 10. PWA 与离线（可选，M6）
+## 10. PWA 与离线（二期，一期不实现）
 
 - `manifest.webmanifest`：名称、图标（192/512）、主题色、`display: standalone`
 - 添加到主屏幕后启动图与实际站点一致
 - Service Worker 仅缓存静态资源与已访问页面（**不缓存 API**，避免后台数据陈旧）
-- 一期可以只做 manifest，不做 SW
+- manifest、安装入口、离线及Service Worker均属二期；一期不输出PWA manifest或安装入口
 
 ---
 
@@ -949,3 +873,6 @@ return (
 - 各模块的详细字段与交互 → [06-modules.md](06-modules.md)
 - 前台数据的来源接口 → [03-api-spec.md](03-api-spec.md)
 - 模块开关如何改变本页 → [04-admin-console.md §3](04-admin-console.md)
+
+## 一期响应式验收补充
+移动首页作品采用横向轨道（可触摸滚动、键盘可达，不造成页面横向溢出）；平板时间线单列，桌面中轴；桌面Logo链接回首页；移动首页底部导航文字对比度≥4.5:1。公共内容统一发布时间/软删除过滤，preview24h且no-store/noindex。

@@ -88,7 +88,7 @@
 |---|---|---|
 | **Next.js 15 App Router** | 前台要 SEO（RSC/SSR/ISR），后台要复杂交互（CSR），同一框架两种模式零成本混用；Route Handlers 直接充当 API 层，省掉一个后端服务与一套部署 | 心智负担：必须分清 Server / Client Component 边界 |
 | **RSC 直连 service 读数据** | 首屏零客户端请求瀑布，数据在服务端拿到就渲染；SEO 友好 | 不能用浏览器 API，调试链路稍长 |
-| **Prisma** | 类型安全、迁移工具成熟、`Json`/`enum`/数组支持好、单 schema 同时适配 SQLite/Postgres | 复杂查询（全文检索、聚合）会退化到 `$queryRaw` |
+| **Prisma** | 类型安全、迁移工具成熟、`Json`/`enum`/数组支持好；开发生产统一PostgreSQL | 复杂查询（全文检索、聚合）会退化到 `$queryRaw` |
 | **PostgreSQL** | `enum`、`String[]`、`JsonB`、GIN 索引、`tsvector` 全文检索，一条 `to_tsvector` 搞定站内搜索 | 比 SQLite 多一个进程（Docker 一行解决） |
 | **JWT（自建）** | 无三方依赖、可主动撤销（refresh 存库）、Cookie 方案天然防 XSS 读取 | 需要自己写轮转与撤销逻辑（设计已给出） |
 | **Tailwind v4 + shadcn/ui** | 三端响应式靠断点前缀天然表达；组件源码内联，可随意改；无运行时 CSS-in-JS 开销 | 类名较长，需团队约定抽取粒度 |
@@ -106,7 +106,7 @@
 
 | 路由 | 模式 | revalidate / 失效方式 | 说明 |
 |---|---|---|---|
-| `/` 首页 | ISR | 300s + `revalidateTag('content')` | 聚合页，允许最长 5 分钟延迟 |
+| `/` 首页 | ISR | 300s + `revalidateTag('content')` | 事件失效保证保存后5秒内新请求更新；300s TTL仅兜底，不放宽SLA |
 | `/logs` `/logs/[id]` | ISR | 600s + `revalidateTag('log')` | 日志更新频率低 |
 | `/articles` | ISR | 600s + `revalidateTag('article')` | |
 | `/articles/[slug]` | ISR + `generateStaticParams` | 发布会 `revalidateTag('article')` | 已发布文章预渲染 |
@@ -115,9 +115,9 @@
 | `/about` | ISR | 3600s + `revalidateTag('profile')` | |
 | `/search` | Dynamic（`?q=`） | 不缓存 | 依赖查询参数 |
 | `/admin/**` | Dynamic + `no-store` | — | 必须实时，且不可被 CDN 缓存 |
-| `/api/v1/**`（公开） | `s-maxage=60, stale-while-revalidate=300` | tag 失效 | GET 可 CDN 缓存 |
+| `/api/v1/**`（公开） | `no-store`（一期公开接口） | tag 失效 | 不叠加CDN缓存，保证开关合同 |
 | `/api/v1/admin/**` | `no-store` | — | |
-| `sitemap.xml` / `rss.xml` | Dynamic（revalidate 3600） | tag 失效 | |
+| `sitemap.xml` / `rss.xml` | Dynamic + no-store | 每次请求读取公共边界 | |
 
 ### 缓存失效链路
 
@@ -130,7 +130,7 @@
 客户端 TanStack Query invalidateQueries(['admin','articles'])
 ```
 
-**统一在 service 层调用 `revalidateTag`**，而不是散落在各个路由里 —— 这样无论从 API、Server Action 还是脚本触发，缓存都一定失效。
+service写库事务返回失效事件，由Next适配层执行revalidateTag；脚本通过受鉴权重验证入口处理，不能假设处于Next请求上下文。保存后5秒仅指新请求，已打开/预取页面需主动刷新。模块/设置公开读取no-store，避免CDN再叠加失效窗口；时间线同时失效profile/content，Profile失效content，分类/标签失效article/content，发布失效RSS/sitemap。
 
 ### 缓存 tag 命名表
 
@@ -157,13 +157,13 @@
   → 未命中：Node Runtime 执行 RSC
       → articleService.getBySlug(slug)
           → 校验模块开关（Module.enabled），关闭则 notFound()
-          → prisma.article.findFirst({ where: { slug, status: 'PUBLISHED' } })
+          → prisma.article.findFirst({ where: { slug, status: 'PUBLISHED', publishedAt: { lte: new Date() }, deletedAt: null } })
           → 组装 DTO（含 tags / category / 上下篇 / 相关文章）
       → 渲染 HTML + RSC Payload → 写入 ISR 缓存
   → 浏览器逐步注水（Hydration），仅交互岛需要 JS
 ```
 
-**收益**：文章详情页首屏 JS 体积可控制在 ~90KB（gzip），无客户端数据请求。
+**收益**：文章详情页首屏 JS 体积可控制在 ≤135KB（gzip，需实测），无客户端数据请求。
 
 ### 5.2 后台写入（客户端 → API）
 
@@ -196,71 +196,18 @@
 
 ## 6. 鉴权与会话
 
-### 6.1 Token 策略
+### 6.1 Token与会话
+AT为HS256 JWT，15分钟，载荷包含sub/sid/role/name/iat/exp。httpOnly at Cookie，Secure（生产）、SameSite=Lax、Path=/。RT随机32字节、哈希入Session、7天；httpOnly rt，SameSite=Strict、Path=/api/v1/auth。
 
-| | Access Token | Refresh Token |
-|---|---|---|
-| 格式 | JWT (HS256) | 随机 32 字节，**哈希后**入库 |
-| 有效期 | 15 分钟 | 7 天（滑动续期） |
-| 存储 | httpOnly Cookie `at`，`Secure`，`SameSite=Lax`，`Path=/` | httpOnly Cookie `rt`，`Secure`，`SameSite=Strict`，`Path=/api/v1/auth` |
-| 载荷 | `{ sub, role, name, iat, exp }`（**不含敏感信息**） | 仅作查库索引 |
-| 撤销 | 无法单独撤销（靠短过期） | `Session.revokedAt` 置位即失效 |
-| 轮转 | — | 每次刷新签发新 RT 并作废旧的（检测重放） |
+AT并非仅靠短过期撤销：每次管理数据访问在service校验sid对应会话未撤销/过期且用户存在、isActive=true；权限从当前用户读取。Session具有rotatedAt/successorId/rotationReply（加密后继凭证）支持轮转。
 
-### 6.2 登录 / 刷新时序
+### 6.2 登录与原子刷新
+登录按IP/email双维度共享PostgreSQL限流，失败统一信息。刷新在事务中锁定/条件更新旧Session并建立后继；首次轮转写rotatedAt和successorId，10秒内重复旧RT返回同一加密保存的后继凭证，避免多标签误判。超过宽限旧RT重放撤销该用户全部会话并审计。加密回复只保留宽限所需时间且不得日志输出。登出/停用/改密码按会话撤销合同执行。
 
-```
-POST /api/v1/auth/login  { email, password }
-  → 限流检查（IP + email，5 次 / 15 分钟）
-  → 查 User，argon2.verify(passwordHash)
-  → 失败：统一返回 "邮箱或密码错误"（不泄露账号是否存在），并记 AuditLog
-  → 成功：
-      签发 AT（15m）
-      创建 Session（RT hash, UA, IP, expiresAt=+7d）
-      Set-Cookie: at=...; rt=...
-      更新 User.lastLoginAt，写 AuditLog(action='login')
-  → 200 { user: { id, name, role } }
+### 6.3 Node runtime middleware与权威授权
+Next.js15.5配置middleware的runtime为nodejs；入口校验、动态栏目分发和UX重定向可使用Node能力，但不取代service授权。ADMIN、EDITOR、VIEWER均可进入其授权后台，不能入口统一拒绝VIEWER。每个RSC/REST/Server Action/脚本数据入口复用service权限检查。AT过期页面保留安全站内next，进入静默刷新恢复流程；API401由客户端刷新后最多重试一次，草稿不丢失。所有写请求验证Origin。
 
-POST /api/v1/auth/refresh   （Cookie 自动携带 rt）
-  → 查 Session by hash，校验未过期且未撤销
-  → 命中已撤销的 RT → 判定为令牌重放 → 撤销该用户全部会话 + 告警
-  → 轮转：旧 Session.revokedAt=now，创建新 Session
-  → Set-Cookie: 新 at + 新 rt
-```
 
-### 6.3 路由保护（⚠️ 易踩的坑）
-
-Next.js `middleware.ts` 运行在 **Edge Runtime**，**不能使用 Prisma**。因此**绝不能**在 middleware 里查库校验会话。
-
-正确做法分两层：
-
-**第一层 · middleware（Edge，只做廉价判断）**
-```ts
-// 伪代码
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl
-  if (pathname.startsWith('/admin')) {
-    const at = req.cookies.get('at')?.value
-    if (!at) return redirect('/login?next=' + pathname)
-    try {
-      const payload = await verifyJwt(at, secret)   // jose 可在 Edge 运行
-      if (payload.role !== 'ADMIN' && payload.role !== 'EDITOR') return redirect('/403')
-    } catch {
-      return redirect('/login?next=' + pathname)     // 过期 → 前端用 rt 静默刷新
-    }
-  }
-  if (pathname.startsWith('/api/v1/admin')) {
-    // 同理校验 AT，失败返回 401 JSON（让客户端去 refresh 后重试）
-  }
-}
-```
-> Edge 只验证签名与过期，**不做数据库查询**。
-
-**第二层 · 服务端二次校验（Node Runtime，权威）**
-- `app/(admin)/admin/layout.tsx` 中调用 `getCurrentUser()`，查库确认用户仍存在且 `isActive`；
-- **每个 `/api/v1/admin/*` Route Handler 内部**再 `requireRole()` 一次。
-
-> **安全原则**：middleware 只是 UX 优化的重定向，**真正的授权必须在数据入口处**。任何只依赖 middleware 的保护都视为不存在。
 
 ### 6.4 RBAC 权限矩阵
 
@@ -295,7 +242,7 @@ model Module {
   navLabel   String?            // 导航文案，为空则用 name
   navOrder   Int      @default(0)
   icon       String?
-  route      String             // /logs（可改）
+  route      String   @unique   // 当前栏目路径（可改）
   config     Json?              // 模块级配置，见下表
   updatedAt  DateTime @updatedAt
 }
@@ -326,12 +273,12 @@ model Module {
   "groupByYear": true,                  // timeline：是否按年份分组
   "direction": "desc",                  // timeline：desc 最新在上 | asc 最早在上
   "sections": {                         // about：区块级开关
-    "advantages": true, "skills": true, "experience": true, "contact": true
+    "bio": true, "advantages": true, "skills": true, "experience": true, "services": true, "contact": true
   }
 }
 ```
 
-> **`config` 的更新语义是浅合并**（`{...old, ...new}`），不是整体替换 —— 否则前台改一个 `pageSize` 会把 `types` 里的子类型开关全冲掉。见 [03-api-spec.md §5.3](03-api-spec.md)。
+> **配置PATCH**：已知嵌套键按层合并，数组整体替换，可空字段null清空；严格拒绝未知键及危险对象键，合并后重新校验完整配置。见03 §5.3。
 
 ### 第 2 层 · 路由层：关闭即不可达
 
@@ -368,7 +315,7 @@ if (!mod.enabled) notFound()
 
 | 位置 | 关闭前 | 关闭后 |
 |---|---|---|
-| 顶部导航 / 移动 Tab Bar | 显示「日志」 | 消失（`navVisible` 也需为 false） |
+| 顶部导航 / 移动 Tab Bar | 显示「日志」 | 消失（`enabled=false自动过滤，无需改navVisible） |
 | 首页日志卡片区 | 显示最新 5 条 | 整块移除，相邻区块上移 |
 | `/logs` 及 `/logs/[id]` | 200 | 404 |
 | `/api/v1/logs` | 200 + 数据 | 200 + 空数组（避免前端报错） |
@@ -381,27 +328,11 @@ if (!mod.enabled) notFound()
 
 ---
 
-## 8. 文件存储抽象
+## 8. 文件存储与上传
+本地LocalDriver仅开发环境；生产R2Driver隔离bucket/prefix与密钥，生产禁止写应用public目录。开发POST /api/v1/admin/media/upload接收multipart；生产POST /api/v1/admin/media/upload-intent申请私有临时key和限时直传凭证，浏览器直传R2，POST /api/v1/admin/media/confirm确认。
 
-```ts
-// lib/storage/types.ts
-export interface StorageDriver {
-  put(file: { buffer: Buffer; filename: string; mimeType: string }): Promise<{ url: string; key: string }>
-  delete(key: string): Promise<void>
-  url(key: string): string
-}
-```
+confirm必须核验用户归属、对象magic/真实MIME、实际大小、sha256和对象key，SVG需清洗/安全规则；通过后登记Media和公开URL，失败不公开并清理临时对象。图片10MB、视频50MB、文档20MB；生产文件不经过Vercel函数大请求体。删除前扫描所有正文、封面、图集、Profile与Setting引用，引用中拒绝删除。
 
-| 实现 | 触发条件 | 说明 |
-|---|---|---|
-| `LocalDriver` | `STORAGE_DRIVER=local`（默认，开发） | 写入 `public/uploads/`，直接由 Next 静态服务 |
-| `S3Driver` | `STORAGE_DRIVER=s3`（生产） | 兼容 Cloudflare R2 / 阿里云 OSS / AWS S3，`forcePathStyle` 适配 |
-
-上传流程：`客户端选择文件 → POST /api/v1/admin/media/upload (multipart) → 校验类型与大小 → 计算 sha256 去重 → driver.put() → 写 Media 表 → 返回 url`。
-
-限制：单文件 ≤ 10MB（图片）/ 50MB（视频）；允许 `image/*`、`video/mp4`、`application/pdf`。
-
----
 
 ## 9. 安全清单
 
@@ -417,7 +348,7 @@ export interface StorageDriver {
 | 依赖漏洞 | `npm audit` + Dependabot；锁定 lockfile |
 | 敏感信息泄露 | 环境变量只走 `.env`（`.env` 入 `.gitignore`）；客户端代码禁止 import `lib/env.server.ts` |
 | 后台被爬 | `/admin` 加 `X-Robots-Tag: noindex`；`robots.txt` Disallow |
-| 数据丢失 | 每日 `pg_dump` 到对象存储，保留 30 天；导出 JSON 兜底 |
+| 数据丢失 | 托管数据库备份或独立任务运行pg_dump，另备份媒体并演练恢复；JSON不是完整备份 |
 
 ### 安全响应头
 
@@ -440,14 +371,14 @@ Content-Security-Policy: default-src 'self'; img-src 'self' data: https:; script
 | LCP | ≤ 2.0s（4G） | ≤ 1.2s |
 | INP | ≤ 150ms | ≤ 100ms |
 | CLS | ≤ 0.05 | ≤ 0.05 |
-| 首屏 JS（文章详情） | ≤ 110KB gzip | 同 |
-| 首屏 JS（后台登录页） | ≤ 80KB gzip | 同 |
-| **动效相关 JS** | **≤ 25KB gzip**，默认配置下为 **0** | 同 |
+| 首屏 JS（文章详情） | ≤ 135KB gzip | 同 |
+| 首屏 JS（后台登录页） | ≤ 110KB gzip | 同 |
+| **动效相关 JS** | **≤ 28KB gzip**，static关闭时不下载库 | 同 |
 | 单页图片总重 | ≤ 800KB | ≤ 1.5MB |
 | Lighthouse Performance | ≥ 90 | ≥ 95 |
 | Lighthouse A11y / Best Practices / SEO | ≥ 95 | ≥ 100 |
 
-> **动效预算单列一行**，因为它最容易失控：一个"顺手引入 Framer Motion 全家桶"就能吃掉全部预算。约束方式见 [08-motion-system.md §6](08-motion-system.md) —— 90% 的动效走纯 CSS（0 KB），重动效延迟加载且移动端不下载。CI 中构建后校验 chunk 体积，超过 25KB 直接失败。
+> **动效预算单列一行**，因为它最容易失控：一个"顺手引入 Framer Motion 全家桶"就能吃掉全部预算。约束方式见 [08-motion-system.md §6](08-motion-system.md) —— 首屏CSS，离屏编排按需加载，移动降档，关闭时不下载库。CI 中构建后校验 chunk 体积，超过 28KB 直接失败。
 
 落地手段：`next/image` 自动 AVIF/WebP + 响应式 `sizes`；`next/font` 自托管子集化字体（`display: swap`）；路由级 `dynamic(() => ..., { ssr: false })` 隔离重组件（编辑器、图表）；`(site)` 与 `(admin)` 各自独立 layout，后台代码不进前台 bundle。
 
@@ -462,7 +393,8 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 # ---- 数据库 ----
 DATABASE_URL="postgresql://user:pass@localhost:5432/personal_site?schema=public"
-# SQLite 降级：file:./dev.db
+# 测试独立URL，库名必须_test后缀
+TEST_DATABASE_URL="postgresql://dev:dev@localhost:5432/personal_site_test?schema=public"
 
 # ---- 鉴权（生产必须替换，用 openssl rand -base64 48 生成）----
 JWT_SECRET=
@@ -497,12 +429,12 @@ REVALIDATE_SECRET=                   # 用于外部触发 /api/revalidate
 
 ```
 GitHub  main 分支 push
-   → Vercel 自动构建（Node 20）
+   → Vercel构建（Node24+，与本地基线一致）
    → Preview 部署（PR）/ Production 部署（main）
    → Edge CDN 全球分发
 数据库   Neon Postgres（Serverless，免费额度 0.5GB 存储）
 存储     Cloudflare R2（免费 10GB + 零出口费）
-定时任务 Vercel Cron → /api/cron/backup（每日 pg_dump）
+定时任务 外部分钟调度 → 受鉴权发布任务；备份用托管能力或独立任务环境
 域名     Vercel Domains + 自动 Let's Encrypt
 ```
 **优点**：零运维、自动 HTTPS/CDN/预览环境。**代价**：绑定平台，Serverless 冷启动。
@@ -511,7 +443,7 @@ GitHub  main 分支 push
 
 ```
 Nginx（TLS 终止 + 反向代理 + gzip/brotli）
-  → Next.js standalone 容器（Docker, node:20-alpine）
+  → Next.js standalone 容器（Docker, node:24-alpine）
   → Postgres 容器（挂载卷）
   → MinIO 或本地磁盘存文件
 Certbot 自动续期 · docker compose 一键起停
@@ -546,3 +478,8 @@ lint → typecheck → unit test → build → e2e smoke → migrate deploy → 
 - 接口契约 → [03-api-spec.md](03-api-spec.md)
 - 后台交互设计 → [04-admin-console.md](04-admin-console.md)
 - 前台页面与响应式 → [05-frontend-ia.md](05-frontend-ia.md)
+
+## 一期动态路由与公开边界
+公开查询统一检查模块及子类型开关、status=PUBLISHED、publishedAt<=now、deletedAt=null；所有首页/feed/详情/搜索/RSS/sitemap使用相同公开过滤器。
+
+Module.route数据库唯一。Node middleware运行时分发当前路径；RouteAlias永久保留历史路径，301直达当前路径，保留详情后缀/query；拒绝保留路径和子路径、模块路径嵌套、别名抢占/循环。关闭模块的历史地址也不可绕过开关。分钟调度触发到期发布和关联缓存失效。

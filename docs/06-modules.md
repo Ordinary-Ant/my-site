@@ -356,7 +356,7 @@
 | `organization` | 公司/学校/主办方 |
 | `location` | 城市 |
 | `startDate` / `endDate` | `endDate = null` 表示"至今" |
-| `isCurrent` | 前台显示脉动圆点 + 置顶 |
+| `isCurrent` | 前台显示静态高亮圆点 + 置顶 |
 | `highlights` | 关键成果 bullets |
 | `description` | Markdown 详述（"为什么做这个选择"写这里） |
 | `tags` | 技术栈或关键词 |
@@ -370,7 +370,7 @@
 1. isCurrent DESC     —— "至今"的条目永远最前
 2. startDate DESC     —— 时间倒序（最新的在上）
 3. order ASC          —— 同起始时间时按手动权重
-4. createdAt ASC      —— 最后的稳定兜底
+4. id ASC             —— 最后的稳定兜底
 ```
 
 > **注意反向时间轴的选择**：倒序（最新在上）适合求职场景 —— 招聘方最关心你最近在做什么。若想讲成长故事，可在后台配置 `config.direction = 'asc'`。
@@ -381,8 +381,8 @@
 |---|---|
 | 类型筛选 | `[全部] [工作] [教育] [项目] [荣誉] [里程碑]`，写进 URL |
 | 年份分组 | `════ 2023 ════` 分隔，PC 端右侧年份锚点可快速跳转 |
-| 中轴布局 | PC/平板：奇偶左右交替；移动：左侧单线右对齐 |
-| 当前项 | 圆点脉动动画（`prefers-reduced-motion` 时静态） |
+| 中轴布局 | PC：奇偶左右交替；平板/移动：左侧单线单列 |
+| 当前项 | 静态高亮圆点（所有偏好均无循环动画） |
 | 展开详情 | `description` 长文默认折叠，点「展开」查看 |
 | 卡片点击 | 无独立详情页 —— 内容直接在时间轴上展开（**避免跳转打断叙事流**） |
 | 空类型 | 筛选后无结果时显示「该类型暂无记录」+ 重置按钮 |
@@ -417,7 +417,7 @@
 |---|---|
 | 教育经历与工作经历时间重叠（在职读研） | 允许；前台左右交替自然错开，不做冲突检测 |
 | 同公司多段经历（离职又回去） | 建两条独立记录，各自有起止时间 |
-| 只有年份没有月份 | 允许，`startDate` 用 `YYYY-01`，前台显示为「2023 年」 |
+| 只有年份没有月份 | 允许，日期落库规范化为YYYY-01-01并保存startPrecision=YEAR，前台显示「2023 年」；月份存MONTH，完整日期存DAY |
 | 时间区间倒置（end < start） | 后台表单校验阻止，`400 VALIDATION_ERROR` |
 | 条目过多（> 30） | 移动端默认折叠「更早的经历」，点击展开 |
 | `isCurrent` 有多条 | 允许，但后台给出警告提示（通常只应有一条） |
@@ -429,7 +429,7 @@
 
 ### 3.11 验收标准
 
-- [ ] 前台排序正确：`isCurrent` 在最前，其余按 `startDate` 倒序
+- [ ] 前台排序正确：isCurrent优先、日期按direction、同日期order升序、id稳定兜底；年/月/日精度不丢失
 - [ ] 修改一条时间戳后，「关于我」页的工作经历同步更新（验证单一数据源）
 - [ ] 移动端时间轴为单列右对齐（不是左右交替）
 - [ ] 关闭 `timeline` 模块后，`/timeline` 404 且关于我页经历区块隐藏
@@ -502,7 +502,7 @@
 **阅读量防刷**
 
 ```
-同 IP + 同 slug：30 分钟内只计一次（服务端内存/Redis 记录）
+同 IP + 同 slug：30 分钟内只计一次（共享PostgreSQL窗口记录）
 爬虫 UA：不计（匹配常见 bot UA 列表）
 Do Not Track 开启：不计
 ```
@@ -550,7 +550,7 @@ Do Not Track 开启：不计
 | 情况 | 处理 |
 |---|---|
 | slug 冲突 | 后台实时校验并建议 `-2` 后缀；接口返回 `409 CONFLICT` |
-| 草稿直链访问 | 404；提供带 `?preview=<token>` 的预览链接（token 有效期 24h） |
+| 草稿直链访问 | 404；提供`/preview/:token` 预览链接（token有效24h，no-store/noindex，不进入公开搜索/RSS/sitemap） |
 | 正文含大量图片 | 图片懒加载 + 模糊占位；首屏外的图片 `loading="lazy"` |
 | 代码块溢出 | 横向滚动容器，不撑破页面宽度 |
 | 中文标题生成 slug | 用 `pinyin` 库转拼音；也可纯用 `article-<id>` 兜底 |
@@ -655,7 +655,7 @@ Do Not Track 开启：不计
 | 交互 | 行为 |
 |---|---|
 | Hero 下载简历 | `resumeUrl` 直链下载；未设置时按钮不渲染 |
-| 联系我 | `contactVisible=false` 时只显示社交链接，不显示邮箱电话 |
+| 联系我 | `contactVisible=false` 时只显示非mailto/tel且不含公开邮箱电话的社交链接；公共DTO、首页、页脚、metadata及JSON-LD同步过滤 |
 | 技能条 | 进入视口时才有填充动画（`IntersectionObserver`），`reduced-motion` 时直接显示 |
 | 工作经历 | 只显示最近 2–3 条 + 「查看完整时间轴 →」跳 `/timeline` |
 | 优势卡片 | PC 3 列 / 平板 2 列 / 移动 1 列 |
@@ -686,7 +686,7 @@ Do Not Track 开启：不计
 | `config.sections.skills = false` | 隐藏技能区块 |
 | `config.sections.experience = false` | 隐藏工作经历区块（不影响 `/timeline`） |
 | `config.sections.contact = false` | 隐藏联系区块 |
-| `contactVisible = false` | 区块仍在，但不显示邮箱与电话，只留社交链接 |
+| `contactVisible = false` | 区块仍在，但不显示邮箱与电话，仅留非mailto/tel且不含公开邮箱电话的社交链接；首页、页脚、metadata及公共DTO同步过滤 |
 | `timeline.enabled = false` | 工作经历区块**被动隐藏**（依赖关系） |
 
 > **依赖提示**：后台关闭 `about` 模块时，确认框要提示「关闭后全站将没有任何联系方式入口」。
@@ -712,7 +712,7 @@ Do Not Track 开启：不计
 ### 5.10 验收标准
 
 - [ ] 修改一条 `TimelineItem` 后，「关于我」页经历区块同步更新
-- [ ] `contactVisible=false` 时前台不出现明文邮箱
+- [ ] `contactVisible=false` 时全站公开DTO/HTML/RSC/metadata/JSON-LD不出现email/phone或mailto/tel
 - [ ] 关闭所有区块后页面仍显示 Hero，不白屏
 - [ ] 移动端技能条填充动画正常且不卡顿
 - [ ] 后台经历区块显示为只读并给出跳转链接
@@ -778,3 +778,6 @@ Do Not Track 开启：不计
 - 这些模块的接口 → [03-api-spec.md](03-api-spec.md)
 - 后台如何管理 → [04-admin-console.md](04-admin-console.md)
 - 前台页面线框 → [05-frontend-ia.md](05-frontend-ia.md)
+
+## 一期公共读取和并发验收
+日志/文章/作品统一检查模块及子类型、PUBLISHED、publishedAt<=now与deletedAt=null；首页/搜索/详情/RSS/sitemap不得绕过。分钟任务触发到期发布和缓存失效。时间线过滤deletedAt并保留start/end年/月/日精度，当前项优先、日期按direction、同日期order ASC、id ASC，软删除与回收站可恢复。所有内容/Profile修改带revision，旧版本409并保留编辑草稿。preview token有效24h/no-store/noindex，不进入公开索引。

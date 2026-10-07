@@ -36,9 +36,9 @@ export interface ModuleConfig {
   /** 列表每页条数 */
   pageSize?: number
   /** 栏目页顶部导语 */
-  intro?: string
+  intro?: string | null
   /** 空态文案 */
-  emptyText?: string
+  emptyText?: string | null
   /** 首页露出配置 */
   home?: {
     enabled: boolean

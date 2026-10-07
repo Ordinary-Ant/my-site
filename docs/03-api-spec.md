@@ -100,12 +100,12 @@
 | 后台写接口 | 120 次 / 15 分钟 / 用户 | 429 |
 | 上传接口 | 20 次 / 小时 / 用户 | 429 |
 
-实现：一期用内存 Map（单实例够用）；上多实例时切 Upstash Redis。
+实现：一期使用共享PostgreSQL RateLimit窗口记录与原子计数；所有实例共用，不以进程Map承担生产限流。
 
 ### 1.6 缓存头
 
 ```
-公开 GET：  Cache-Control: public, s-maxage=60, stale-while-revalidate=300
+公开 GET：  Cache-Control: no-store（一期公开接口，不叠加CDN缓存）
 后台接口：  Cache-Control: no-store, no-cache, must-revalidate
 登录接口：  Cache-Control: no-store
 ```
@@ -147,7 +147,7 @@
 | GET | `/api/v1/auth/me` | 当前用户信息 |
 | POST | `/api/v1/auth/change-password` | 修改密码 |
 
-### 后台接口（需 `EDITOR` 及以上，标注 ★ 者需 `ADMIN`）
+### 后台接口（按permission授权；VIEWER可读其授权仪表盘/内容/审计，写需EDITOR，标注 ★ 者需ADMIN）
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
@@ -211,7 +211,7 @@
   }
 }
 ```
-**缓存**：`s-maxage=300`，tag `setting` + `module`。
+**缓存**：`no-store`，tag `setting` + `module`。
 
 ---
 
@@ -369,6 +369,7 @@
       "organization": "某科技有限公司",
       "location": "杭州",
       "startDate": "2023-03-01T00:00:00.000Z",
+      "startPrecision": "MONTH", "endPrecision": "MONTH",
       "endDate": null,
       "isCurrent": true,
       "logo": "https://cdn.example.com/logos/x.webp",
@@ -380,7 +381,7 @@
   "meta": { "total": 9 }
 }
 ```
-**服务端排序**：`isCurrent DESC, startDate DESC, order ASC`。
+**服务端排序**：`isCurrent DESC, startDate按direction, 同日期order ASC, id ASC`。
 
 ---
 
@@ -398,8 +399,8 @@
     "company": "某公司",
     "location": "杭州",
     "yearsOfExp": 5,
-    "email": "hi@example.com",          // contactVisible=false 时为 null
-    "phone": null,
+    "email": "hi@example.com",          // 仅contactVisible=true；false省略整个email字段
+    "phone": null,                     // 仅contactVisible=true；false省略整个phone字段
     "socials": [ { "platform": "github", "label": "GitHub", "url": "https://github.com/...", "icon": "github" } ],
     "advantages": [ { "title": "工程化落地能力", "description": "…", "icon": "wrench" } ],
     "skills": [ { "category": "前端框架", "items": [ { "name": "React", "level": 5, "years": 5 } ] } ],
@@ -486,9 +487,9 @@
 
 无请求体，依赖 `rt` Cookie。
 
-**成功**：轮转签发新 `at` + 新 `rt`，旧 Session 置 `revokedAt`。
+**成功**：PostgreSQL事务原子轮转并记录rotatedAt/successorId/加密rotationReply；10秒内相同旧RT并发请求返回同一后继AT/RT。
 
-**错误** `401 TOKEN_REUSED`：检测到已撤销的 RT 被再次使用 → **撤销该用户全部会话**、写 AuditLog、返回错误。这是标准的 refresh token 重放防护。
+**错误** `401 TOKEN_REUSED`：超过10秒宽限的旧RT被再次使用 → **撤销该用户全部会话**、写 AuditLog、返回错误。这是标准的 refresh token 重放防护。
 
 ---
 
@@ -560,15 +561,24 @@ export const ArticleCreateSchema = z.object({
   seoKeywords:    z.string().max(200).optional(),
   ogImage:        z.string().optional(),
 })
-export const ArticleUpdateSchema = ArticleCreateSchema.partial()
+export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
+  revision: z.number().int().nonnegative(),
+  summary: z.string().max(500).nullable().optional(),
+  coverImage: z.string().nullable().optional(),
+  publishedAt: z.coerce.date().nullable().optional(),
+  seoTitle: z.string().max(60).nullable().optional(),
+  seoDescription: z.string().max(160).nullable().optional(),
+  seoKeywords: z.string().max(200).nullable().optional(),
+  ogImage: z.string().nullable().optional(),
+}).strict()
 ```
 
-**`PATCH` 语义**：只更新传入的字段。传 `null` 表示清空该可选字段（与"不传"区分），实现上用 `undefined` vs `null` 判断。
+**PATCH语义**：不传不变，仅nullable字段传null清空，必填字段不接受null；未知键拒绝。必须带revision，事务条件更新revision匹配并加1，否则409 REVISION_CONFLICT，不覆盖新内容。Log/Project/Timeline/Profile同样执行。
 
 **副作用（service 层自动处理）**
 - 计算 `wordCount`（中文按字符数、英文按单词数）与 `readingTime = ceil(wordCount / 300)`
 - `status` 从非 PUBLISHED 变为 PUBLISHED 且 `publishedAt` 为空 → 自动填 `now()`
-- `publishedAt` 变化超过 1 分钟且状态为 PUBLISHED → 触发 RSS 缓存失效
+- `publishedAt`变动或到期发布 → 失效首页/列表/详情/RSS/sitemap；分钟调度负责到期事件
 - 写 `AuditLog`（记录变更字段的 before/after 差异）
 - `revalidateTag('article')` + `revalidateTag('content')`
 
@@ -633,7 +643,7 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial()
   "config": { "pageSize": 20, "home": { "enabled": false } }
 }
 ```
-> `config` 为**浅合并**（`{...old, ...new}`），不是整体替换 —— 否则前端只想改一个 `pageSize`，会把 `types` 里的子类型开关全冲掉。键名规范见 [01-architecture.md §7](01-architecture.md)。
+> `config` PATCH：已知嵌套键按层合并，数组整体替换，可空字段null清空；严格拒绝未知键及危险对象键，合并后重新校验完整配置。
 
 **响应**
 ```jsonc
@@ -655,9 +665,9 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial()
 
 **约束**
 - `key` 不可修改（`isBuiltin` 为 true 的模块也不可删除）
-- `route` 必须唯一且以 `/` 开头，不能与已有路由冲突（校验表：`/` `/logs` `/articles` `/portfolio` `/timeline` `/about` `/search` `/admin` `/login`）
+- `route` 必须唯一且以 `/` 开头，数据库唯一并校验保留路径/子路径、模块嵌套、历史别名占用和循环；内部模块路径不能仅靠先查重保护
 - `home` 模块的 `enabled` 不可为 false（否则站点没有首页）
-- 修改 `route` 时，旧路径自动保留 301 重定向（写入 `Setting` 的 `redirects` 键）
+- 修改 `route` 时，旧路径自动保留 301 重定向（写入RouteAlias，永久保留全部历史路径，直接301到当前路径，保留详情后缀与query）
 
 **`PATCH /api/v1/admin/modules/reorder`**
 ```jsonc
@@ -692,7 +702,7 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial()
 
 ### 5.5 媒体上传
 
-`POST /api/v1/admin/media/upload` — `multipart/form-data`
+`POST /api/v1/admin/media/upload`仅本地开发multipart；生产使用POST /media/upload-intent → R2私有临时区直传 → POST /media/confirm。intent限定key/大小/类型/有效期，confirm验证magic、实际大小、sha256、归属后登记公开；失败不公开。开发/预览/生产bucket与密钥隔离，删除前检查全站引用。
 
 | 字段 | 说明 |
 |---|---|
@@ -779,144 +789,19 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial()
 
 ---
 
-### 5.8 动效配置
+### 5.8 动效配置（version2）
+GET /api/v1/admin/settings/motion返回08的完整config、static/editorial/narrative/kinetic四预设及标注估算的体积信息。PATCH仅ADMIN，已知嵌套键合并，严格拒绝未知键；默认editorial+none。无background/text/micro/performance旧字段，无custom。公开GET /api/v1/site的motion只返回渲染配置。完整合法值/默认值/升级见[08](08-motion-system.md)。预算文章135KB、动效28KB、登录110KB gzip。respectReducedMotion固定true，decoration仅none/tint，无连续背景。
 
-完整技术设计见 [08-motion-system.md](08-motion-system.md)。
+### 5.9 草稿预览与slug检查
+POST /api/v1/admin/articles/:id/preview-token需content:write，创建24h随机token（哈希入PreviewToken）；GET /preview/:token仅授权有效token读取对应草稿，no-store及noindex，不进RSS/sitemap/搜索。过期或撤销404。GET /api/v1/admin/articles/slug-available?slug=&excludeId=需content:read，仅给后台校验；最终写入仍由数据库唯一约束兜底。
 
-**`GET /api/v1/admin/settings/motion`** — 需 `setting:read`
+### 5.10 发布与公共边界
+公开查询统一检查模块及子类型开关、status=PUBLISHED、publishedAt<=now、deletedAt=null；所有首页/feed/详情/搜索/RSS/sitemap使用相同公开过滤器。
+时间线无PUBLISHED状态，用visible/showOnAbout分别控制页面，并过滤deletedAt；日期年/月/日精度独立保存。排序当前项DESC、日期按direction、同日期order ASC、id ASC。所有新请求5秒内反映保存结果，已有页面刷新；预览和管理接口no-store。
 
-与其他设置组不同，这个接口不只返回配置：它还返回**预设库**和**性能预估**，因为后台要在一屏内完成"选预设 → 调参 → 看性能"。
+contactVisible=false所有公开DTO、首页、页脚、social、metadata及JSON-LD清除email/phone与mailto/tel。social仍可保留非联系方式链接。
 
-```jsonc
-{
-  "success": true,
-  "data": {
-    // 当前配置（结构见 08 文档 §3）
-    "config": {
-      "version": 1,
-      "preset": "breath",
-      "intensity": "standard",
-      "respectReducedMotion": true,
-      "mobileIntensity": "subtle",
-      "autoDegrade": true,
-      "background": {
-        "enabled": true, "type": "gradient-flow", "scope": "home",
-        "angle": 135, "speed": 24, "blur": 80, "opacity": 0.35,
-        "noiseOverlay": true, "parallax": true,
-        "light": { "colors": ["#6366F1", "#A855F7", "#EC4899"] },
-        "dark":  { "colors": ["#1E1B4B", "#4C1D95", "#0F172A"] }
-      },
-      "interaction": { "cardHover": "lift", "buttonHover": "shine", "linkHover": "underline",
-                       "imageHover": "zoom", "navIndicator": "slide", "cursor": "glow",
-                       "magneticButtons": false },
-      "reveal": { "enabled": true, "type": "fade-up", "range": 0.4,
-                  "duration": 600, "stagger": 80, "easing": "ease-out" },
-      "text": { "heroType": "fade-words", "countUp": true, "gradientHeadings": false },
-      "micro": { "themeTransition": "circle", "copyFeedback": "check",
-                 "pageTransition": "fade", "scrollProgress": true },
-      "performance": { "maxParticles": 60, "fpsGuard": true, "degradeBelowFps": 45,
-                       "pauseWhenHidden": true, "disableOnBattery": false }
-    },
 
-    // 8 个预设的完整参数，供后台一键套用（前端不硬编码）
-    "presets": {
-      "minimal":   { "name": "极简", "description": "纯静态，性能最优", "config": { /* … */ } },
-      "breath":    { "name": "呼吸渐变", "description": "克制且不廉价（推荐）", "config": { /* … */ } },
-      "aurora":    { "name": "极光",   "description": "视觉冲击强，建议仅首页", "config": { /* … */ } },
-      "mesh":      { "name": "光斑",   "description": "现代 SaaS 风", "config": { /* … */ } },
-      "grid":      { "name": "网格",   "description": "极客 / 工程感", "config": { /* … */ } },
-      "stars":     { "name": "星空",   "description": "暗色主题为主", "config": { /* … */ } },
-      "particles": { "name": "粒子",   "description": "炫技向，移动端自动降档", "config": { /* … */ } },
-      "custom":    { "name": "自定义", "description": "手动配置全部参数", "config": null }
-    },
-
-    // 当前配置的性能预估（与后台预览窗右上角显示的一致）
-    "estimate": {
-      "jsBytes": 0,
-      "jsBudget": 25600,
-      "compositeLayers": 1,
-      "lcpImpactMs": 0,
-      "mobileHeavyEffects": 0,
-      "level": "good",              // good | warning | danger
-      "notes": ["背景动效建议仅首页开启，可省约 40% 渲染开销"]
-    },
-
-    "updatedAt": "2025-01-15T10:23:00.000Z"
-  }
-}
-```
-
-**`PATCH /api/v1/admin/settings/motion`** — 需 `setting:write`（ADMIN）
-
-```jsonc
-// 请求：只传要改的字段（深合并，不是整体替换）
-{
-  "preset": "custom",
-  "background": { "type": "particles", "speed": 18 },
-  "performance": { "maxParticles": 150 }
-}
-```
-
-**响应 —— 有性能警告时返回 200 + `warnings`（而非报错）**
-
-```jsonc
-{
-  "success": true,
-  "data": {
-    "config": { /* 保存后的完整配置 */ },
-    "estimate": { "jsBytes": 12000, "compositeLayers": 1, "level": "warning", /* … */ },
-    "warnings": [
-      { "code": "MOBILE_HEAVY_EFFECT", "field": "background.type",
-        "message": "背景为「粒子」，但移动端强度为「标准」，中低端手机可能掉到 30fps 以下" },
-      { "code": "PARTICLES_OVER_LIMIT", "field": "performance.maxParticles",
-        "message": "最大粒子数 150 超过建议值 120" },
-      { "code": "TOO_MANY_HEAVY_EFFECTS", "field": "interaction",
-        "message": "同时启用了 5 项重动效，低端设备降级概率较高" }
-    ],
-    "blocking": [],                 // 阻断类问题（有值时返回 422 而非 200）
-    "cacheInvalidated": ["setting"]
-  }
-}
-```
-
-> **为什么警告用 200 而不是 4xx**：这些都是"合法但需要斟酌"的配置。返回 200 + `warnings` 让后台弹出确认框（「我知道，仍然保存」），而不是把用户堵死。真正的非法值（如颜色格式错误、粒子数超上限）才返回 `422 BUSINESS_RULE_VIOLATION`。
-
-**交叉校验规则**（完整表见 [08-motion-system.md §3](08-motion-system.md)）
-
-| 类型 | 例子 |
-|---|---|
-| 阻断（422） | 颜色数组为空、枚举值非法、`maxParticles` 超出 10–200 |
-| 警告（200 + warnings） | 粒子 + 移动端非关闭、粒子数 > 120、同时 ≥ 4 项重动效、`blur > 120` |
-| 强制（不可覆盖） | `respectReducedMotion` 必须为 `true`，传 `false` 直接 422 |
-
-**公开侧**：动效配置通过 [`GET /api/v1/site`](#31-get-apiv1site) 的 `data.motion` 字段下发（前台 RSC 也可以直接调 `settingService.getMotionConfig()`，走缓存不产生 HTTP 往返）。
-
-```jsonc
-// GET /api/v1/site 响应中新增
-{
-  "data": {
-    "site": { /* … */ },
-    "modules": [ /* … */ ],
-    "motion": {
-      "intensity": "standard",
-      "background": { "enabled": true, "type": "gradient-flow", "scope": "home",
-                      "speed": 24, "blur": 80, "opacity": 0.35, "angle": 135,
-                      "light": { "colors": ["#6366F1", "#A855F7", "#EC4899"] },
-                      "dark":  { "colors": ["#1E1B4B", "#4C1D95", "#0F172A"] } },
-      "interaction": { "cardHover": "lift", "buttonHover": "shine", "cursor": "glow" },
-      "reveal": { "type": "fade-up", "duration": 600, "stagger": 80 },
-      "text": { "heroType": "fade-words", "countUp": true },
-      "micro": { "themeTransition": "circle", "scrollProgress": true },
-      "mobileIntensity": "subtle",
-      "autoDegrade": true
-    }
-  }
-}
-```
-
-> **注意**：公开响应**只含渲染必需字段**，不含 `presets`、`estimate`、`performance` 细节 —— 那些是后台的配置工具，前台不需要知道，下发它们只会白白增加 HTML 体积。`performance` 的降级阈值在客户端有独立常量，不依赖配置下发。
-
----
 
 ## 6. 错误处理策略（前端约定）
 

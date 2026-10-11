@@ -18,6 +18,7 @@ export class ClientError extends Error {
     public code: string,
     message: string,
     public retryAfter = 0,
+    public details?: { path: string; message: string }[],
   ) {
     super(message)
   }
@@ -69,6 +70,7 @@ export async function api<T>(
       body.error?.code ?? 'UNKNOWN',
       body.error?.message ?? '请求失败',
       Number(response.headers.get('retry-after')) || 0,
+      Array.isArray(body.error?.details) ? body.error.details : undefined,
     )
   return body
 }

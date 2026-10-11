@@ -31,9 +31,14 @@ export function Dashboard() {
           </p>
         </div>
         {user?.permissions.includes('content:write') && (
-          <Link href="/admin/articles/new" className="text-brand">
-            写一篇文章 +
-          </Link>
+          <div className="flex gap-4">
+            <Link href="/admin/logs?quick=1" className="text-brand">
+              记一笔
+            </Link>
+            <Link href="/admin/articles/new" className="text-brand">
+              写一篇文章 +
+            </Link>
+          </div>
         )}
       </header>
       {error && (

@@ -65,9 +65,11 @@ export interface ModuleConfig {
   direction?: 'desc' | 'asc'
   /** about：区块级开关 */
   sections?: {
+    bio: boolean
     advantages: boolean
     skills: boolean
     experience: boolean
+    services: boolean
     contact: boolean
   }
 }
@@ -170,7 +172,14 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     defaultConfig: {
       intro: '我是谁，我在做什么，我擅长什么',
       home: { enabled: false, limit: 0, order: 6 },
-      sections: { advantages: true, skills: true, experience: true, contact: true },
+      sections: {
+        bio: true,
+        advantages: true,
+        skills: true,
+        experience: true,
+        services: true,
+        contact: true,
+      },
     },
   },
 }

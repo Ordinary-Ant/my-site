@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-html-link-for-pages -- 登录返回与错误恢复使用完整导航，避免依赖失败的客户端路由。 */
+import { getPublicSite } from '@/lib/services/public-site'
 
 /**
  * 404
@@ -6,7 +7,9 @@
  * 说明：模块被后台关闭时也走这个页面，但文案不同。
  *       这里不暴露"后台被关闭"这类技术细节。见 docs/05-frontend-ia.md §4.11
  */
-export default function NotFound() {
+export default async function NotFound() {
+  // 推荐入口与导航同源，栏目关闭后隐藏，改路径后直达当前地址。
+  const article = (await getPublicSite()).modules.find((module) => module.key === 'article')
   return (
     <div className="container-page grid min-h-[70vh] place-items-center py-20 text-center">
       <div>
@@ -25,12 +28,14 @@ export default function NotFound() {
           >
             回首页
           </a>
-          <a
-            href="/articles"
-            className="border-border-strong hover:bg-muted rounded-[10px] border px-5 py-2.5 text-sm font-medium transition-colors"
-          >
-            看看文章
-          </a>
+          {article && (
+            <a
+              href={article.route}
+              className="border-border-strong hover:bg-muted rounded-[10px] border px-5 py-2.5 text-sm font-medium transition-colors"
+            >
+              看看文章
+            </a>
+          )}
         </div>
       </div>
     </div>

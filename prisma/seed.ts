@@ -15,6 +15,7 @@ import bcrypt from 'bcryptjs'
 
 import { MODULE_KEYS, MODULE_REGISTRY } from '../src/config/modules'
 import { DEFAULT_MOTION } from '../src/config/motion'
+import { SEED_TAGS } from '../src/config/seed-taxonomy'
 
 const prisma = new PrismaClient()
 
@@ -204,9 +205,8 @@ async function seedTaxonomy() {
     await prisma.category.upsert({ where: { slug: c.slug }, update: {}, create: c })
   }
 
-  const tags = ['Next.js', 'React', '性能', '工程化', '重构', 'TypeScript']
-  for (const name of tags) {
-    const slug = name.toLowerCase().replace(/\./g, '').replace(/\s+/g, '-')
+  const tags = SEED_TAGS
+  for (const { name, slug } of tags) {
     await prisma.tag.upsert({ where: { slug }, update: {}, create: { name, slug } })
   }
   console.log(`  ✓ Category × ${categories.length} · Tag × ${tags.length}`)

@@ -1,3 +1,4 @@
+import { testBaseURL } from './base-url'
 import { expect, test } from '@playwright/test'
 import sharp from 'sharp'
 test('后台登录→新建草稿→预览→发布→阅读→删除→恢复', async ({ page, browser }, testInfo) => {
@@ -62,6 +63,15 @@ test('后台登录→新建草稿→预览→发布→阅读→删除→恢复',
   const mediaResponse = await uploaded
   expect(mediaResponse.status()).toBe(201)
   const media = (await mediaResponse.json()).data
+  const picker = page.getByRole('dialog', { name: '选择媒体库文件', exact: true })
+  await expect(picker).toBeVisible()
+  await picker.getByLabel('搜索媒体', { exact: true }).fill(`${title}.png`)
+  await picker.getByRole('button', { name: '查看媒体 ' + `${title}.png`, exact: true }).click()
+  const mediaDetail = page.getByRole('dialog', { name: '媒体详情', exact: true })
+  await mediaDetail.getByLabel('媒体替代文本', { exact: true }).fill('')
+  await expect(mediaDetail.getByRole('button', { name: '选择此文件', exact: true })).toBeDisabled()
+  await mediaDetail.getByLabel('媒体替代文本', { exact: true }).fill('文章上传图片描述')
+  await mediaDetail.getByRole('button', { name: '选择此文件', exact: true }).click()
   await expect(page.getByLabel('正文', { exact: true })).toHaveValue(new RegExp(media.url))
   await page.getByRole('button', { name: '保存草稿', exact: true }).click()
   await expect(page.getByRole('status')).toContainText('保存成功')
@@ -75,12 +85,12 @@ test('后台登录→新建草稿→预览→发布→阅读→删除→恢复',
   expect(
     (
       await page.request.delete(`/api/v1/admin/media/${media.id}`, {
-        headers: { Origin: 'http://localhost:3000' },
+        headers: { Origin: testBaseURL },
       })
     ).status(),
   ).toBe(409)
   const preview = await page.request.post(`/api/v1/admin/articles/${id}/preview-token`, {
-    headers: { Origin: 'http://localhost:3000' },
+    headers: { Origin: testBaseURL },
   })
   const previewUrl = (await preview.json()).data.url
   const view = await page.context().newPage()
@@ -151,17 +161,17 @@ test('后台登录→新建草稿→预览→发布→阅读→删除→恢复',
   // 仅清理本次创建的数据，仍走修订和彻底删除权限检查。
   const current = (await (await page.request.get(`/api/v1/admin/articles/${id}`)).json()).data
   await page.request.delete(`/api/v1/admin/articles/${id}`, {
-    headers: { Origin: 'http://localhost:3000' },
+    headers: { Origin: testBaseURL },
     data: { revision: current.revision },
   })
   await page.request.delete(`/api/v1/admin/articles/${id}/purge`, {
-    headers: { Origin: 'http://localhost:3000' },
+    headers: { Origin: testBaseURL },
     data: { revision: current.revision + 1 },
   })
   expect(
     (
       await page.request.delete(`/api/v1/admin/media/${media.id}`, {
-        headers: { Origin: 'http://localhost:3000' },
+        headers: { Origin: testBaseURL },
       })
     ).status(),
   ).toBe(200)
@@ -215,11 +225,11 @@ test('延迟保存返回前离开仍保留请求期间新增的本地正文', as
   await page.getByRole('button', { name: '恢复正文', exact: true }).click()
   await expect(page.getByLabel('正文', { exact: true })).toHaveValue('保存请求期间新增的输入')
   await page.request.delete(`/api/v1/admin/articles/${id}`, {
-    headers: { Origin: 'http://localhost:3000' },
+    headers: { Origin: testBaseURL },
     data: { revision: 2 },
   })
   await page.request.delete(`/api/v1/admin/articles/${id}/purge`, {
-    headers: { Origin: 'http://localhost:3000' },
+    headers: { Origin: testBaseURL },
     data: { revision: 3 },
   })
 })

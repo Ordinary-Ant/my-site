@@ -1,3 +1,4 @@
+import { testBaseURL } from './base-url'
 import { expect, test } from '@playwright/test'
 import { PrismaClient } from '@prisma/client'
 
@@ -48,6 +49,9 @@ test('后台模块关闭撤销、嵌套配置和连续改路径同步到公共�
       ),
     ).toBe(false)
     expect(await (await page.request.get('/')).text()).not.toContain('href="/articles"')
+    const closedMissing = await page.request.get('/missing-module-' + Date.now())
+    expect(closedMissing.status()).toBe(404)
+    expect(await closedMissing.text()).not.toContain('看看文章')
     await page.getByRole('button', { name: '撤销关闭文章', exact: true }).click()
     await expect(card.getByRole('switch', { name: '文章显示' })).toHaveAttribute(
       'aria-checked',
@@ -59,7 +63,7 @@ test('后台模块关闭撤销、嵌套配置和连续改路径同步到公共�
     const articleModule = entries.find((entry: { key: string }) => entry.key === 'article')
     if (!articleModule.enabled) {
       const restored = await page.request.patch('/api/v1/admin/modules/article', {
-        headers: { Origin: 'http://localhost:3000' },
+        headers: { Origin: testBaseURL },
         data: { enabled: true, expectedUpdatedAt: articleModule.updatedAt },
       })
       expect(restored.status()).toBe(200)
@@ -69,7 +73,7 @@ test('后台模块关闭撤销、嵌套配置和连续改路径同步到公共�
   const original = (await response.json()).data.find(
     (item: { key: string }) => item.key === 'article',
   )
-  const headers = { Origin: 'http://localhost:3000' }
+  const headers = { Origin: testBaseURL }
   const firstRoute = `/notes-${Date.now()}`
   const secondRoute = firstRoute.replace('notes-', 'essays-')
   try {
@@ -102,19 +106,22 @@ test('后台模块关闭撤销、嵌套配置和连续改路径同步到公共�
       maxRedirects: 0,
     })
     expect(old.status()).toBe(301)
-    expect(new URL(old.headers().location, 'http://localhost:3000').pathname).toBe(
-      `${secondRoute}/test-slug`,
-    )
-    expect(new URL(old.headers().location, 'http://localhost:3000').search).toBe('?tag=next&page=2')
+    expect(new URL(old.headers().location, testBaseURL).pathname).toBe(`${secondRoute}/test-slug`)
+    expect(new URL(old.headers().location, testBaseURL).search).toBe('?tag=next&page=2')
     const middle = await page.request.get(`${firstRoute}?q=中文`, { maxRedirects: 0 })
     expect(middle.status()).toBe(301)
-    expect(new URL(middle.headers().location, 'http://localhost:3000').pathname).toBe(secondRoute)
+    expect(new URL(middle.headers().location, testBaseURL).pathname).toBe(secondRoute)
     await page.goto('/')
     await expect(
       page
         .locator('header')
         .getByRole('link', { name: original.navLabel ?? original.name, exact: true }),
     ).toHaveAttribute('href', secondRoute)
+    expect((await page.goto('/missing-current-route-' + Date.now()))?.status()).toBe(404)
+    await expect(page.getByRole('link', { name: '看看文章', exact: true })).toHaveAttribute(
+      'href',
+      secondRoute,
+    )
     await page.goto(secondRoute)
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.getByText('文章配置导语验收', { exact: true })).toBeVisible()

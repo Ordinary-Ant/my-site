@@ -88,7 +88,7 @@
 | 图集 | 点击图片打开 Lightbox，支持左右切换与 `Esc` 关闭 |
 | 上下篇 | 按 `logDate` 相邻，显示标题 |
 | 复制链接 | 文末按钮，复制当前 URL |
-| 返回 | 顶部 `← 返回日志列表`（用 `router.back()` 保留列表滚动位置） |
+| 返回 | 顶部 `← 返回日志列表` 返回进入详情前保存的列表URL和滚动位置；相邻日志跳转后仍返回列表，不能依赖未经确认的上一历史记录 |
 
 **日历视图**
 
@@ -142,21 +142,21 @@
 | 操作 | 效果 |
 |---|---|
 | `enabled = false` | `/logs*` → 404；首页日志区块消失；列表接口返回空数组；sitemap 移除 |
-| `config.types.DAILY = false` | 列表与日历不显示 DAILY 类型；该类型详情页仍可通过直链访问（**不 404**，避免已分享链接失效） |
+| `config.types.DAILY = false` | 列表、日历、首页及公开派生出口不显示DAILY；该类型详情直链返回404 |
 | `config.home.enabled = false` | 仅首页不显示该区块，`/logs` 照常 |
 | `config.home.limit = 3` | 首页日志区块只显示 3 条 |
 | `config.defaultView = 'calendar'` | 前台日志页默认打开日历视图 |
 | `navVisible = false` | 导航不显示，但 `/logs` 仍可直链访问 |
 
-> **「子类型开关」与「模块开关」的语义差异**：模块开关是"这个栏目不存在了"，子类型开关是"我不想在这个视图里看到这类内容"。因此子类型关闭**不做 404**，只做视图过滤。
+> 按一期已确认的公开过滤合同，子类型关闭也隐藏公开详情，不能通过直链绕过。模块开关隐藏整个栏目，子类型开关仅隐藏对应类型；后台数据均保留。
 
 ### 1.7 边界与异常
 
 | 情况 | 处理 |
 |---|---|
 | 同一天多篇日志 | 允许，日历上显示数字徽章 |
-| 未来日期的日志 | 允许（提前写计划），但 `logDate > 今天` 的默认在前台**不显示**，除非 `isPinned` 或用户开启「显示未来日志」（防调试草稿外泄） |
-| 超长日志 | 正文无长度限制；列表摘要固定截断 120 字 |
+| 未来日期的日志 | 允许（提前写计划），但 `logDate > 今天` 的默认在前台**不显示**，除非 `isPinned`；一期无「显示未来日志」配置。publishedAt仍须到期，置顶不能绕过发布状态 |
+| 超长日志 | 正文上限100万字符，超限400；列表摘要固定截断120字（含显式摘要）；详情保留完整摘要 |
 | 图片失效 | 图集用 `onError` 替换为占位图，不破坏布局 |
 | 删除 | 软删除，进回收站，可恢复 |
 | 时区 | `logDate` 是 `@db.Date`（无时间），按服务器时区解释；**在 service 层统一用 UTC+8 处理**，避免跨时区显示成前一天 |
@@ -282,18 +282,20 @@
 |---|---|
 | 列表 | 表格视图，支持网格预览切换 |
 | 拖拽排序 | `order` 字段拖拽调整；`featured` 单独一列可切换 |
-| 封面图裁切 | 上传后可选裁切区域，保证 16:9 统一（用 `react-image-crop` 或 `sharp` 服务端裁） |
-| 图集排序 | 多图拖拽排序，第一张自动成为封面（可覆盖） |
+| 封面图裁切 | 选择本地图片后可调整16:9裁切区域、缩放和位置；浏览器canvas导出WebP，再由媒体服务校验上传，确认后替换封面，失败保留原封面 |
+| 图集排序 | 多图拖拽排序；创建未指定coverImage时默认首张封面。编辑器新增首图且未手动指定封面时显式选择首图；后续gallery更新不隐式改封面，coverImage:null明确清空 |
 | 外链校验 | 填入 URL 时校验可访问性（HEAD 请求，失败仅警告不阻止） |
 | 技术栈 | 从历史技术栈中智能补全（下拉 + 自由输入） |
 | 预览 | 保存前可预览卡片效果 |
+
+外链可达性由后台浏览器以HEAD、无凭据和超时检查；跨域限制或网络失败显示「无法确认」警告，不表示链接必然失效，不阻止保存。服务器不抓取用户任意URL。历史技术栈来自真实作品，type统计忽略当前类型但保留其他筛选及公开过滤。排序固定order ASC/startDate DESC NULLS LAST/id ASC，最新优先startDate DESC NULLS LAST/order ASC/id ASC；日期展示北京时间。草稿服务器预览采用与日志一致的私有24小时凭据。
 
 ### 2.6 开关行为
 
 | 操作 | 效果 |
 |---|---|
 | `enabled = false` | `/portfolio*` → 404；首页精选区块消失 |
-| `config.types.GAME = false` | 列表不显示游戏；直接访问游戏详情页**仍可打开**（避免分享链接失效） |
+| `config.types.GAME = false` | 列表、首页和公开派生出口不显示游戏；游戏详情直链返回404 |
 | `config.layout = 'list'` | 前台默认用列表布局 |
 | `config.showTechStack = false` | 卡片不显示技术栈徽章 |
 
@@ -320,7 +322,7 @@
 - [ ] 首页精选位正确显示 `featured=true` 的作品
 - [ ] 类型 Tab 的数字与实际条数一致
 - [ ] 移动端图集可滑动切换
-- [ ] 关闭 `GAME` 子类型后，列表不显示游戏但直链仍可访问
+- [ ] 关闭 `GAME` 子类型后，列表不显示游戏且详情直链404
 
 ---
 
@@ -342,7 +344,7 @@
 | 类型 | 中文 | 颜色 | 图标 | 前台位置 |
 |---|---|---|---|---|
 | `WORK` | 工作 | 蓝 `#3b82f6` | `briefcase` | 时间轴 + 关于我 |
-| `EDUCATION` | 教育 | 绿 `#10b981` | `graduation-cap` | 时间轴 + 关于我 |
+| `EDUCATION` | 教育 | 绿 `#10b981` | `graduation-cap` | 时间轴（About经历区块仅WORK，同§5.2及profile接口） |
 | `PROJECT` | 项目 | 紫 `#8b5cf6` | `folder-git-2` | 时间轴 |
 | `AWARD` | 荣誉 | 金 `#f59e0b` | `trophy` | 时间轴 |
 | `MILESTONE` | 里程碑 | 橙 `#f97316` | `flag` | 时间轴 |
@@ -394,7 +396,7 @@
 | 功能 | 说明 |
 |---|---|
 | 列表即排序 | 列表页每行带 `☰` 拖拽手柄，拖拽写 `order` |
-| 时间格式化 | 输入框用月份选择器（`2023-03`），不用完整日期选择器 |
+| 时间格式化 | 按精度选择年份/月/日输入，默认月份；年归一01-01、月归一当月01日，保存精度，展示不补出未记录的月日 |
 | 「至今」开关 | `endDate` 留空 + `isCurrent=true` |
 | 双可见性开关 | 列表里两列：`时间戳页` / `关于我页`，各自独立 Switch |
 | 类型筛选 | 按类型过滤列表 |
@@ -555,7 +557,7 @@ Do Not Track 开启：不计
 | 代码块溢出 | 横向滚动容器，不撑破页面宽度 |
 | 中文标题生成 slug | 用 `pinyin` 库转拼音；也可纯用 `article-<id>` 兜底 |
 | 文章被大量引用 | 删除前提示，软删除可恢复 |
-| 归档状态 | `ARCHIVED` 前台不显示但**返回 410**（而非 404），明确告知搜索引擎"曾存在现在没了" |
+| 归档状态 | `ARCHIVED` 不进入公开列表、详情、搜索或订阅，公开直链统一404，避免泄露非公开记录是否存在 |
 
 ### 4.9 未来扩展
 
@@ -657,7 +659,7 @@ Do Not Track 开启：不计
 | Hero 下载简历 | `resumeUrl` 直链下载；未设置时按钮不渲染 |
 | 联系我 | `contactVisible=false` 时只显示非mailto/tel且不含公开邮箱电话的社交链接；公共DTO、首页、页脚、metadata及JSON-LD同步过滤 |
 | 技能条 | 进入视口时才有填充动画（`IntersectionObserver`），`reduced-motion` 时直接显示 |
-| 工作经历 | 只显示最近 2–3 条 + 「查看完整时间轴 →」跳 `/timeline` |
+| 工作经历 | 只显示当前项优先、开始日期降序、order/id稳定排序的最近3条 + 「查看完整时间轴 →」跳 `/timeline` |
 | 优势卡片 | PC 3 列 / 平板 2 列 / 移动 1 列 |
 | 邮箱防爬 | 邮箱用 JS 拼接输出（`data-user`/`data-domain`），避免被爬虫直接抓取明文 |
 | 复制邮箱 | 点击邮箱图标复制到剪贴板 + toast「已复制」 |
@@ -681,11 +683,13 @@ Do Not Track 开启：不计
 
 | 操作 | 效果 |
 |---|---|
-| `enabled = false` | `/about` → 404；导航移除；**联系方式彻底不可达**（此时确保首页或页脚仍有联系方式，否则失去转化入口） |
+| `enabled = false` | `/about` → 404；导航移除；首页、页脚、metadata及全部公共DTO同步隐藏邮箱、电话与联系链接 |
+| `config.sections.bio = false` | 隐藏自我介绍区块 |
 | `config.sections.advantages = false` | 隐藏优势区块 |
 | `config.sections.skills = false` | 隐藏技能区块 |
 | `config.sections.experience = false` | 隐藏工作经历区块（不影响 `/timeline`） |
-| `config.sections.contact = false` | 隐藏联系区块 |
+| `config.sections.services = false` | 隐藏服务区块 |
+| `config.sections.contact = false` | 隐藏联系区块并在全站公共出口隐藏邮箱电话和联系链接 |
 | `contactVisible = false` | 区块仍在，但不显示邮箱与电话，仅留非mailto/tel且不含公开邮箱电话的社交链接；首页、页脚、metadata及公共DTO同步过滤 |
 | `timeline.enabled = false` | 工作经历区块**被动隐藏**（依赖关系） |
 
@@ -781,3 +785,5 @@ Do Not Track 开启：不计
 
 ## 一期公共读取和并发验收
 日志/文章/作品统一检查模块及子类型、PUBLISHED、publishedAt<=now与deletedAt=null；首页/搜索/详情/RSS/sitemap不得绕过。分钟任务触发到期发布和缓存失效。时间线过滤deletedAt并保留start/end年/月/日精度，当前项优先、日期按direction、同日期order ASC、id ASC，软删除与回收站可恢复。所有内容/Profile修改带revision，旧版本409并保留编辑草稿。preview token有效24h/no-store/noindex，不进入公开索引。
+
+D04补齐：About区块配置sections含bio/advantages/skills/experience/services/contact，默认全true；后台区块开关与公开DTO同步。经历区块显示最近3条（当前优先、开始日期降序、order/id），更多链接使用时间戳最新动态路径；timeline或WORK类型关闭时整块隐藏。完整时间轴仍按自身direction排序。

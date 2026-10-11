@@ -8,7 +8,7 @@ import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import { useEffect, useRef, useState } from 'react'
 import { markdownRequiresSource, safeContentUrl } from '@/lib/markdown'
-import { uploadMedia } from '@/lib/api/upload'
+import { MediaPicker } from './media-picker'
 
 /** 未知结构锁定源码，标准结构使用官方Markdown扩展往返。 */
 export default function MarkdownEditor({
@@ -22,6 +22,8 @@ export default function MarkdownEditor({
   const [full, setFull] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
   const latest = useRef(value)
   const mode = useRef(sourceMode)
   const textarea = useRef<HTMLTextAreaElement>(null)
@@ -53,37 +55,12 @@ export default function MarkdownEditor({
     setSourceMode(true)
     onChange(`${value}\n\n${text}`)
   }
-  const uploadImages = async (files: File[]) => {
+  // 文件上传后仍由选择器确认描述，未明确选择前不修改正文。
+  const uploadImages = (files: File[]) => {
     if (uploading) return
-    setUploading(true)
     setUploadError('')
-    const original = latest.current
-    const start = textarea.current?.selectionStart ?? original.length
-    const end = textarea.current?.selectionEnd ?? start
-    try {
-      for (const file of files) {
-        const media = await uploadMedia(file, { alt: file.name })
-        if (!mode.current && editor)
-          editor
-            .chain()
-            .focus()
-            .setImage({ src: media.url, alt: media.alt ?? '' })
-            .run()
-        else {
-          const image = `![${(media.alt ?? file.name).replace(/[\\\[\]]/g, '\\$&')}](${media.url})`
-          const next =
-            latest.current === original
-              ? `${original.slice(0, start)}\n${image}\n${original.slice(end)}`
-              : `${latest.current}\n\n${image}`
-          latest.current = next
-          onChange(next)
-        }
-      }
-    } catch (error) {
-      setUploadError((error as Error).message)
-    } finally {
-      setUploading(false)
-    }
+    setPendingFiles(files)
+    setPickerOpen(true)
   }
   return (
     <section
@@ -111,6 +88,9 @@ export default function MarkdownEditor({
       }}
     >
       <div className="bg-surface-subtle flex flex-wrap gap-2 border-b p-3 text-sm">
+        <button type="button" disabled={uploading} onClick={() => setPickerOpen(true)}>
+          从媒体库插入图片
+        </button>
         <label className="cursor-pointer">
           {uploading ? '上传图片中…' : '上传图片'}
           <input
@@ -202,12 +182,14 @@ export default function MarkdownEditor({
               type="button"
               onClick={() => {
                 const src = prompt('图片地址')
-                if (src && safeContentUrl(src))
-                  editor
-                    .chain()
-                    .focus()
-                    .setImage({ src, alt: prompt('图片描述') ?? '' })
-                    .run()
+                if (src && safeContentUrl(src)) {
+                  const alt = prompt('图片描述（必填）')?.trim()
+                  if (!alt) {
+                    setUploadError('图片描述不能为空；已取消插入。')
+                    return
+                  }
+                  editor.chain().focus().setImage({ src, alt }).run()
+                }
               }}
             >
               图片
@@ -271,6 +253,31 @@ export default function MarkdownEditor({
       ) : (
         <EditorContent editor={editor} />
       )}
+      <MediaPicker
+        open={pickerOpen}
+        imagesOnly
+        initialFiles={pendingFiles}
+        onBusyChange={setUploading}
+        onClose={() => {
+          setPickerOpen(false)
+          setPendingFiles([])
+          setUploading(false)
+        }}
+        onSelect={(media) => {
+          if (!mode.current && editor)
+            editor
+              .chain()
+              .focus()
+              .setImage({ src: media.url, alt: media.alt ?? '' })
+              .run()
+          else {
+            const image = `![${(media.alt ?? media.originalName).replace(/[\\\[\]]/g, '\\$&')}](${media.url})`
+            const next = `${latest.current}\n\n${image}`
+            latest.current = next
+            onChange(next)
+          }
+        }}
+      />
     </section>
   )
 }

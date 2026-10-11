@@ -37,6 +37,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // 全局规则先应用，预览的更严格策略随后覆盖同名响应头。
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+      {
         // 后台一律禁止索引
         source: '/admin/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
@@ -53,10 +58,6 @@ const nextConfig: NextConfig = {
           { key: 'Cache-Control', value: 'private, no-store' },
           { key: 'Referrer-Policy', value: 'no-referrer' },
         ],
-      },
-      {
-        source: '/:path*',
-        headers: securityHeaders,
       },
     ]
   },

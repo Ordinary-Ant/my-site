@@ -86,6 +86,7 @@ model User {
   avatar       String?
   role         Role      @default(EDITOR)
   isActive     Boolean   @default(true)
+  revision     Int       @default(1)
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -217,6 +218,7 @@ model PreviewToken {
 
 /// 文章分类（支持树形）
 model Category {
+  revision    Int      @default(1)
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
@@ -238,6 +240,7 @@ model Category {
 
 /// 标签（文章 / 日志 / 作品共用）
 model Tag {
+  revision  Int      @default(1)
   id        String   @id @default(cuid())
   name      String
   slug      String   @unique

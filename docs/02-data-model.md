@@ -235,6 +235,7 @@ model User {
   role         Role      @default(EDITOR)
   isActive     Boolean   @default(true)
   lastLoginAt  DateTime?
+  revision     Int       @default(1) // 用户资料/角色/状态/密码变更的并发保护；登录时间不递增
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -368,6 +369,7 @@ model Category {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
+  revision    Int      @default(1) // 管理CAS修订号
   description String?
   icon        String?
   color       String?
@@ -389,6 +391,7 @@ model Tag {
   id        String   @id @default(cuid())
   name      String
   slug      String   @unique
+  revision    Int      @default(1) // 管理CAS修订号
   color     String?
   createdAt DateTime @default(now())
 
@@ -818,6 +821,7 @@ npx prisma db seed
   "exportedAt": "2025-01-01T00:00:00Z",
   "data": {
     "modules": [...],
+    "routeAliases": [...],
     "settings": [...],
     "profile": {...},
     "categories": [...],
@@ -830,7 +834,13 @@ npx prisma db seed
 }
 ```
 
-对应 `POST /api/v1/admin/import`（`mode: 'merge' | 'replace'`），用于换库或恢复。
+对应 `POST /api/v1/admin/import/preview` 与 `POST /api/v1/admin/import`（`mode: 'merge' | 'replace'`），先验证和预览再确认执行。内容包含草稿、归档、未来及软删记录，标签关系用tagIds、分类关系用categoryId/parentId；不含用户口令、会话、预览令牌、上传票据、审计、限流、内部任务游标和媒体二进制。settings仅包含已知settingGroups及已知键，replace同样保留内部运行游标，避免恢复旧游标误处理定时任务。媒体与数据库独立备份，JSON不能代替完整灾备。
+
+默认标签采用固定合法slug：Next.js/nextjs、React/react、性能/performance、工程化/engineering、重构/refactoring、TypeScript/typescript。20261010000000_seed_tag_slugs只修复精确匹配旧seed中文名称与中文slug的三项，保留ID及关系；目标slug被占用时使用-seed-N，不覆盖既有记录。每项Tag及受影响内容revision递增，重复执行幂等；其他自定义slug不改。旧分类/标签URL无别名合同仍适用，此修复必须记录验收证据。
+
+merge按分类/标签slug复用已有项并映射来源ID；同ID不同slug分配新ID。文章/作品遇已有slug、日志/时间戳遇已有ID时跳过且报告，禁止静默覆盖；其他ID碰撞映射到新ID。merge保留现有配置单例（modules/settings/profile），报告这些配置未覆盖。replace在单一事务中替换内容/词表，并应用完整配置单例；保留用户、会话、媒体及审计。已有同ID内容和Profile恢复后revision必须大于替换前及导入值，旧编辑稿不能覆盖恢复数据。来源authorId只保留本库有效用户，否则映射当前管理员并报告。
+
+任何缺失关系、非法两层树、重复ID/slug、非法配置/危险键及路由冲突均拒绝整次导入。replace保留已有历史栏目别名，路径变化补旧地址别名，再校验导入别名与最终路径无抢占/嵌套；历史301不能被恢复操作破坏。执行前重新验证预览凭证及当前库快照；变化则409要求重新预览，事务失败全量回滚（包括审计）。
 
 ### 数据库备份
 
@@ -862,3 +872,7 @@ npm run test:e2e
 test:db使用目标URL同一服务器的/postgres管理连接创建/迁移测试库，拒绝非_test后缀；禁止测试重置开发/生产库。集成测试显式读取TEST_DATABASE_URL。
 
 本轮真实证据（执行者协调结果）：开发/测试两库migrate deploy通过；第二迁移20261007044400_publication_backfill仅回填已发布Log/Project的空publishedAt，不改草稿或已有时间；seed重复执行计数不增加，新增日志发布时间取logDate。5unit+3真实PGintegration通过，含seed幂等和publication回填。最终复跑与整阶段验收待台账确认。
+
+### D05 分类标签数据修订
+
+Category及Tag补revision Int @default(1)，真实迁移回填既有行。管理写CAS；分类最多两层由服务层事务完整校验。标签删除/合并、分类删除改变正文关系时，相关Article/Log/Project revision随事务递增，以保护打开中的旧编辑快照。类别删除不删除文章，标签合并包含草稿和软删关联。

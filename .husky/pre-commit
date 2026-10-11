@@ -1,1 +1,2 @@
-npx lint-staged
+# Windows 的包装命令也占长度，缩小分批以保留完整检查。
+npx lint-staged --max-arg-length 4000

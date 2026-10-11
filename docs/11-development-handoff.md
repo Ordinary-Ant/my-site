@@ -1,55 +1,71 @@
 # 11 · 开发交接与恢复
 
-更新：2026-10-07 23:50。A（66dca93）、B（c5fe0c6）、C（本次本地提交）已验收；D–G待开始。当前分支codex/full-site，保留master，origin已配置，禁止自动push。全站一期尚未完成。
+更新：2026-10-11。A（66dca93）、B（c5fe0c6）、C（cc9fb5d）已验收并本地提交；D01–D08已验收，准备本地阶段提交，E–G待开始。分支codex/full-site，保留master，origin已配置，禁止自动push。一期尚未完成；D整阶段已通过，之后进入E。
 
 ## 恢复顺序
 
-1. 在C:/Users/ordinaryPuly/Desktop/personal-site读AGENTS.md，核对git status --short与git log -5 --oneline，确认未提交变化归属。
-2. 读10台账、12批准计划及本交接，查当前阶段verification证据；09仅是修订前历史快照。
-3. 检查Docker PostgreSQL健康，已有.env不可输出/覆盖/提交；迁移先查状态，不reset开发/生产库。
-4. 开始功能前登记，实际验收后填证据，阶段通过后本地提交。公开生产发布最终确认。
+1. 读AGENTS.md，核对Git状态和最近提交；当前未提交变化均属于D实现，不覆盖/回退。
+2. 读README、10台账、12批准计划及当前阶段verification；09只是旧可行性快照。
+3. 检查Docker与实际端口。现有.env不可输出/覆盖/提交，不reset开发/生产库。
+4. 开发前登记，实际验收后填证据；公开生产发布最终确认。
 
 ## 环境与启动
 
-Node24.19/npm11.17，PostgreSQL16容器personal-site-db。首次迁移和seed已经完成，不重复初始化。Node>=24/npm>=11为工程基线。
+Node24.19/npm11.17，PostgreSQL16容器personal-site-db，卷personal-site_pgdata。2026-10-10 Windows excludedportrange含5341–5440，原5432无法绑定；已保留同卷重建映射15432。开发库4篇文章；开发与测试库现有7个迁移均已部署，未reset或修改.env。docker已在PATH，安装于用户AppData/Local/Programs/DockerDesktop。
+
+当前启动命令（进程环境覆盖，不覆盖.env）：
 
 ```powershell
-npm install
-npm run db:up
+$env:POSTGRES_PORT = '15432'
+docker compose up -d db
+$env:DATABASE_URL = 'postgresql://dev:dev@localhost:15432/personal_site?schema=public'
 npm run db:deploy
-npm run dev
+$env:NEXT_PUBLIC_SITE_URL = 'http://localhost:3100'
+npm run dev -- --port 3100
 ```
 
-Docker如缺PATH，使用Docker Desktop安装路径；不要据此认定Docker不存在。.env仅当不存在时从example复制。Windows文件操作使用LiteralPath，删除/移动前核对目标位于工作区。
-
-独立测试库：
+独立测试：
 
 ```powershell
-$env:TEST_DATABASE_URL = 'postgresql://dev:dev@localhost:5432/personal_site_test?schema=public'
-npm run test:db
+$env:TEST_DATABASE_URL = 'postgresql://dev:dev@localhost:15432/personal_site_test?schema=public'
+$env:E2E_BASE_URL = 'http://localhost:3100'
+$env:NEXT_PUBLIC_SITE_URL = $env:E2E_BASE_URL
+npm run build
 npm test
 npm run test:integration
 npm run test:e2e
 ```
 
-测试只允许_test后缀，禁止重置开发/生产库。E2E自动启动测试库新服务，不复用已有开发服务器；Chrome headless shell已可用。Windows Prisma DLL在数据库测试期间可能被锁：PG与prisma generate/build顺序执行，不并发。
+迁移/seed已完成，不重复初始化。TEST_DATABASE_URL仅允许_test且核实current_database；禁止测试重置开发/生产。2026-10-11新增Windows保留端口2929–3028，3000启动EACCES，改用3100。Playwright通过E2E_BASE_URL配置本机地址，Origin/独立浏览器上下文/runner一致，构建时NEXT_PUBLIC_SITE_URL须与测试地址相同。Chromium可用。Windows Prisma DLL在PG测试期间可能被锁：PG与generate/build顺序执行，结束后disconnect再build。Docker端口参数与DATABASE_URL必须一致，不能只看容器healthy。
 
-## 已验收与证据
+## 验收与证据
 
-- A：规范/设计统一、依赖/CI/测试环境、基础迁移/seed。见verification/phase-a.md。
-- B：认证/会话原子轮转与重放/角色、文章编辑预览发布阅读回收、Local媒体与R2隔离协议、真实分钟runner。52PG、16unit及三端/角色浏览器已通过；见verification/phase-b.md。
-- C：模块关闭恢复/5秒撤销、嵌套配置/null/严格键、历史301动态路由、首页真实聚合/导航/设置/审计、全站既有出口隐私边界。见verification/phase-c.md和phase-c-backend.md。
-- 最终C代码：43unit（14files）、68真实PG（12files）、check/verify/build退出0；Playwright article/foundation/modules/roles 9passed/6skipped，三端文章和首页实际通过。只有既有Markdown外链图片lint警告。
-- gzip登录107.65KB<=110、文章117.60KB<=135（decimal KB）。动效预算与Lighthouse待F/G。
-- home_default_order迁移20261007185500已部署开发/测试库，仅完整等于旧seed默认的配置回填；幂等/自定义保留真实PG通过。此前3个迁移foundation/publication_backfill/media_upload_intents已部署。
-- 最新隐私修复含格式化电话、percent/entity/CommonMark转义、强调/link/inlineCode可见文字拆分、长文/Unicode位置；TOC从脱敏后正文生成。规格和质量复审均批准，实际HTTP夹具无本人邮箱/电话/mailto/tel。feed兼容路由共用首页过滤且关闭模块数组为空。
+- A基础治理、B文章认证媒体发布、C模块路由配置隐私均已提交，见verification/phase-a/b/c.md及backend证据。
+- D01日志、D02作品、D03时间线、D04 About已验收，功能/三端/权限/并发证据见verification/phase-d.md及对应backend文件。D04最终111unit/114PG，全部spec/quality通过。实际PNG/PDF上传、图集裁切、拖拽/键盘、无JS/reduce、About同源经历与隐私均有真实证据。
+- D05分类标签已验收：118unit/123真实PG，最终taxonomy+roles浏览器8passed/10skipped（桌面业务只跑1440，三端布局全跑）；全部规格与质量复审通过，check/build退出0。分类父删除保护/同父排序、标签跨三模型合并去重、内容revision递增、bulk删正文保留、SLUG_CONFLICT、手动slug回调竞态、Navigation取消后退及不支持时sessionStorage恢复原revision、undo-to-clean防旧稿复活已验证。详见阶段D及taxonomy backend证据。
+- D05 revision迁移20261009153000_taxonomy_revision两库已部署并可重跑；此前foundation/publication_backfill/media_upload_intents/home_default_order均已部署；D06新增20261010000000_seed_tag_slugs已部署两库，固定旧seed中文slug且保留ID/关系，1unit+1PG通过。
+- .gitignore的logs/已改/logs/，否则src日志API被忽略；所有D新文件都必须随阶段提交。Markdown idPrefix及脚注命名空间避免双布局和相同标题DOM重复id。当前动态强调色对比度仍留F/G。
 
-## 下一步
+## 当前工作与下一步
 
-进入D，按台账登记日志、作品、时间线、About、分类标签、用户与数据管理；保留中文关键注释、revision409、公开过滤、媒体引用和权限规则。C新增的配置必须被后续模块页面实际消费。D阶段功能验收后本地提交；不要把现有栏目导航链接或静态稿当作D实现。
+D06已验收，完整记录见verification/phase-d.md及phase-d-data-backend.md：最终build退出0、127unit/138PG、data+roles浏览器5passed4skipped。规格/质量全部批准；时间线精度/年份、motion完整字段、生日UTC偏移漏洞均RED→GREEN并复审。真实下载、merge关系恢复、replace冲突/重算、旧稿409、三端暗色/reduce、角色越权均通过。gzip登录107816字节/107.82KB、文章126713字节/126.71KB。
+
+D07用户管理合同已补03/04/02：ADMIN权限、User revision、随机初始/重置密码一次展示、停用/角色/邮箱变更撤销全部会话、自己不可停用降级、最后管理员并发保护、无物理删除。users_backend负责user service/validator/APIs、User revision迁移、auth改密码rev递增及unit/PG；root负责users UI/helpers/E2E和总文档。
+
+测试备份已从.next改到Git忽略的/.test-backups/，避免build清理。浏览器data-browser-test-backup.json、后端data-backend-test-backup.json在replace前以wx保存原包，有残留必须先恢复_test再跑；成功恢复后才删除，不能覆盖/盲删。首轮测试清理错误曾导致_test几个配置未恢复，已核对seed重新初始化这些字段并明确记录，开发库未操作。恢复目录build保留探针及新路径E2E已通过，探针及成功恢复的原包均已删除。
+
+20261010010000_user_revision已部署两库且重跑无待部署项，包含User revision与不区分大小写邮箱唯一索引。D07后端规格/质量复审批准；邮箱修改与登录竞态确定性PG红测复现旧邮箱错误登录，锁内邮箱重验后26项user/auth PG及2项user unit通过。root用户UI/helpers及浏览器已验收；132unit/147PG、users+roles5pass4skip18.1秒，全部规格质量批准。保存后旧筛选覆盖列表真实RED→GREEN；邮箱/avatar、复制/Escape清除、active筛选及权限均实际通过。PG/generate/build按顺序由root执行，其他审查只读。D08完整设置媒体已验收；D阶段本地提交后继续E/F/G。
 
 ## 未验证及环境边界
 
-R2云ACL/CORS/公网直传、生产托管/域名/数据库和备份凭据未提供，G须记录实际阻塞并验证；B仅本地对象协议与真实PG，不是R2云验收。实际分钟runner60秒证据在B；生产外部调度尚未配置。默认TRUST_PROXY=false，可信代理正确覆盖头后才开启。
+R2云ACL/CORS/公网直传、生产托管/域名/数据库和备份凭据未提供，G记录实际阻塞；B只证明本地协议与真实PG。真实分钟runner已在B验收，生产外部调度未配置。默认TRUST_PROXY=false，代理正确覆盖头后才开启。
 
-主题自定义强调色的暗色/文字对比度、完整三端/无JS/reduce、搜索/RSS/sitemap、动效、生产CSP/备份恢复均留D–G实际验收，不宣称已通过。生产npm audit --omit=dev已0漏洞；开发链braces→micromatch→fast-glob→eslint-config-next仍5high，无上游修复，禁止force降级Next14，G复核。密钥/RT/rotationReply不得日志输出。
+主题对比度、全站最终视觉、搜索/RSS/sitemap、动效、生产CSP、独立数据库/媒体备份恢复留E–G。最近gzip登录107.90KB/文章126.80KB（D08实测）；预算110/135KB。生产audit既有0漏洞，开发链5high待G复核，不force降级Next。D07首轮全PG曾有media-r2本地模拟协议测试fetch bad port失败，随后全147项通过；实际随机端口未保留，不推测具体值，仍须稳定测试端口分配。密钥、RT、rotationReply、导入凭证不能输出日志或Git。
+
+## D阶段最终恢复点
+
+D01–D08及全部规格/质量复审通过。最终143unit（47文件）、156真实PG（23文件）、check/verify/生产build退出0，仅既有Markdown外部图片警告。全套96浏览器54pass42skip（2.6分钟，跳过设备不适用重复场景）。分类键盘偶发根因为Dnd键盘监听器延后注册，测试等待真实监听器后重复10次通过，见phase-d-taxonomy-keyboard.md。分类标签公开计数已复用日志日期/置顶过滤，真实RED→GREEN并复审。
+
+全套浏览器之后补修404推荐链接：模块关闭隐藏、连续改路由使用当前路径。单元RED→GREEN，重新生产build后modules+foundation实际4pass2skip（8.3秒）。gzip登录107902字节、文章126799字节，均低于110/135KB。未覆盖生产R2和部署，不据此声称一期完成。测试恢复备份无残留。
+
+下一步：本地D提交，记录hash；先修订E搜索/归档/匿名阅读统计/订阅SEO合同再开发。搜索全局分页不得先每表截断再合并；阅读统计不存IP，以签名匿名访客cookie和PG30分钟窗口为准；lastBackupAt无实际来源时为null。继续登记E功能及真实验收，不自动push。

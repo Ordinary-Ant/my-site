@@ -175,7 +175,8 @@ describe('文章路径与404边界', () => {
 
   it.each(['disabled', 'unknown', 'wrong-module', 'nested-suffix'])('%s 返回404', async (kind) => {
     if (kind === 'disabled') articleModule.enabled = false
-    if (kind === 'wrong-module') articleModule.key = 'log'
+    // 日志已接入解析器，未知模块才属于无页面实现的404边界。
+    if (kind === 'wrong-module') articleModule.key = 'unsupported'
     const path =
       kind === 'unknown'
         ? ['missing']

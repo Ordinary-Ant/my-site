@@ -53,7 +53,10 @@ const schemas = {
     })
     .strict(),
   about: z
-    .object({ ...common, sections: switches(['advantages', 'skills', 'experience', 'contact']) })
+    .object({
+      ...common,
+      sections: switches(['bio', 'advantages', 'skills', 'experience', 'services', 'contact']),
+    })
     .strict(),
 }
 

@@ -68,6 +68,8 @@ const configLabels: Record<string, string> = {
   AWARD: '奖项',
   MILESTONE: '里程碑',
   advantages: '个人优势',
+  bio: '自我介绍',
+  services: '我能提供什么',
   skills: '技能',
   experience: '经历',
   contact: '联系区块',

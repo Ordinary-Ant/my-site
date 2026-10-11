@@ -1,3 +1,4 @@
+import { testBaseURL } from './base-url'
 import { expect, test } from '@playwright/test'
 import { spawn } from 'node:child_process'
 test('分钟调度机器凭据校验与实际60秒运行周期', async ({ request }, testInfo) => {
@@ -8,7 +9,7 @@ test('分钟调度机器凭据校验与实际60秒运行周期', async ({ reques
     env: {
       ...process.env,
       REVALIDATE_SECRET: 'e2e-only-publication-machine-secret-32-chars',
-      NEXT_PUBLIC_SITE_URL: 'http://localhost:3000',
+      NEXT_PUBLIC_SITE_URL: testBaseURL,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   })

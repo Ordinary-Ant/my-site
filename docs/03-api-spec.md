@@ -88,7 +88,7 @@
 | `from` / `to` | ISO date | — | 时间范围（`logDate` / `publishedAt` / `createdAt`，按资源而定） |
 | `fields` | string | — | 稀疏字段集，如 `fields=id,title,slug`（列表页减包体） |
 
-> **排序白名单**：每个资源只接受白名单内的排序字段，其余一律回退默认。杜绝 `sort=passwordHash` 这类探测。
+> **排序白名单**：每个资源只接受白名单内的排序字段。后台日志明确拒绝非法字段并返回400，最多4个字段，允许logDate/updatedAt/title/viewCount（支持标准字段或`-字段`，兼容`字段:asc/desc`）；其他资源按各自合同处理。公开日志固定置顶、记录日期降序、稳定ID顺序，不使用sort参数。禁止将任意用户字段直接传入数据库排序。
 
 ### 1.5 限流
 
@@ -171,15 +171,21 @@
 | GET ★ | `/api/v1/admin/settings/motion` | **动效配置**：返回 config + 4 个预设 + 性能预估（见 §5.8） |
 | PATCH ★ | `/api/v1/admin/settings/motion` | 保存动效配置（Zod + 交叉规则，可能带 `warnings`） |
 | GET | `/api/v1/admin/media` | 媒体列表 |
+| GET/POST | `/api/v1/admin/media/folders` | 全部目录汇总/新建持久空目录 |
+| POST | `/api/v1/admin/media/deduplicate` | 按hash/size/mimeType复用已验证媒体 |
 | POST | `/api/v1/admin/media/upload` | 上传 |
 | PATCH | `/api/v1/admin/media/:id` | 改 alt / folder |
 | DELETE | `/api/v1/admin/media/:id` | 删除（含存储文件） |
 | — | `/api/v1/admin/categories` | 分类 CRUD（含 `/reorder`） |
 | — | `/api/v1/admin/tags` | 标签 CRUD（含合并 `/merge`） |
 | GET | `/api/v1/admin/audit-logs` | 审计日志 |
-| — | `/api/v1/admin/users` ★ | 用户 CRUD |
+| GET/POST | `/api/v1/admin/users` ★ | 用户列表/创建；生命周期由停用/启用管理 |
+| GET/PATCH | `/api/v1/admin/users/:id` ★ | 用户详情/资料角色状态修改（revision） |
+| POST | `/api/v1/admin/users/:id/reset-password` ★ | 随机重置密码并撤销全部会话 |
+| POST | `/api/v1/admin/users/:id/revoke-sessions` ★ | 撤销指定用户全部会话 |
 | GET | `/api/v1/admin/export` ★ | 全站导出 JSON |
 | POST | `/api/v1/admin/import` ★ | 导入 |
+| POST | `/api/v1/admin/import/preview` ★ | 校验、冲突映射和影响预览 |
 
 ---
 
@@ -273,7 +279,7 @@
 
 ### 3.4 `GET /api/v1/logs`
 
-**查询参数**：通用参数 + `type`（`DAILY|EVENT|SUMMARY`）+ `year`（int）+ `month`（1-12）+ `mood`
+**查询参数**：通用参数 + `type`（`DAILY|EVENT|SUMMARY`）+ `year`（1–9998）+ `month`（1-12）+ `mood` + `date`（有效YYYY-MM-DD，年份1–9998，精确日期）。只传month时按北京时间当前年筛选；仅date可直接查询历史日期。创建/修改的logDate采用相同日期范围，9999年日期拒绝400，避免年度范围终点溢出。
 
 **响应**
 ```jsonc
@@ -301,7 +307,7 @@
 
 ### 3.5 `GET /api/v1/logs/calendar?year=2025`
 
-供移动端日历视图与 PC 端侧边日历。
+供移动端日历视图与 PC 端侧边日历。可复用type/mood/tag/q/date筛选；不传year时取date的年份，无date则取北京时间当前年。月份另外返回dayCounts（日期号→条数），供同一天多篇徽章。后台`GET /api/v1/admin/logs/calendar`需content:read，与后台列表共用状态/回收站筛选，不泄露到公共接口。
 
 ```jsonc
 {
@@ -322,6 +328,12 @@
 ### 3.6 `GET /api/v1/projects`
 
 **查询参数**：通用参数 + `type`（`GAME|REPO|SKILL|OTHER`）+ `featured`（boolean）+ `tech`（技术栈名）
+
+作品补充合同：未传sort或原生表单`sort=`均使用默认`order ASC,startDate DESC NULLS LAST,id ASC`；`sort=latest`使用`startDate DESC NULLS LAST,order ASC,id ASC`。其他排序只接受order/startDate/updatedAt/title/viewCount的安全字段及明确方向，非法400。tech按数组中的技术栈名精确匹配。from/to作用于startDate：YYYY-MM-DD按北京时间当日00:00至23:59:59.999的闭区间，带时区ISO按实际时刻；无效/倒置400。meta.typeCounts返回GAME/REPO/SKILL/OTHER计数，忽略当前type但保留其余条件及公开过滤，关闭类型为0。fields使用已知DTO顶层白名单，公开列表禁止content/deletedAt等内部字段，隐私处理后投影，meta保留。
+
+后台作品补充入口：GET /admin/projects/options 返回tags及历史techStack；GET /admin/projects/slug-available?slug=...&excludeId=...检查slug；PATCH /admin/projects/reorder 接受`{items:[{id,order,revision}]}`，全事务版本校验，任一409全体回滚。POST /admin/projects/:id/preview-token为content:read授权、同源POST及共享写限流120次/15分钟；kind=project/hash24h，不缓存不索引，模块关闭/删除/到期404。预览可以读取草稿/归档/未来及已关闭子类型，与日志私有预览一致，不进入公开查询。
+
+创建作品时coverImage未传才使用gallery首张；PATCH coverImage:null明确清空，修改gallery但未传coverImage保持旧封面。links只接收github/demo/video/docs/article安全URL已知键，nullable清空，拒绝未知键。媒体和标签数组整体替换，关系写入与审计同一事务。
 
 **响应**
 ```jsonc
@@ -382,6 +394,10 @@
 }
 ```
 **服务端排序**：`isCurrent DESC, startDate按direction, 同日期order ASC, id ASC`。
+
+时间线日期为日历日期：接受YYYY、YYYY-MM、YYYY-MM-DD（兼容合法ISO输入中的日历日期部分）；规范化UTC零时并保存YEAR/MONTH/DAY精度。YEAR归一为01-01，MONTH归一为当月01日，DAY保存完整日期；不存在日期/结束早于开始返回400。修改日期未传精度时按输入推断，单独修改精度时归一化现有日期；合并后重验起止。空endDate可清空，isCurrent=true须endDate为空；允许多个当前项，后台提示。公开列表只返回未删除且visible=true的条目，按模块/类型开关过滤；timeline无发布状态，以visible管理公开性。About经历仅WORK/showOnAbout=true，独立于visible，但同时受timeline.enabled、WORK类型和about.sections.experience约束。所有公开DTO过滤联系方式。
+
+后台同构入口GET/POST /admin/timeline、GET/PATCH/DELETE /admin/timeline/:id、POST :id/restore、DELETE :id/purge（仅ADMIN）；写入带revision并CAS，审计及缓存失效。PATCH /admin/timeline/reorder接受`{items:[{id,order,revision}]}`，全事务版本校验，排序只影响同isCurrent/同startDate内的顺序，跨日期不能覆盖日期优先级。支持type/q、回收站includeDeleted/deleted筛选。公开不设详情页，Markdown详情通过原生折叠展开。
 
 ---
 
@@ -593,6 +609,7 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
 // 请求
 {
   "ids": ["clx1", "clx2", "clx3"],
+  "revisions": { "clx1": 2, "clx2": 1, "clx3": 4 }, // 每个ID必须携带读取时的修订版本
   "action": "publish",          // publish | unpublish | archive | delete | restore | addTags | removeTags
   "payload": { "tagIds": ["clx9"] }   // action 为 addTags/removeTags 时需要
 }
@@ -701,7 +718,10 @@ export const ArticleUpdateSchema = ArticleCreateSchema.partial().extend({
 
 **`PATCH /api/v1/admin/settings/:group`** — 需 `setting:write`（ADMIN）
 ```jsonc
-{ "site.name": "新的站点名", "footer.icp": "京ICP备12345678号" }
+// PATCH /api/v1/admin/settings/general
+{ "site.name": "新的站点名" }
+// PATCH /api/v1/admin/settings/footer（独立请求）
+{ "footer.icp": "京ICP备12345678号" }
 ```
 每个已知 key 有独立的 Zod 校验规则（`lib/validators/settings.ts`）；未知 key 返回 `400 VALIDATION_ERROR`。
 
@@ -806,7 +826,7 @@ intent JSON：`{originalName,mimeType,size,hash,alt?,folder?}`（hash为64位小
 GET /api/v1/admin/settings/motion返回08的完整config、static/editorial/narrative/kinetic四预设及标注估算的体积信息。PATCH仅ADMIN，已知嵌套键合并，严格拒绝未知键；默认editorial+none。无background/text/micro/performance旧字段，无custom。公开GET /api/v1/site的motion只返回渲染配置。完整合法值/默认值/升级见[08](08-motion-system.md)。预算文章135KB、动效28KB、登录110KB gzip。respectReducedMotion固定true，decoration仅none/tint，无连续背景。
 
 ### 5.9 草稿预览与slug检查
-POST /api/v1/admin/articles/:id/preview-token需content:write，创建24h随机token（哈希入PreviewToken）；GET /preview/:token仅授权有效token读取对应草稿，no-store及noindex，不进RSS/sitemap/搜索。过期或撤销404。GET /api/v1/admin/articles/slug-available?slug=&excludeId=需content:read，仅给后台校验；最终写入仍由数据库唯一约束兜底。
+POST /api/v1/admin/articles/:id/preview-token需content:write；POST /api/v1/admin/logs/:id/preview-token需content:read（ADMIN/EDITOR/VIEWER均可），两者POST均检查Origin、启用账号与AT对应会话。创建24h随机token，PreviewToken只保存哈希与内容类型；GET /preview/:token按凭据类型分发文章/日志，日志提供Markdown及图集。预览允许草稿、归档、未来内容及已关闭子类型，属于凭据授权的私有读取，与公开过滤不同；整个模块关闭或内容软删除时预览404，过期/缺失/未知类型凭据也404。页面no-store及noindex，不含公开导航或上下篇，不进RSS/sitemap/搜索。GET /api/v1/admin/articles/slug-available?slug=&excludeId=需content:read，仅给后台校验；最终写入仍由数据库唯一约束兜底。
 
 ### 5.10 发布与公共边界
 `GET /api/v1/jobs/publication`为外部分钟调度入口，仅接受`Authorization: Bearer <REVALIDATE_SECRET>`独立机器密钥（至少32位），不接受后台Cookie替代；未配置503、错误凭据401。任务使用PostgreSQL事务级锁和`jobs.publication.cursor`内部Setting游标，扫描上次游标至本次时间的公开文章/日志/作品并失效依赖tag；失效失败不推进游标，支持重试。清理到期预览token。正常公开读取始终检查publishedAt，不依赖任务把草稿或未来内容提前公开。本地`npm run jobs:publication`每60秒调用一次；托管环境必须配置外部分钟调度，当前尚未验证生产调度。
@@ -840,3 +860,52 @@ contactVisible=false所有公开DTO、首页、页脚、social、metadata及JSON
 - 这些接口背后读写的表 → [02-data-model.md](02-data-model.md)
 - 后台如何使用这些接口 → [04-admin-console.md](04-admin-console.md)
 - 前台如何消费这些接口 → [05-frontend-ia.md](05-frontend-ia.md)
+
+### D04 实施合同补齐（2026-10-09）
+
+About的sections统一含bio、advantages、skills、experience、services、contact，六项默认true；新增键通过默认合并兼容既有四键配置，不覆盖自定义值。Hero始终显示。公开GET /api/v1/profile在about关闭时404；只返回页面所需字段，不公开birthday、revision及管理时间戳，关闭的区块不进入DTO。experience复用TimelineItem，后台仅只读并链接时间戳；前台选当前项优先、开始日期降序、order/id稳定排序的最近3条，完整列表遵循时间轴direction。联系区块关闭、about关闭或contactVisible=false均执行全站既有脱敏规则。
+
+后台GET /api/v1/admin/profile需content:read，PATCH需content:write、Origin及共享adminwrite限流；已停用/撤销会话立即拒绝。PATCH只接受已知字段，未传保持、数组整体替换、nullable字段null清空，合并后校验全部数据。name/headline必填，bio可空字符串；skills等级1–5，years非负；链接采用安全HTTP(S)/规范站内路径，social另支持合法mailto/tel并由公开脱敏控制。保存必须带revision，旧号409，事务内更新及审计、成功后失效全部依赖。空表GET返回待完善占位对象revision=0；首次PATCH仅revision=0允许原子创建revision=1，并发创建返回409。
+
+## 用户管理实施合同（D07，2026-10-10）
+
+用户管理仅ADMIN/user:manage。GET列表/详情使用当前启用用户及sid权威授权，不要求GET Origin；POST/PATCH需Origin与共享adminwrite额度。列表支持q（姓名/邮箱）、role、active、page/pageSize，返回安全DTO（id/name/email/avatar/role/isActive/lastLoginAt/createdAt/updatedAt/revision）和分页meta、activeAdmins；任何读接口均不返回passwordHash/会话凭证。业务生命周期使用停用/启用，不提供物理删除用户入口，保留作者和审计关联。
+
+POST /admin/users接{name,email,role,avatar?}，姓名1–200字符、邮箱归一小写且大小写不敏感唯一，role为三角色，avatar可空且安全URL；始终创建启用用户。服务端生成密码（至少大小写与数字，随机部分不少于128位）并bcrypt12，只在创建响应{user,temporaryPassword}返回一次；不写审计/日志/前端持久存储，响应no-store。后台提示首次登录后在个人设置修改。
+
+PATCH /admin/users/:id接{revision,name?,email?,avatar?,role?,isActive?}，严格拒绝未知字段，null仅avatar清空，禁止空修改；User新增revision默认1，业务修改与密码变更递增，旧revision返回409。不能停用/降级自己，不能令启用ADMIN数量为0；并发相互降级也须保持至少一位启用管理员。角色/邮箱变更或停用须同事务撤销目标全部Session并清空rotationReply，已签发AT下一请求即失效。普通姓名/头像修改不撤销会话。
+
+POST :id/reset-password接{revision}，仅其他用户，生成新随机密码，返回{user,temporaryPassword}一次，递增revision并撤销目标全部会话；自己的密码沿用/account旧密码核验流程。POST :id/revoke-sessions接{revision}，仅其他用户，撤销全部会话并递增revision，返回{user,revoked}；当前用户沿用个人设置的登出其他设备/全部设备。自操作保护422、最后管理员保护422、邮箱冲突409、版本冲突409、缺失404、越权403；未知/格式400。
+
+写事务固定用户管理advisory锁、按ID顺序锁actor/target，重验当前ADMIN/启用/sid，再做CAS、管理员数量保护、会话撤销及审计，防止等待期间权限改变或并发绕过保护。锁顺序与认证的用户→会话一致，序列化/死锁冲突409整次回滚。审计只记业务字段差异或操作名，不存临时密码/hash/token。登录更新lastLoginAt不递增业务revision；个人改密码须递增revision。真实PG验证三角色/停用AT/角色和邮箱撤销/随机密码登录/重复邮箱/旧版本/并发管理员保护/审计脱敏，浏览器验证完整用户生命周期及三端。
+
+## 数据管理实施合同（D06，2026-10-10）
+
+GET /api/v1/admin/export需data:export（ADMIN），校验当前启用用户及sid，显式消费PG管理额度；GET不要求Origin。返回标准data包裹的version=1.0、exportedAt、data快照，结构见02，附下载文件名/no-store。所有内容含软删及未发布，关系明确tagIds；不导出身份凭据、媒体二进制或审计。单包JSON上限4,000,000字节，实体合计最多5000项；超出需使用数据库/媒体备份，不截断。
+
+POST /api/v1/admin/import/preview接{mode:'merge'|'replace',bundle}，POST /import接同样字段并加token、replace时confirmation='替换全部内容'。两者data:import/ADMIN、Origin、共享PG限流；现有JSON请求上限4,200,000字节仍有效。严格拒绝未知/危险键、缺关系、重复ID/slug、非法日期和业务字段、两层树及配置/路线冲突。preview不修改业务数据，返回{mode,token,expiresAt,created,skipped,mapped,warnings,replaces}；计数键为categories/tags/articles/logs/projects/timelineItems/modules/settings/profile/routeAliases，mapped为来源ID到目标ID的映射说明。凭证签名绑定user/sid、mode、文件摘要及业务数据库快照，10分钟有效；执行前重验，文件/权限/库内容变化或过期返回409要求重新预览。
+
+merge/replace精确定义见02；replace历史路径不可丢失，已有同IDrevision递增并撤销受影响草稿预览令牌。配置复用已有严格module/settings/profile/motion合同，任何不合法项整次拒绝。导入在Serializable事务内锁定关联内容/词表及配置，映射、关系、配置、审计原子提交，冲突409全量回滚，完成后失效所有派生缓存。审计仅记录模式、摘要和数量，不保存全文、联系方式或预览凭证。返回实际created/skipped/mapped/warnings计数，不能以文件上传或预览成功代替导入验收。
+
+## 分类与标签实施合同（D05，2026-10-09）
+
+POST /api/v1/admin/tags/merge/preview保持content:read及Origin校验，在锁事务前显式消费与写操作共用的PostgreSQL adminwrite额度（120次/15分钟）；超限429并返回Retry-After。
+
+Category支持最多两层；parentId=null为根，子分类只能挂根，禁止自指/环/把带子项的根移入另一根。删除有子分类的分类返回422；删除叶分类只把全部关联文章（包括草稿/软删）改为未分类，不删除正文。分类slug可编辑但无历史别名，后台提醒旧分类链接失效；栏目路径历史301合同不因此扩展。
+
+Tag在Article/Log/Project共用，创建后slug不可修改；改显示名不改slug，替换slug应新建再合并。删除标签仅解除全部内容关联，不删除正文；合并来源标签到目标标签时全事务转移关联、去重、保留目标名称/slug并删除来源。包括草稿/未来/归档/软删内容，防止恢复后断关系。受影响内容revision递增，避免旧编辑快照重新覆盖关系。Category/Tag新增revision默认1，管理修改/删除/排序/合并均带CAS，冲突409整次操作回滚。
+
+公开GET /api/v1/categories只返回有公开文章的分类及必要祖先，parent计数汇总子孙公开文章。GET /api/v1/tags仅返回公开使用数>0的标签，分article/log/project及total计数；严格复用模块/类型/PUBLISHED/到期/未删除过滤，关闭模块不能通过词表名称和计数泄露草稿。全部公开DTO复用联系方式清洗。管理列表返回全记录及全部内容使用数（含软删）方便清理。
+
+管理接口统一content:read读、content:write写（ADMIN/EDITOR写，VIEWER只读），权威会话/Origin/PostgreSQL限流。GET/POST /admin/categories、GET/PATCH/DELETE /admin/categories/:id，PATCH /admin/categories/reorder接items[{id,order,revision}]（不借排序改父级），GET/POST /admin/tags、GET/PATCH/DELETE /admin/tags/:id，POST /admin/tags/bulk接items[{id,revision}]原子批删，POST /admin/tags/merge/preview与/merge接{target:{id,revision},sources:[{id,revision}]}。预览返回去重后的影响数与来源/目标，确认合并前显示不可撤销提示；确认时重新计算并返回实际影响数。source不能包含target或重复；关联变化与审计事务同提交，所有派生缓存失效。未知键400、缺失404、slug冲突409。管理tag列表q/sort（usage/name/newest）/page/pageSize；category返回完整有序树，name/slug搜索由页面筛选树且保留祖先。新建/改名字段为name必填，slug小写英文数字连字符；description/icon/color可空（color仅#RRGGBB）；数组及字符串按大小上限限制。无引用的安全删除同样带确认。
+
+
+### D08 媒体管理补充合同
+
+GET /admin/media 的q按文件名originalName或替代文本alt不区分大小写匹配，trim后最长200；省略folder查询全部，folder=/只根目录，历史末尾斜杠目录按原值精确匹配。GET /admin/media/folders需content:read，返回{folders:[{path,count,size}],total,totalSize}，统计全部媒体而非当前筛选，根目录永有，按path稳定排序。
+
+POST /admin/media/folders需media:write、Origin及PG adminwrite额度，严格{path}，沿用安全逻辑目录字符集、最长200，新增路径去末尾斜杠（根除外）。空目录持久在Setting media.folders/group internal数组，不增模型；固定事务锁保证并发幂等，最多200个登记目录，超限409 DIRECTORY_LIMIT。列表合并登记目录与有文件的目录。此内部管理数据不公开、不进入普通设置和内容JSON导出，独立数据库备份保留。
+
+POST /admin/media/deduplicate需media:write、Origin及PG adminwrite额度，严格{hash:64位小写sha256,size:正安全整数,mimeType:允许类型}，匹配已登记验证过的完整Media且hash/size/真实mime均相同，返回{media:安全DTO|null,deduplicated:boolean}。命中仅复用原ID/url/alt/folder并记录审计，不按客户端声明创建/更改对象，不返回存储key/hash/uploadedBy；等同选择已有共享媒体。Local/R2均先在浏览器算hash再查询，命中避免传输；未命中完整沿用上传magic/大小/hash/归属验证。查询只扣adminwrite，未命中后真实上传仍扣20次/小时，避免双扣上传额度。
+
+媒体批量操作每批最多50个ID快照，界面逐项调用既有PATCH {folder}、PATCH {alt:string|null}或DELETE；各项独立鉴权、引用保护、事务及审计，部分成功不回滚，结果逐项列出，失败项保留选择供重试。禁止绕过共享额度或强删引用文件。清理继续使用原POST /media/cleanup及{cleaned,failed,pending}，需确认并展示真实结果。

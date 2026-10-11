@@ -125,8 +125,8 @@ export async function login(
   return prisma.$transaction(async (tx) => {
     const current = await lockUser(tx, user.id)
     if (!current.isActive) throw new ApiError(403, 'ACCOUNT_DISABLED', '账号已停用')
-    // 密码在等待锁期间已变更时，不复用事务外的旧认证结果。
-    if (current.passwordHash !== user.passwordHash)
+    // 邮箱或密码在等待锁期间变更时，不复用事务外的旧认证结果。
+    if (current.email !== normalized || current.passwordHash !== user.passwordHash)
       throw new ApiError(401, 'INVALID_CREDENTIALS', '邮箱或密码错误')
     const session = await tx.session.create({
       data: {
@@ -370,7 +370,7 @@ export async function changePassword(
     // 比较原摘要避免并发修改覆盖已生效的新密码。
     const changed = await tx.user.updateMany({
       where: { id: user.id, passwordHash: record.passwordHash, isActive: true },
-      data: { passwordHash },
+      data: { passwordHash, revision: { increment: 1 } },
     })
     if (!changed.count) throw new ApiError(401, 'INVALID_CREDENTIALS', '密码已变更，请重新核验')
     await tx.session.updateMany({

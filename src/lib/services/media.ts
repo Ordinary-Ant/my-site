@@ -8,11 +8,12 @@ import remarkGfm from 'remark-gfm'
 import { prisma } from '@/lib/prisma'
 import { env } from '@/lib/env'
 import { ApiError } from '@/lib/api/errors'
-import { inspectMedia, mediaType } from '@/lib/storage/validation'
+import { inspectMedia, mediaType, MEDIA_TYPES } from '@/lib/storage/validation'
 import { storageDriver, LocalDriver, R2Driver, assertLocalAllowed } from '@/lib/storage/drivers'
 import { requirePermission } from './auth'
 import { consumeRateLimit } from './rate-limit'
 import { writeAudit } from './audit'
+import { mediaFolderSchema, mediaQuerySchema, mediaDeduplicateSchema } from '@/lib/validators/media'
 
 const fieldsSchema = z
   .object({
@@ -260,6 +261,7 @@ export async function cleanupUploadIntents(request?: Request) {
 }
 export async function listMedia(params: URLSearchParams, request?: Request) {
   await requirePermission('content:read', request)
+  const query = mediaQuerySchema.parse(Object.fromEntries(params))
   const page = Math.max(1, Math.min(100000, Math.floor(Number(params.get('page')) || 1)))
   const pageSize = Math.max(1, Math.min(100, Math.floor(Number(params.get('pageSize')) || 20)))
   const kind = z
@@ -267,10 +269,15 @@ export async function listMedia(params: URLSearchParams, request?: Request) {
     .optional()
     .parse(params.get('kind') || undefined)
   const where: Prisma.MediaWhereInput = {
-    ...(params.get('folder') ? { folder: params.get('folder')! } : {}),
+    ...(query.folder ? { folder: query.folder } : {}),
     ...(kind ? { kind } : {}),
-    ...(params.get('q')
-      ? { originalName: { contains: params.get('q')!.slice(0, 200), mode: 'insensitive' } }
+    ...(query.q
+      ? {
+          OR: [
+            { originalName: { contains: query.q, mode: 'insensitive' } },
+            { alt: { contains: query.q, mode: 'insensitive' } },
+          ],
+        }
       : {}),
   }
   const [data, total] = await prisma.$transaction([
@@ -293,6 +300,116 @@ export async function listMedia(params: URLSearchParams, request?: Request) {
       hasPrev: page > 1,
     },
   }
+}
+const foldersKey = 'media.folders'
+/** 内部目录元数据不进入公开设置或内容JSON，仅完整数据库备份保留。 */
+export async function listMediaFolders(request?: Request) {
+  await requirePermission('content:read', request)
+  return prisma.$transaction(
+    async (tx) => {
+      const registered = await tx.setting.findUnique({ where: { key: foldersKey } })
+      const groups = await tx.media.groupBy({
+        by: ['folder'],
+        _count: { _all: true },
+        _sum: { size: true },
+      })
+      const folders = new Map<string, { path: string; count: number; size: number }>()
+      for (const path of ['/', ...z.array(z.string()).parse(registered?.value ?? [])])
+        folders.set(path, { path, count: 0, size: 0 })
+      let total = 0
+      let totalSize = 0
+      for (const group of groups) {
+        const size = group._sum.size ?? 0
+        folders.set(group.folder, { path: group.folder, count: group._count._all, size })
+        total += group._count._all
+        totalSize += size
+      }
+      return {
+        folders: [...folders.values()].sort((a, b) =>
+          a.path < b.path ? -1 : a.path > b.path ? 1 : 0,
+        ),
+        total,
+        totalSize,
+      }
+    },
+    { isolationLevel: 'RepeatableRead' },
+  )
+}
+export async function createMediaFolder(input: unknown, request?: Request) {
+  const user = await requirePermission('media:write', request)
+  const { path } = mediaFolderSchema.parse(input)
+  return prisma.$transaction(async (tx) => {
+    // 固定事务锁防止不同进程同时创建空目录时丢失更新或突破上限。
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(74390234)`
+    const setting = await tx.setting.findUnique({ where: { key: foldersKey } })
+    const paths = z.array(z.string()).parse(setting?.value ?? [])
+    if (path === '/' || paths.includes(path)) return { path }
+    if (paths.length >= 200) throw new ApiError(409, 'DIRECTORY_LIMIT', '最多创建200个目录')
+    const value = [...paths, path].sort()
+    await tx.setting.upsert({
+      where: { key: foldersKey },
+      create: { key: foldersKey, group: 'internal', value, updatedBy: user.id },
+      update: { group: 'internal', value, updatedBy: user.id },
+    })
+    await writeAudit(tx, {
+      userId: user.id,
+      action: 'create-folder',
+      resource: 'media',
+      resourceId: path,
+      after: { path },
+    })
+    return { path }
+  })
+}
+/** 只复用服务端已验证并登记的媒体，不信任客户端metadata或公开未知字节。 */
+export async function deduplicateMedia(input: unknown, request?: Request) {
+  const user = await requirePermission('media:write', request)
+  const parsed = mediaDeduplicateSchema.parse(input)
+  if (!Object.hasOwn(MEDIA_TYPES, parsed.mimeType))
+    throw new ApiError(415, 'UNSUPPORTED_MEDIA', '不支持此媒体类型')
+  mediaType(parsed.mimeType, parsed.size)
+  return prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${parsed.hash}))`
+    const existing = await tx.media.findFirst({ where: parsed })
+    if (!existing) return { media: null, deduplicated: false }
+    await writeAudit(tx, {
+      userId: user.id,
+      action: 'deduplicate',
+      resource: 'media',
+      resourceId: existing.id,
+    })
+    const {
+      id,
+      filename,
+      originalName,
+      url,
+      kind,
+      mimeType,
+      size,
+      width,
+      height,
+      alt,
+      folder,
+      createdAt,
+    } = existing
+    return {
+      media: {
+        id,
+        filename,
+        originalName,
+        url,
+        kind,
+        mimeType,
+        size,
+        width,
+        height,
+        alt,
+        folder,
+        createdAt,
+      },
+      deduplicated: true,
+    }
+  })
 }
 export async function getMedia(id: string, request?: Request) {
   await requirePermission('content:read', request)

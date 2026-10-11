@@ -8,6 +8,7 @@ import { ApiError } from '@/lib/api/errors'
 import { mergeModuleConfig } from '@/lib/validators/module'
 import { readKnownSettings } from './settings'
 import { scrubPublicContacts } from './public-privacy'
+import { chinaToday } from '@/lib/log-display'
 export { scrubPublicContacts } from './public-privacy'
 const publicModule = (m: Module) => ({
   key: m.key as ModuleKey,
@@ -81,7 +82,7 @@ export async function getPublicSite() {
   if (p && about) {
     profile = {
       ...profile,
-      bio: p.bio,
+      ...(about.config.sections?.bio !== false ? { bio: p.bio } : {}),
       location: p.location,
       jobTitle: p.jobTitle,
       company: p.company,
@@ -89,6 +90,7 @@ export async function getPublicSite() {
       socials: p.socials,
       ...(about.config.sections?.advantages !== false ? { advantages: p.advantages } : {}),
       ...(about.config.sections?.skills !== false ? { skills: p.skills } : {}),
+      ...(about.config.sections?.services !== false ? { services: p.services } : {}),
       ...(contact ? { email: p.email, phone: p.phone } : {}),
     }
   }
@@ -149,7 +151,11 @@ export async function getHomeFeed() {
         })
       if (m.key === 'log')
         items = await prisma.log.findMany({
-          where: { ...where, type: { in: types as ('DAILY' | 'EVENT' | 'SUMMARY')[] } },
+          where: {
+            ...where,
+            type: { in: types as ('DAILY' | 'EVENT' | 'SUMMARY')[] },
+            OR: [{ logDate: { lte: new Date(chinaToday() + 'T00:00:00Z') } }, { isPinned: true }],
+          },
           select: {
             id: true,
             title: true,
@@ -178,8 +184,17 @@ export async function getHomeFeed() {
             coverImage: true,
             type: true,
             techStack: true,
+            highlights: true,
+            links: true,
+            startDate: true,
+            endDate: true,
+            featured: true,
           },
-          orderBy: [{ order: 'asc' }, { publishedAt: 'desc' }, { id: 'asc' }],
+          orderBy: [
+            { order: 'asc' },
+            { startDate: { sort: 'desc', nulls: 'last' } },
+            { id: 'asc' },
+          ],
           take: home.limit,
         })
       if (m.key === 'timeline')

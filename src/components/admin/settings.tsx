@@ -1,67 +1,14 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api } from '@/lib/api/client'
 import { useAdminUser } from './shell'
-type Field = {
-  key: string
-  label: string
-  nullable?: boolean
-  kind?: 'text' | 'area' | 'theme' | 'color' | 'links'
-  max?: number
-}
-export const SETTING_FIELDS: Record<string, { label: string; fields: Field[] }> = {
-  general: {
-    label: '基础信息',
-    fields: [
-      { key: 'site.name', label: '站点名称', max: 40 },
-      { key: 'site.description', label: '站点描述', kind: 'area', max: 200 },
-      { key: 'site.logo', label: 'Logo地址', nullable: true },
-      { key: 'site.favicon', label: '浏览器图标地址', nullable: true },
-      { key: 'site.locale', label: '语言标记', max: 20 },
-    ],
-  },
-  theme: {
-    label: '外观',
-    fields: [
-      { key: 'theme.default', label: '默认主题', kind: 'theme' },
-      { key: 'theme.accent', label: '强调色', kind: 'color' },
-    ],
-  },
-  seo: {
-    label: '搜索引擎',
-    fields: [
-      { key: 'seo.defaultTitle', label: '默认标题', max: 60 },
-      { key: 'seo.defaultDescription', label: '默认描述', kind: 'area', max: 200 },
-      { key: 'seo.keywords', label: '关键词', max: 500 },
-      { key: 'seo.ogImage', label: '默认分享图地址', nullable: true },
-    ],
-  },
-  footer: {
-    label: '页脚',
-    fields: [
-      { key: 'footer.copyright', label: '版权文字', max: 200 },
-      { key: 'footer.icp', label: '备案号', nullable: true },
-      { key: 'footer.links', label: '附加链接', kind: 'links' },
-    ],
-  },
-  social: {
-    label: '社交链接',
-    fields: [
-      { key: 'social.github', label: 'GitHub', nullable: true },
-      { key: 'social.email', label: '邮箱', nullable: true },
-      { key: 'social.phone', label: '电话', nullable: true },
-      { key: 'social.twitter', label: 'X / Twitter', nullable: true },
-      { key: 'social.linkedin', label: 'LinkedIn', nullable: true },
-      { key: 'social.weibo', label: '微博', nullable: true },
-      { key: 'social.bilibili', label: '哔哩哔哩', nullable: true },
-    ],
-  },
-  integration: {
-    label: '集成',
-    fields: [{ key: 'integration.analyticsId', label: '访问分析标识', max: 100 }],
-  },
-}
+import { settingDefinitions, type SettingField } from '@/config/settings'
+import { MediaPicker } from './media-picker'
+import Image from 'next/image'
+import { safeContentUrl } from '@/lib/markdown'
+const SETTING_FIELDS: Record<string, { label: string; fields: SettingField[] }> = settingDefinitions
+
 type ExtraLink = { label: string; url: string | null }
 const control = 'bg-background mt-2 w-full rounded-lg border px-3 py-2'
 /** 设置保存只发送当前组已知字段；清空可空字段明确发送null。 */
@@ -73,6 +20,53 @@ export function SettingsEditor({ group }: { group: string }) {
   const [loaded, setLoaded] = useState(false)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [pickerField, setPickerField] = useState<string | null>(null)
+  const mutation = useRef(false),
+    dirtyRef = useRef(false),
+    leaveAllowed = useRef(0)
+  dirtyRef.current = loaded && JSON.stringify(values) !== JSON.stringify(initial)
+  useEffect(() => {
+    const canLeave = () => {
+      if (mutation.current) {
+        setMessage('正在保存，请等待完成。')
+        return false
+      }
+      if (!dirtyRef.current || Date.now() < leaveAllowed.current) return true
+      if (!confirm('设置尚未保存，确定放弃并离开？')) return false
+      leaveAllowed.current = Date.now() + 500
+      return true
+    }
+    const click = (event: MouseEvent) => {
+      const anchor = (event.target as Element).closest?.('a[href]') as HTMLAnchorElement | null
+      if (anchor && new URL(anchor.href).pathname !== location.pathname && !canLeave())
+        event.preventDefault()
+    }
+    const unload = (event: BeforeUnloadEvent) => {
+      if (dirtyRef.current || mutation.current) {
+        event.preventDefault()
+        event.returnValue = ''
+      }
+    }
+    const navigation = (window as Window & { navigation?: EventTarget }).navigation
+    const navigate = (event: Event) => {
+      const next = (event as Event & { destination?: { url: string } }).destination
+      if (
+        event.cancelable &&
+        next &&
+        new URL(next.url).pathname !== location.pathname &&
+        !canLeave()
+      )
+        event.preventDefault()
+    }
+    document.addEventListener('click', click, true)
+    window.addEventListener('beforeunload', unload)
+    navigation?.addEventListener('navigate', navigate)
+    return () => {
+      document.removeEventListener('click', click, true)
+      window.removeEventListener('beforeunload', unload)
+      navigation?.removeEventListener('navigate', navigate)
+    }
+  }, [])
   const definition = SETTING_FIELDS[group]
   useEffect(() => {
     let active = true
@@ -120,6 +114,8 @@ export function SettingsEditor({ group }: { group: string }) {
           className="max-w-2xl space-y-6 rounded-xl border p-6"
           onSubmit={async (event) => {
             event.preventDefault()
+            if (!writable || mutation.current) return
+            mutation.current = true
             setBusy(true)
             try {
               const patch = Object.fromEntries(
@@ -137,6 +133,7 @@ export function SettingsEditor({ group }: { group: string }) {
             } catch (error) {
               setMessage((error as Error).message)
             } finally {
+              mutation.current = false
               setBusy(false)
             }
           }}
@@ -151,6 +148,7 @@ export function SettingsEditor({ group }: { group: string }) {
               return (
                 <fieldset key={field.key} className="space-y-3 rounded-lg border p-4">
                   <legend>{field.label}</legend>
+                  <p className="text-muted-foreground text-sm">{field.help}</p>
                   {links.map((link, index) => (
                     <div key={index} className="grid gap-2 rounded-lg border p-3">
                       <label>
@@ -231,10 +229,12 @@ export function SettingsEditor({ group }: { group: string }) {
               )
             }
             return (
-              <label key={field.key} className="block text-sm">
-                {field.label}
+              <div key={field.key} className="block text-sm">
+                <label htmlFor={field.key}>{field.label}</label>
                 {field.kind === 'theme' ? (
                   <select
+                    id={field.key}
+                    aria-describedby={field.key + '-help'}
                     className={control}
                     value={value || 'system'}
                     disabled={!writable || busy}
@@ -246,6 +246,8 @@ export function SettingsEditor({ group }: { group: string }) {
                   </select>
                 ) : field.kind === 'area' ? (
                   <textarea
+                    id={field.key}
+                    aria-describedby={field.key + '-help'}
                     className={control}
                     rows={3}
                     maxLength={field.max}
@@ -255,6 +257,8 @@ export function SettingsEditor({ group }: { group: string }) {
                   />
                 ) : (
                   <input
+                    id={field.key}
+                    aria-describedby={field.key + '-help'}
                     className={control}
                     type={field.kind === 'color' ? 'color' : 'text'}
                     maxLength={field.max ?? 2000}
@@ -269,7 +273,34 @@ export function SettingsEditor({ group }: { group: string }) {
                     }
                   />
                 )}
-              </label>
+                <p id={field.key + '-help'} className="text-muted-foreground mt-2 text-xs">
+                  {field.help}
+                </p>
+                {field.kind === 'image' && (
+                  <div className="mt-3 space-y-3">
+                    {safeContentUrl(value) && (
+                      <Image
+                        unoptimized
+                        src={value}
+                        alt={field.label + '预览'}
+                        width={300}
+                        height={160}
+                        className="bg-muted max-h-40 max-w-full rounded-lg border object-contain"
+                      />
+                    )}
+                    {writable && (
+                      <button
+                        type="button"
+                        className="rounded-lg border px-3 py-2 text-sm"
+                        disabled={busy}
+                        onClick={() => setPickerField(field.key)}
+                      >
+                        从媒体库选择{field.label}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             )
           })}
           {group === 'social' && (
@@ -308,6 +339,14 @@ export function SettingsEditor({ group }: { group: string }) {
           )}
         </form>
       )}
+      <MediaPicker
+        open={pickerField !== null}
+        imagesOnly
+        onClose={() => setPickerField(null)}
+        onSelect={(item) => {
+          if (pickerField) update(pickerField, item.url)
+        }}
+      />
     </div>
   )
 }

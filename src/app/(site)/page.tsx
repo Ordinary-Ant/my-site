@@ -3,8 +3,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getHomeFeed, getPublicSite } from '@/lib/services/public-site'
 import { safeContentUrl } from '@/lib/markdown'
-import { formatDate, excerpt } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
 import { format } from 'date-fns'
+import { ProjectCard, type ProjectCardItem } from '@/components/site/project-card'
 type Item = {
   id: string
   title?: string
@@ -179,44 +180,18 @@ export default async function HomePage() {
           </header>
           {s.key === 'portfolio' ? (
             <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:px-0 lg:grid-cols-3">
-              {(s.items as Item[]).map((item) => (
-                <article
+              {(s.items as ProjectCardItem[]).map((item) => (
+                <div
                   key={item.id}
-                  className="bg-card shadow-card w-[82vw] max-w-sm shrink-0 snap-start overflow-hidden rounded-xl border md:w-auto md:max-w-none"
+                  className="w-[82vw] max-w-sm shrink-0 snap-start md:w-auto md:max-w-none"
                   data-motion="card"
                 >
-                  <Link href={s.route + '/' + item.slug}>
-                    {cover(item.coverImage)}
-                    <div className="p-5">
-                      <h3 className="text-lg font-semibold">{item.title}</h3>
-                      <p className="text-muted-foreground mt-3 line-clamp-2 text-sm leading-relaxed">
-                        {item.subtitle || excerpt(item.description ?? '', 100)}
-                      </p>
-                      {s.config.showTechStack && (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {item.techStack?.slice(0, 5).map((tech) => (
-                            <span key={tech} className="bg-muted rounded px-2 py-1 text-xs">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <p className="text-brand mt-5 text-xs">
-                        {
-                          (
-                            {
-                              GAME: '游戏',
-                              REPO: '代码库',
-                              SKILL: 'Skills',
-                              OTHER: '个人制作',
-                            } as Record<string, string>
-                          )[item.type ?? 'OTHER']
-                        }{' '}
-                        · 查看作品 ↗
-                      </p>
-                    </div>
-                  </Link>
-                </article>
+                  <ProjectCard
+                    item={item}
+                    route={s.route}
+                    showTechStack={s.config.showTechStack !== false}
+                  />
+                </div>
               ))}
             </div>
           ) : s.key === 'article' ? (

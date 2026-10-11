@@ -1,6 +1,6 @@
 # Personal Site · 个人网站与私有后台
 
-当前为**一期阶段A、B、C已完成**。已有可构建工程骨架与33个HTML设计源稿/45张截图；A本地基础验收已通过，B登录权限、文章编辑/预览/发布/阅读/恢复、Local媒体与分钟发布闭环通过，R2云验收留至G，C模块/路由/设置/首页/审计与隐私闭环已验收，D–G待开始；已批准范围与合同见[一期计划](docs/12-phase-one-plan.md)。预计45–65人日。
+当前为**一期阶段A–D已完成**。已有可构建工程与33个HTML设计源稿/45张截图；A本地基础验收已通过，B登录权限、文章编辑/预览/发布/阅读/恢复、Local媒体与分钟发布闭环通过，R2云验收留至G，C模块/路由/设置/首页/审计与隐私闭环已验收，D日志、作品、时间线、About、分类标签及数据导入导出已验收，用户管理已验收，完整设置媒体库已验收，E–G待开始；已批准范围与合同见[一期计划](docs/12-phase-one-plan.md)。预计45–65人日。
 
 Next.js15.5 App Router / Node runtime middleware / TypeScript / Tailwind4 / Prisma6 / PostgreSQL16；开发与测试使用真实PostgreSQL，生产计划Vercel+托管Postgres+R2，公开生产发布最终确认。CSS首屏与Anime.js按需编排，动效version2四预设默认editorial无装饰，仅none/tint，不做连续背景。预算文章135KB/动效28KB/登录110KB gzip，需真实测量。
 
@@ -29,11 +29,15 @@ Next.js15.5 App Router / Node runtime middleware / TypeScript / Tailwind4 / Pris
 ```powershell
 npm install
 # 仅当.env不存在时复制，禁止覆盖已有密钥
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# 当前Windows保留端口范围包含5432，容器与连接使用同一显式端口
+$env:POSTGRES_PORT = '15432'
+$env:DATABASE_URL = 'postgresql://dev:dev@localhost:15432/personal_site?schema=public'
+$env:NEXT_PUBLIC_SITE_URL = 'http://localhost:3100'
 npm run db:up
 npm run db:migrate
 npm run db:seed
-npm run dev
+npm run dev -- --port 3100
 ```
 本地PG已healthy、首迁移完成，后续先查迁移状态；执行结果记入台账，不能据此声明业务完成。已有骨架历史check/verify/build通过不代表本轮验收。npm run check、npm run verify、npm run build为基础门禁，真实PG集成与Playwright按阶段执行，脚本以package.json实际定义为准。
 
@@ -45,7 +49,11 @@ A基础治理 → B文章闭环（含auth/权限/编辑器/媒体/预览/发布/
 ## 独立测试数据库与Node基线
 Node>=24 / npm>=11（.node-version为24.19.0），不再支持旧Node20基线。测试显式独立URL：
 ```powershell
-$env:TEST_DATABASE_URL = 'postgresql://dev:dev@localhost:5432/personal_site_test?schema=public'
+$env:TEST_DATABASE_URL = 'postgresql://dev:dev@localhost:15432/personal_site_test?schema=public'
+$env:E2E_BASE_URL = 'http://localhost:3100'
+# E2E生产包与测试服务须使用相同站点Origin；不覆盖.env
+$env:NEXT_PUBLIC_SITE_URL = $env:E2E_BASE_URL
+npm run build
 npm run test:db
 npm run test
 npm run test:integration

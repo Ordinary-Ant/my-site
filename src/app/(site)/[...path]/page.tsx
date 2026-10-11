@@ -23,9 +23,10 @@ async function resolve(path: string[]) {
       if (error instanceof ApiError && error.status === 404) notFound()
       throw error
     })
-  if (matched.key !== 'article') notFound()
+  if (!['article', 'log', 'portfolio', 'timeline', 'about'].includes(matched.key)) notFound()
   const suffix = route.slice(matched.route.length).replace(/^\//, '')
   if (suffix.includes('/')) notFound()
+  if (['timeline', 'about'].includes(matched.key) && suffix) notFound()
   return { matched, suffix }
 }
 
@@ -41,6 +42,30 @@ async function articleOr404(slug: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matched, suffix } = await resolve((await params).path)
   if (!suffix) return { title: matched.name }
+  if (matched.key === 'portfolio') {
+    const { projectOr404 } = await import('@/components/site/project-pages')
+    const item = await projectOr404(suffix)
+    return {
+      title: item.title,
+      description: excerpt(item.description),
+      alternates: { canonical: matched.route + '/' + item.slug },
+      openGraph: {
+        type: 'website',
+        title: item.title,
+        ...(item.coverImage ? { images: [item.coverImage] } : {}),
+      },
+    }
+  }
+  if (matched.key === 'log') {
+    const { logOr404 } = await import('@/components/site/log-pages')
+    const item = await logOr404(suffix)
+    return {
+      title: item.title,
+      description: item.summary ?? excerpt(item.content),
+      alternates: { canonical: matched.route + '/' + item.id },
+      openGraph: { type: 'article', title: item.title },
+    }
+  }
   const article = await articleOr404(suffix)
   return {
     title: article.seoTitle ?? article.title,
@@ -58,6 +83,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ContentPage({ params, searchParams }: Props) {
   const { matched, suffix } = await resolve((await params).path)
+  if (matched.key === 'about') {
+    const { AboutPage } = await import('@/components/site/about-page')
+    return <AboutPage />
+  }
+  if (matched.key === 'timeline') {
+    const { TimelineIndex } = await import('@/components/site/timeline-pages')
+    const query = new URLSearchParams()
+    for (const [key, value] of Object.entries(await searchParams))
+      if (typeof value === 'string') query.set(key, value)
+    return <TimelineIndex column={matched} query={query} />
+  }
+  if (matched.key === 'portfolio') {
+    const { ProjectDetail, ProjectIndex, projectOr404 } =
+      await import('@/components/site/project-pages')
+    if (suffix) return <ProjectDetail item={await projectOr404(suffix)} column={matched} />
+    const query = new URLSearchParams()
+    for (const [key, value] of Object.entries(await searchParams))
+      if (typeof value === 'string') query.set(key, value)
+    return <ProjectIndex column={matched} query={query} />
+  }
+  if (matched.key === 'log') {
+    const { LogDetail, LogIndex, logOr404 } = await import('@/components/site/log-pages')
+    if (suffix) return <LogDetail item={await logOr404(suffix)} column={matched} />
+    const query = new URLSearchParams()
+    for (const [key, value] of Object.entries(await searchParams))
+      if (typeof value === 'string') query.set(key, value)
+    return <LogIndex column={matched} query={query} />
+  }
   if (suffix) {
     const article = await articleOr404(suffix)
     return (

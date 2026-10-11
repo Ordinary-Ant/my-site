@@ -1,5 +1,5 @@
 import 'server-only'
-import type { Module } from '@prisma/client'
+import type { Module, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { MODULE_KEYS, type ModuleKey, type ModuleConfig } from '@/config/modules'
 import { DEFAULT_MOTION, motionSchema } from '@/config/motion'
@@ -43,11 +43,14 @@ export async function requirePageModule(path: string | string[]) {
   return publicModule(m)
 }
 /** 所有公开内容DTO复用联系方式边界，正文保留其余文字。 */
-export async function applyPublicPrivacy<T>(value: T): Promise<T> {
+export async function applyPublicPrivacy<T>(
+  value: T,
+  db: Prisma.TransactionClient = prisma,
+): Promise<T> {
   const [profile, about, contacts] = await Promise.all([
-    prisma.profile.findUnique({ where: { id: 'default' } }),
-    prisma.module.findUnique({ where: { key: 'about' } }),
-    prisma.setting.findMany({ where: { key: { in: ['social.email', 'social.phone'] } } }),
+    db.profile.findUnique({ where: { id: 'default' } }),
+    db.module.findUnique({ where: { key: 'about' } }),
+    db.setting.findMany({ where: { key: { in: ['social.email', 'social.phone'] } } }),
   ])
   const config = about ? (mergeModuleConfig('about', about.config, {}) as ModuleConfig) : null
   if (profile?.contactVisible && about?.enabled && config?.sections?.contact !== false) return value

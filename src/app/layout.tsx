@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: name,
       title,
       description,
-      ...(og ? { images: [og] } : {}),
+      images: [og || '/api/v1/og'],
     },
     twitter: { card: 'summary_large_image' },
     robots: {

@@ -36,6 +36,10 @@ async function login(page: Page, email: string, role: string) {
   const me = await page.request.get('/api/v1/auth/me')
   expect(me.status()).toBe(200)
   expect((await me.json()).data.role).toBe(role)
+  const stats = await page.request.get('/api/v1/admin/stats')
+  expect(stats.status()).toBe(200)
+  expect((await stats.json()).data.traffic).toHaveLength(7)
+  await expect(page.getByRole('heading', { name: '最近7日阅读', exact: true })).toBeVisible()
 }
 
 test('EDITOR可编辑且无管理员入口，VIEWER列表与正文只读，越权API返回403', async ({

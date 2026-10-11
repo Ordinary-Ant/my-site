@@ -6,6 +6,9 @@ import { safeContentUrl } from '@/lib/markdown'
 import { formatDate } from '@/lib/utils'
 import { format } from 'date-fns'
 import { ProjectCard, type ProjectCardItem } from '@/components/site/project-card'
+import { JsonLd } from '@/components/site/json-ld'
+import { absolutePublicUrl } from '@/lib/seo'
+export const metadata = { alternates: { canonical: '/' } }
 type Item = {
   id: string
   title?: string
@@ -66,6 +69,20 @@ export default async function HomePage() {
     : []
   return (
     <div>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'WebSite',
+              name: site.site.name,
+              description: site.site.description,
+              url: absolutePublicUrl('/'),
+            },
+            ...(p ? [{ '@type': 'Person', name: p.name, description: p.headline }] : []),
+          ],
+        }}
+      />
       <section className="container-page py-16 text-center md:py-24" data-motion="hero">
         {avatar ? (
           <Image

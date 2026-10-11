@@ -7,6 +7,9 @@ import { PROJECT_TYPES, projectDate, projectLinks } from '@/lib/project-display'
 import { ProjectCard } from './project-card'
 import ImageGallery from './image-gallery'
 import { Markdown } from './markdown'
+import { ViewCounter } from './view-counter'
+import { JsonLd } from './json-ld'
+import { absolutePublicUrl } from '@/lib/seo'
 
 type Column = { name: string; description: string | null; route: string; config: ModuleConfig }
 export async function projectOr404(slug: string) {
@@ -49,6 +52,14 @@ export async function ProjectIndex({ column, query }: { column: Column; query: U
         : 'md:grid-cols-2 xl:grid-cols-3'
   return (
     <div className="container-page py-12">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: column.name,
+          url: absolutePublicUrl(column.route),
+        }}
+      />
       <header className="mb-8">
         <p className="text-brand mb-3 text-sm font-medium">SELECTED WORK</p>
         <h1 className="text-4xl font-bold">{column.name}</h1>
@@ -155,6 +166,16 @@ export function ProjectDetail({
   const images = [...new Set([...(item.coverImage ? [item.coverImage] : []), ...item.gallery])]
   return (
     <article className="container-page py-12">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'CreativeWork',
+          name: item.title,
+          description: item.description,
+          url: absolutePublicUrl(column.route + '/' + item.slug),
+        }}
+      />
+      <ViewCounter resource="project" id={item.id} initialCount={item.viewCount} />
       <Link href={column.route} className="text-brand text-sm">
         ← 返回作品集
       </Link>

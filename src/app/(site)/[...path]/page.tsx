@@ -1,11 +1,17 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { z } from 'zod'
 import { ApiError } from '@/lib/api/errors'
 import { getPublicArticle, listPublicArticles } from '@/lib/services/article'
 import { applyPublicPrivacy, requirePageModule } from '@/lib/services/public-site'
 import { Markdown } from '@/components/site/markdown'
 import { excerpt, formatDate } from '@/lib/utils'
+import { getArticleArchive } from '@/lib/services/search'
+import { ArticleArchive } from '@/components/site/article-archive'
+import { JsonLd } from '@/components/site/json-ld'
+import { absolutePublicUrl } from '@/lib/seo'
+import { ViewCounter } from '@/components/site/view-counter'
 
 export const dynamic = 'force-dynamic'
 type Props = {
@@ -25,7 +31,11 @@ async function resolve(path: string[]) {
     })
   if (!['article', 'log', 'portfolio', 'timeline', 'about'].includes(matched.key)) notFound()
   const suffix = route.slice(matched.route.length).replace(/^\//, '')
-  if (suffix.includes('/')) notFound()
+  if (
+    suffix.includes('/') &&
+    !(matched.key === 'article' && /^(category|tag)\/[^/]+$/.test(suffix))
+  )
+    notFound()
   if (['timeline', 'about'].includes(matched.key) && suffix) notFound()
   return { matched, suffix }
 }
@@ -39,46 +49,93 @@ async function articleOr404(slug: string) {
   }
 }
 
+async function archiveOr404(suffix: string, query = new URLSearchParams()) {
+  const [kind, slug] = suffix.split('/')
+  try {
+    return await getArticleArchive(kind as 'category' | 'tag', slug, query)
+  } catch (error) {
+    if (error instanceof z.ZodError) notFound()
+    if (error instanceof ApiError && error.status === 404) notFound()
+    throw error
+  }
+}
+/** 页面与分享图只用公开服务返回的标题和当前地址。 */
+function pageMetadata(
+  title: string,
+  description: string | null,
+  path: string,
+  resource?: string,
+  id?: string,
+  image?: string | null,
+): Metadata {
+  const og =
+    image || (resource ? '/api/v1/og?' + new URLSearchParams({ resource, id: id! }) : '/api/v1/og')
+  return {
+    title,
+    description: description ?? undefined,
+    alternates: { canonical: path },
+    openGraph: {
+      type: resource === 'article' || resource === 'log' ? 'article' : 'website',
+      title,
+      description: description ?? undefined,
+      url: path,
+      images: [og],
+    },
+    twitter: { card: 'summary_large_image', title, images: [og] },
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matched, suffix } = await resolve((await params).path)
-  if (!suffix) return { title: matched.name }
+  if (matched.key === 'about') {
+    const { getPublicProfile } = await import('@/lib/services/profile')
+    const profile = await getPublicProfile()
+    return pageMetadata(
+      matched.name,
+      profile.headline ?? matched.description,
+      matched.route,
+      undefined,
+      undefined,
+      profile.avatar,
+    )
+  }
+  if (!suffix) return pageMetadata(matched.name, matched.description, matched.route)
+  if (matched.key === 'article' && suffix.includes('/')) {
+    const archive = await archiveOr404(suffix)
+    return pageMetadata(archive.title, archive.description, archive.url)
+  }
   if (matched.key === 'portfolio') {
     const { projectOr404 } = await import('@/components/site/project-pages')
     const item = await projectOr404(suffix)
-    return {
-      title: item.title,
-      description: excerpt(item.description),
-      alternates: { canonical: matched.route + '/' + item.slug },
-      openGraph: {
-        type: 'website',
-        title: item.title,
-        ...(item.coverImage ? { images: [item.coverImage] } : {}),
-      },
-    }
+    return pageMetadata(
+      item.title,
+      excerpt(item.description),
+      matched.route + '/' + item.slug,
+      'project',
+      item.slug,
+      item.coverImage,
+    )
   }
   if (matched.key === 'log') {
     const { logOr404 } = await import('@/components/site/log-pages')
     const item = await logOr404(suffix)
-    return {
-      title: item.title,
-      description: item.summary ?? excerpt(item.content),
-      alternates: { canonical: matched.route + '/' + item.id },
-      openGraph: { type: 'article', title: item.title },
-    }
+    return pageMetadata(
+      item.title,
+      item.summary ?? excerpt(item.content),
+      matched.route + '/' + item.id,
+      'log',
+      item.id,
+    )
   }
   const article = await articleOr404(suffix)
-  return {
-    title: article.seoTitle ?? article.title,
-    description: article.seoDescription ?? article.summary ?? excerpt(article.content),
-    alternates: { canonical: `${matched.route}/${article.slug}` },
-    openGraph: {
-      type: 'article',
-      title: article.title,
-      ...(article.ogImage || article.coverImage
-        ? { images: [article.ogImage ?? article.coverImage!] }
-        : {}),
-    },
-  }
+  return pageMetadata(
+    article.seoTitle ?? article.title,
+    article.seoDescription ?? article.summary ?? excerpt(article.content),
+    `${matched.route}/${article.slug}`,
+    'article',
+    article.slug,
+    article.ogImage ?? article.coverImage,
+  )
 }
 
 export default async function ContentPage({ params, searchParams }: Props) {
@@ -112,18 +169,69 @@ export default async function ContentPage({ params, searchParams }: Props) {
     return <LogIndex column={matched} query={query} />
   }
   if (suffix) {
+    if (suffix.includes('/')) {
+      const query = new URLSearchParams()
+      for (const [key, value] of Object.entries(await searchParams))
+        if (typeof value === 'string') query.set(key, value)
+      return <ArticleArchive data={await archiveOr404(suffix, query)} />
+    }
     const article = await articleOr404(suffix)
     return (
       <article className="container-prose py-12">
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'BlogPosting',
+                headline: article.title,
+                description: article.summary ?? undefined,
+                url: absolutePublicUrl(matched.route + '/' + article.slug),
+                datePublished: article.publishedAt?.toISOString(),
+                dateModified: article.updatedAt.toISOString(),
+                author: { '@type': 'Person', name: article.author?.name ?? '站点作者' },
+              },
+              {
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                  {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: matched.name,
+                    item: absolutePublicUrl(matched.route),
+                  },
+                  {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: article.title,
+                    item: absolutePublicUrl(matched.route + '/' + article.slug),
+                  },
+                ],
+              },
+            ],
+          }}
+        />
         <Link href={matched.route} className="text-brand text-sm">
           ← 全部文章
         </Link>
         <header className="my-8">
           <div className="text-muted-foreground mb-3 text-sm">
-            {article.category?.name ?? '文章'} · {formatDate(article.publishedAt!)} ·{' '}
-            {article.readingTime} 分钟阅读
+            {article.category ? (
+              <Link href={`${matched.route}/category/${article.category.slug}`}>
+                {article.category.name}
+              </Link>
+            ) : (
+              '文章'
+            )}{' '}
+            · {formatDate(article.publishedAt!)} · {article.readingTime} 分钟阅读
           </div>
           <h1 className="text-3xl leading-tight font-bold md:text-4xl">{article.title}</h1>
+          <ViewCounter
+            resource="article"
+            id={article.id}
+            initialCount={article.viewCount}
+            visible={matched.config.showViewCount !== false}
+          />
           {article.summary && (
             <p className="text-muted-foreground mt-5 text-lg">{article.summary}</p>
           )}
@@ -131,7 +239,7 @@ export default async function ContentPage({ params, searchParams }: Props) {
             {article.tags.map((tag) => (
               <Link
                 key={tag.id}
-                href={`${matched.route}?tag=${tag.slug}`}
+                href={`${matched.route}/tag/${tag.slug}`}
                 className="bg-muted rounded-full px-3 py-1 text-xs"
               >
                 {tag.name}
@@ -169,6 +277,14 @@ export default async function ContentPage({ params, searchParams }: Props) {
   }
   return (
     <div className="container-prose py-12">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: matched.name,
+          url: absolutePublicUrl(matched.route),
+        }}
+      />
       <header className="mb-10">
         <p className="text-brand mb-3 text-sm font-medium">WRITING</p>
         <h1 className="text-4xl font-bold">{matched.name}</h1>

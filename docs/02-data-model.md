@@ -634,15 +634,31 @@ model Media {
 
 /// 页面访问按天聚合
 model DailyStat {
-  id      String   @id @default(cuid())
-  date    DateTime @db.Date
-  path    String
-  views   Int      @default(0)
-  uniques Int      @default(0)
+  id        String   @id @default(cuid())
+  date      DateTime @db.Date
+  path      String
+  resource  String   @default("legacy")
+  contentId String
+  views     Int      @default(0)
+  uniques   Int      @default(0)
 
-  @@unique([date, path])
+  @@unique([date, resource, contentId])
   @@index([date(sort: Desc)])
   @@map("daily_stats")
+}
+
+/// 同一匿名身份与内容的成功计数窗口，不存IP或登录用户。
+model ViewReceipt {
+  resource        String
+  contentId       String
+  visitorHash     String
+  windowExpiresAt DateTime
+  countedDate     DateTime @db.Date
+  updatedAt       DateTime
+
+  @@id([resource, contentId, visitorHash])
+  @@index([updatedAt])
+  @@map("view_receipts")
 }
 
 ```
@@ -876,3 +892,5 @@ test:db使用目标URL同一服务器的/postgres管理连接创建/迁移测试
 ### D05 分类标签数据修订
 
 Category及Tag补revision Int @default(1)，真实迁移回填既有行。管理写CAS；分类最多两层由服务层事务完整校验。标签删除/合并、分类删除改变正文关系时，相关Article/Log/Project revision随事务递增，以保护打开中的旧编辑快照。类别删除不删除文章，标签合并包含草稿和软删关联。
+
+阅读统计迁移20261011053000_view_receipts保留旧DailyStat：resource=legacy、contentId=旧path，不推测内容关联。新记录唯一(date,resource,contentId)，匿名receipt唯一(resource,contentId,visitorHash)，countedDate为北京日历日，updatedAt只记录最近成功计数；G保留30天后按此字段清理，不能按windowExpiresAt清理。

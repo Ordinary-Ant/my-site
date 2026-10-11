@@ -13,6 +13,9 @@ import { safeContentUrl } from '@/lib/markdown'
 import type { ModuleConfig } from '@/config/modules'
 import { ApiError } from '@/lib/api/errors'
 import { notFound } from 'next/navigation'
+import { ViewCounter } from './view-counter'
+import { JsonLd } from './json-ld'
+import { absolutePublicUrl } from '@/lib/seo'
 type PublicLog = Awaited<ReturnType<typeof getPublicLog>>
 type SiteModule = { name: string; description: string | null; route: string; config: ModuleConfig }
 export async function logOr404(id: string) {
@@ -31,6 +34,16 @@ export function LogDetail({ item, column }: { item: PublicLog; column: SiteModul
   const cover = item.coverImage ? safeContentUrl(item.coverImage) : null
   return (
     <article className="container-prose py-12">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: item.title,
+          url: absolutePublicUrl(column.route + '/' + item.id),
+          datePublished: item.publishedAt?.toISOString(),
+          dateModified: item.updatedAt.toISOString(),
+        }}
+      />
       <ReadingActions route={column.route} backOnly />
       <header className="my-8">
         <p className="text-muted-foreground mb-4 text-sm">
@@ -40,6 +53,7 @@ export function LogDetail({ item, column }: { item: PublicLog; column: SiteModul
           {item.location && ' · ' + item.location}
         </p>
         <h1 className="text-3xl font-bold md:text-4xl">{item.title}</h1>
+        <ViewCounter resource="log" id={item.id} initialCount={item.viewCount} visible={false} />
         {item.summary && <p className="text-muted-foreground mt-5 text-lg">{item.summary}</p>}
       </header>
       {cover && (
@@ -125,6 +139,14 @@ export async function LogIndex({ column, query }: { column: SiteModule; query: U
   return (
     <div className="container-page py-12">
       <LogNavigation route={column.route} />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: column.name,
+          url: absolutePublicUrl(column.route),
+        }}
+      />
       <header className="mb-8">
         <p className="text-brand mb-3 text-sm font-medium">JOURNAL</p>
         <h1 className="text-4xl font-bold">{column.name}</h1>

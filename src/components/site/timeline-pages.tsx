@@ -4,6 +4,8 @@ import type { ModuleConfig } from '@/config/modules'
 import { listPublicTimeline } from '@/lib/services/timeline'
 import { TIMELINE_TYPES, type TimelineItem } from '@/lib/timeline-display'
 import { TimelineCard } from './timeline-card'
+import { JsonLd } from './json-ld'
+import { absolutePublicUrl } from '@/lib/seo'
 
 type Column = { name: string; description: string | null; route: string; config: ModuleConfig }
 /** 保留服务端完整顺序，年份锚点仅分隔相邻年份，不把当前项重新排回历史位置。 */
@@ -89,6 +91,25 @@ export async function TimelineIndex({ column, query }: { column: Column; query: 
   }
   return (
     <div className="container-page py-12">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            { '@type': 'CollectionPage', name: column.name, url: absolutePublicUrl(column.route) },
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                {
+                  '@type': 'ListItem',
+                  position: 1,
+                  name: column.name,
+                  item: absolutePublicUrl(column.route),
+                },
+              ],
+            },
+          ],
+        }}
+      />
       <header className="mb-8">
         <p className="text-brand mb-3 text-sm font-medium">MY JOURNEY</p>
         <h1 className="text-4xl font-bold">{column.name}</h1>

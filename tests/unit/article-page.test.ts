@@ -82,6 +82,12 @@ beforeEach(() => {
 })
 
 describe('文章页面的公开边界', () => {
+  it('公开详情输出安全结构化数据及当前canonical', async () => {
+    const html = await render(['articles', 'example'])
+    expect(html).toContain('application/ld+json')
+    expect(html).toContain('BlogPosting')
+    expect(html).toContain('/articles/example')
+  })
   it('隐藏联系方式时栏目 HTML 与 metadata 均脱敏', async () => {
     articleModule.name = '文章 hidden@example.com'
     articleModule.description = '联系 +86 138 0013 8000 mailto:hidden@example.com'
@@ -156,7 +162,7 @@ describe('文章路径与404边界', () => {
     })
     const html = await render(['writing', 'notes', 'example'])
     expect(html).toContain('href="/writing/notes"')
-    expect(html).toContain('href="/writing/notes?tag=test"')
+    expect(html).toContain('href="/writing/notes/tag/test"')
     expect((await generateMetadata(props(['writing', 'notes', 'example']))).alternates).toEqual({
       canonical: '/writing/notes/example',
     })

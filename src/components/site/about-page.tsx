@@ -10,6 +10,7 @@ import { Markdown } from './markdown'
 import { TimelineCard } from './timeline-card'
 import { ProfileContact } from './profile-contact'
 import { ProfileIcon } from '@/components/admin/profile-icons'
+import { JsonLd } from './json-ld'
 
 type ProfileView = {
   name: string
@@ -59,6 +60,18 @@ export async function AboutPage() {
     )
   return (
     <div className="container-page">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'ProfilePage',
+          mainEntity: {
+            '@type': 'Person',
+            name: profile.name,
+            description: profile.headline,
+            jobTitle: profile.jobTitle ?? undefined,
+          },
+        }}
+      />
       <header className="mx-auto max-w-2xl py-16 text-center md:py-24">
         {avatar ? (
           <Image

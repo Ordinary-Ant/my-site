@@ -23,4 +23,16 @@ Local开发与R2生产隔离；R2私有临时直传后确认magic/大小/归属�
 首页默认区块顺序统一为Hero→精选作品（order=2）→最新文章（3）→最新日志（4）→近期经历（5），以06及首页设计为准。后台现有自定义顺序优先；数据迁移仅修复仍完整等于旧seed默认配置的顺序，不覆盖已编辑配置。
 
 ## 交付规则
-真实PostgreSQL测试，阶段验收后本地提交，禁止自动push；部署验证在授权范围内执行，缺凭据记录阻塞。细功能登记依赖、验收、状态、代码、证据、提交；恢复先读Git/台账/交接。一期不做评论、注册、订阅、i18n、PWA。当前A–C已验收并本地提交；D全部内容管理、用户、设置与媒体闭环已验收，准备本地阶段提交；E–G尚未完成。实际证据和最新状态以10台账、11交接及verification记录为准。
+真实PostgreSQL测试，阶段验收后本地提交，禁止自动push；部署验证在授权范围内执行，缺凭据记录阻塞。细功能登记依赖、验收、状态、代码、证据、提交；恢复先读Git/台账/交接。一期不做评论、注册、订阅、i18n、PWA。当前A–C已验收并本地提交；D全部内容管理、用户、设置与媒体闭环已验收并本地提交80347bc；E已验收，F–G尚未开始。实际证据和最新状态以10台账、11交接及verification记录为准。
+
+## 阶段 E 实施合同（2026-10-11）
+
+搜索遵循03全局SQL分页和公开隐私边界。分类/标签归档使用当前文章模块路径/category或tag/slug；分类根汇总自己和直接子分类，标签归档仅文章，其他资源保留各自标签筛选；不存在或无公开文章的归档404。关闭或改路径后搜索、归档、RSS、sitemap、OG一致隐藏或更新。
+
+阅读统计采用签名HttpOnly匿名cookie（固定30天，生产HTTPS secure），数据库仅保存匿名标识哈希，不保存IP。ViewReceipt唯一(resource,contentId,visitorHash)，保存windowExpiresAt、countedDate及最近成功计数updatedAt；锁定稳定身份后取数据库时间，30分钟内重复不修改任何计数和时间。首次PV/当日UV各加1，同日超窗PV加1/UV不加；跨午夜仍受30分钟窗口限制，次日首次成功计数才增加次日UV。UV指成功计数的匿名身份，不能描述为真实人数；无cookie首次并发可能形成不同匿名身份，已持同cookie的并发必须严格去重。请求不能传计数、路径或时间。DNT/GPC与常见bot跳过，Origin/PG限流仍有效。内容viewCount、receipt及DailyStat原子事务，不更新内容revision或updatedAt。G清理最近成功计数超过30天的receipt，不能按30分钟窗口清理。
+
+DailyStat新增resource/contentId稳定维度，唯一(date,resource,contentId)，date为北京时间日历日期；path仅展示快照，统计链接从当前内容ID解析。旧数据迁为resource=legacy/contentId=旧path且保留原统计，不假装可关联现有内容。管理员统计使用真实未删除状态计数、北京时间最近7日及真实Top内容；备份无来源时lastBackupAt=null。
+
+RSS合并最近50条公开文章/日志，摘要纯文本/XML转义，GUID为资源/ID，关闭全部仍返回有效空feed。sitemap包含启用列表、公开详情、可见分类标签归档及About/时间线；不包含别名/私有/搜索。robots禁止admin/api/login/preview/search，固定分享图/api/v1/og使用既有api保留路径，OG仅公开站点或已公开内容，缺失/关闭内容404，不抓取任意远程图片。SEO输出当前canonical、公开DTO的结构化数据，JSON-LD转义小于号等字符防脚本闭合。一期公开页面与SEO路由force-dynamic/no-store，不使用旧300–3600秒ISR合同；保留未来缓存依赖tag失效。
+
+robots仍禁止普通/api抓取，但明确Allow: /api/v1/og，允许分享图读取。图片端点复用既有/api保留空间，D阶段合法的/og栏目和历史别名不受抢占。

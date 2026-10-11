@@ -498,13 +498,13 @@
 | 分享 | 复制链接 / Twitter / 微博 |
 | 上下篇 | 同分类下按 `publishedAt` 相邻 |
 | 相关文章 | 同分类 + 共享标签数排序，取 3 条 |
-| 阅读量 | 进入页面时 `POST /api/v1/views`，**同 session 同文章只计一次**（`sessionStorage` 去重） |
+| 阅读量 | 进入页面时 `POST /api/v1/views`，签名匿名访客cookie + PostgreSQL同资源30分钟窗口去重，sessionStorage仅优化成功请求 |
 | RSS | 每篇文章自动进 `/rss.xml` |
 
 **阅读量防刷**
 
 ```
-同 IP + 同 slug：30 分钟内只计一次（共享PostgreSQL窗口记录）
+同签名匿名访客 + 同资源类型/ID：30分钟内只计一次（共享PostgreSQL窗口记录，不保存IP，不依赖slug/路径）
 爬虫 UA：不计（匹配常见 bot UA 列表）
 Do Not Track 开启：不计
 ```
@@ -572,7 +572,7 @@ Do Not Track 开启：不计
 - [ ] 草稿直链 404，预览链接可访问
 - [ ] TOC 生成正确，滚动时高亮跟随
 - [ ] slug 冲突时后台实时提示且接口返回 409
-- [ ] 阅读量同 session 只计一次
+- [ ] 阅读量签名匿名访客同资源30分钟去重，跨路径不重复
 - [ ] 关闭文章模块后 RSS 仍正常（只输出日志）
 - [ ] 文章详情页移动端代码块可横向滚动且不撑破布局
 

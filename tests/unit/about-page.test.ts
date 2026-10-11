@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
-import ContentPage from '@/app/(site)/[...path]/page'
+import ContentPage, { generateMetadata } from '@/app/(site)/[...path]/page'
 import { AboutPage } from '@/components/site/about-page'
 const mocks = vi.hoisted(() => ({ module: vi.fn(), profile: vi.fn() }))
 vi.mock('@/lib/services/public-site', () => ({
@@ -31,4 +31,21 @@ test('About自定义动态路径展示Hero，关闭全部区块不白屏且无�
   expect(html).toContain('具体定位')
   expect(html).not.toContain('mailto:')
   expect(html).not.toContain('profile-contact')
+})
+
+test('About metadata 使用公开个人定位与头像', async () => {
+  mocks.module.mockResolvedValue({
+    key: 'about',
+    name: '个人介绍',
+    description: '栏目说明',
+    route: '/me',
+    config: {},
+  })
+  mocks.profile.mockResolvedValue({ headline: '公开定位', avatar: '/uploads/avatar.png' })
+  const result = await generateMetadata({
+    params: Promise.resolve({ path: ['me'] }),
+    searchParams: Promise.resolve({}),
+  })
+  expect(result.description).toBe('公开定位')
+  expect(result.openGraph?.images).toEqual(['/uploads/avatar.png'])
 })

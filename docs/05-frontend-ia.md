@@ -8,25 +8,26 @@
 
 | 路由 | 页面 | 渲染 | 缓存 | 模块归属 |
 |---|---|---|---|---|
-| `/` | 首页 | ISR | `revalidate=300`, tag `content` | `home` |
-| `/logs` | 日志列表 | ISR | 600s, tag `log` | `log` |
-| `/logs/[id]` | 日志详情 | ISR + `generateStaticParams` | 600s, tag `log` | `log` |
-| `/logs/calendar` | 日志日历（可选） | ISR | 600s, tag `log` | `log` |
-| `/portfolio` | 作品集 | ISR | 3600s, tag `project` | `portfolio` |
-| `/portfolio/[slug]` | 作品详情 | ISR + `generateStaticParams` | 3600s, tag `project` | `portfolio` |
-| `/timeline` | 时间轴 | ISR | 3600s, tag `timeline` | `timeline` |
-| `/articles` | 文章列表 | ISR | 600s, tag `article` | `article` |
-| `/articles/[slug]` | 文章详情 | ISR + `generateStaticParams` | 600s, tag `article` | `article` |
-| `/articles/category/[slug]` | 分类归档 | ISR | 600s, tag `article` | `article` |
-| `/articles/tag/[slug]` | 标签归档 | ISR | 600s, tag `article` | `article` |
-| `/about` | 关于我 | ISR | 3600s, tag `profile` | `about` |
+| `/` | 首页 | Dynamic | no-store | `home` |
+| `/logs` | 日志列表 | Dynamic | no-store | `log` |
+| `/logs/[id]` | 日志详情 | Dynamic | no-store | `log` |
+| `/logs/calendar` | 日志日历（可选） | Dynamic | no-store | `log` |
+| `/portfolio` | 作品集 | Dynamic | no-store | `portfolio` |
+| `/portfolio/[slug]` | 作品详情 | Dynamic | no-store | `portfolio` |
+| `/timeline` | 时间轴 | Dynamic | no-store | `timeline` |
+| `/articles` | 文章列表 | Dynamic | no-store | `article` |
+| `/articles/[slug]` | 文章详情 | Dynamic | no-store | `article` |
+| `/articles/category/[slug]` | 分类归档 | Dynamic | no-store | `article` |
+| `/articles/tag/[slug]` | 标签归档 | Dynamic | no-store | `article` |
+| `/about` | 关于我 | Dynamic | no-store | `about` |
 | `/search` | 搜索结果 | Dynamic | 不缓存 | — |
-| `/tags` | 标签云（可选） | ISR | 3600s | — |
-| `/404` (`not-found.tsx`) | 未找到 | Static | — | — |
+| `/tags` | 标签云（可选） | Dynamic | no-store | — |
+| `/404` (`not-found.tsx`) | 未找到 | Dynamic | no-store | — |
 | `/error.tsx` | 错误 | Static | — | — |
 | `/sitemap.xml` | 站点地图 | Dynamic | no-store | — |
 | `/rss.xml` | RSS 订阅 | Dynamic | no-store | — |
-| `/robots.txt` | 爬虫规则 | Static | — | — |
+| `/robots.txt` | 爬虫规则 | Dynamic | no-store | — |
+| `/api/v1/og` | 公开分享图 | Dynamic | no-store | 当前内容模块 |
 | `/manifest.webmanifest` | PWA清单（二期，一期不实现） | 二期 | — | — |
 | `/api/health` | 健康检查 | Dynamic | no-store | — |
 
@@ -876,3 +877,5 @@ layout.tsx (site)
 
 ## 一期响应式验收补充
 移动首页作品采用横向轨道（可触摸滚动、键盘可达，不造成页面横向溢出）；平板时间线单列，桌面中轴；桌面Logo链接回首页；移动首页底部导航文字对比度≥4.5:1。公共内容统一发布时间/软删除过滤，preview24h且no-store/noindex。
+
+robots仍禁止普通/api抓取，但明确Allow: /api/v1/og，允许分享图读取。图片端点复用既有/api保留空间，D阶段合法的/og栏目和历史别名不受抢占。

@@ -486,13 +486,29 @@ model Media {
 
 /// 页面访问按天聚合
 model DailyStat {
-  id      String   @id @default(cuid())
-  date    DateTime @db.Date
-  path    String
-  views   Int      @default(0)
-  uniques Int      @default(0)
+  id        String   @id @default(cuid())
+  date      DateTime @db.Date
+  path      String
+  resource  String   @default("legacy")
+  contentId String
+  views     Int      @default(0)
+  uniques   Int      @default(0)
 
-  @@unique([date, path])
+  @@unique([date, resource, contentId])
   @@index([date(sort: Desc)])
   @@map("daily_stats")
+}
+
+/// 同一匿名身份与内容的成功计数窗口，不存IP或登录用户。
+model ViewReceipt {
+  resource        String
+  contentId       String
+  visitorHash     String
+  windowExpiresAt DateTime
+  countedDate     DateTime @db.Date
+  updatedAt       DateTime
+
+  @@id([resource, contentId, visitorHash])
+  @@index([updatedAt])
+  @@map("view_receipts")
 }

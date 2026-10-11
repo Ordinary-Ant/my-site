@@ -96,7 +96,8 @@
 |---|---|---|
 | `POST /auth/login` | 5 次 / 15 分钟 / (IP + email) | 429 + `Retry-After` |
 | `POST /auth/refresh` | 30 次 / 15 分钟 / IP | 429 |
-| 公开 GET 接口 | 300 次 / 15 分钟 / IP | 429 |
+| 公开 GET 与 POST /views | 300 次 / 15 分钟 / IP，共享公开桶 | 429 |
+| POST /views | 另加60次 / 30分钟 / 签名匿名身份 | 429 |
 | 后台写接口 | 120 次 / 15 分钟 / 用户 | 429 |
 | 上传接口 | 20 次 / 小时 / 用户 | 429 |
 
@@ -461,14 +462,13 @@
       "title": "我为什么选择 Next.js",
       "excerpt": "…<em>Next.js</em> 的渲染模型…",   // 命中词已 <em> 包裹
       "url": "/articles/why-i-choose-nextjs",
-      "publishedAt": "2025-01-15T08:00:00.000Z",
-      "score": 0.87
+      "publishedAt": "2025-01-15T08:00:00.000Z"
     }
   ],
   "meta": { "page": 1, "pageSize": 20, "total": 7, "query": "next" }
 }
 ```
-实现：一期 `ILIKE '%q%'` + `Promise.all` 跨表查询后按时间合并；单次最多返回 50 条。`q` 长度 < 2 时直接返回空。
+实现：参数化SQL UNION ALL三个公开资源的轻量ID、类型与发布时间后，按publishedAt DESC/type ASC/id ASC全局分页；完整总数和typeCounts不受分页影响，typeCounts不受当前type筛选影响。只读取当前页最多50个正文。q先trim，少于2字符返回空，超过200字符400；type仅all/article/log/project，page为1–10000，pageSize默认20、最大50，非法参数400。ILIKE关键词中的百分号、下划线和反斜杠按字面转义；不输出不存在的相关性score。摘要先执行公开隐私清洗，再纯文本截取、HTML实体转义并用固定em高亮；前端用安全文本节点渲染。只读RepeatableRead保证计数与页数据一致。
 
 ---
 
@@ -762,7 +762,7 @@ intent JSON：`{originalName,mimeType,size,hash,alt?,folder?}`（hash为64位小
 
 ### 5.6 仪表盘统计
 
-阶段 B 的 `GET /api/v1/admin/dashboard` 需要 dashboard:read，返回当前真实基础计数 `{articles,drafts,logs,projects,media,recent}`；recent 为最近更新的五篇未删除文章（id/title/status/updatedAt）。此入口不提供尚未建立的访问统计或备份状态。下述完整 `stats` 在阶段 D/E/G 接入相应统计和备份来源后实现，不能填模拟数字。
+阶段 B 的 `GET /api/v1/admin/dashboard` 需要 dashboard:read，返回当前真实基础计数 `{articles,drafts,logs,projects,media,recent}`；recent 为最近更新的五篇未删除文章（id/title/status/updatedAt）。此入口不提供尚未建立的访问统计或备份状态。阶段E的完整stats供仪表盘读取，必须使用真实统计；备份来源留G，未验证时为null。
 
 `GET /api/v1/admin/stats`
 
@@ -786,7 +786,7 @@ intent JSON：`{originalName,mimeType,size,hash,alt?,folder?}`（hash为64位小
       "modulesEnabled": 5,
       "modulesDisabled": 1,
       "dbStatus": "ok",
-      "lastBackupAt": "2025-01-15T03:00:00.000Z"
+      "lastBackupAt": null
     }
   }
 }
@@ -909,3 +909,15 @@ POST /admin/media/folders需media:write、Origin及PG adminwrite额度，严格{
 POST /admin/media/deduplicate需media:write、Origin及PG adminwrite额度，严格{hash:64位小写sha256,size:正安全整数,mimeType:允许类型}，匹配已登记验证过的完整Media且hash/size/真实mime均相同，返回{media:安全DTO|null,deduplicated:boolean}。命中仅复用原ID/url/alt/folder并记录审计，不按客户端声明创建/更改对象，不返回存储key/hash/uploadedBy；等同选择已有共享媒体。Local/R2均先在浏览器算hash再查询，命中避免传输；未命中完整沿用上传magic/大小/hash/归属验证。查询只扣adminwrite，未命中后真实上传仍扣20次/小时，避免双扣上传额度。
 
 媒体批量操作每批最多50个ID快照，界面逐项调用既有PATCH {folder}、PATCH {alt:string|null}或DELETE；各项独立鉴权、引用保护、事务及审计，部分成功不回滚，结果逐项列出，失败项保留选择供重试。禁止绕过共享额度或强删引用文件。清理继续使用原POST /media/cleanup及{cleaned,failed,pending}，需确认并展示真实结果。
+
+### E 阅读统计与索引补充
+
+POST /views严格接收{resource:article|log|project,id}，Origin校验、共享PG公开额度和匿名身份额度；匿名访客cookie site_visitor为HttpOnly/SameSite=Lax/Path=/，固定30天，生产HTTPS secure。签名与登录凭证用途隔离，数据库仅存随机身份哈希，不保存IP。无有效cookie由服务端建立身份；已持相同cookie并发只计一次。DNT=1、Sec-GPC=1和常见bot不统计且不建立cookie。正常返回{counted,viewCount}，跳过返回{counted:false,viewCount:null}；草稿/未来/软删/模块或类型关闭404。客户端sessionStorage只优化成功计数的30分钟内重复请求，不作为权威授权或去重。
+
+ViewReceipt/每日统计/内容阅读量原子提交；锁后使用数据库时间，北京日历日，同日超窗只增PV，跨日窗口内仍不增PV/UV。UV是当日成功计数的独立匿名身份；无cookie首次并发或清除cookie可能建立不同身份，不宣称真实人数。计数不更新revision或内容updatedAt，改路径不分裂身份；DailyStat.path最后接受计数时更新，统计链接从当前资源ID解析。
+
+GET /admin/stats需dashboard:read，三个角色当前有效会话均可读。内容total为未删除数，published为到期PUBLISHED，draft为DRAFT，archived为ARCHIVED，scheduled为未到期或无发布时间的PUBLISHED。traffic返回北京时间今天及前6天的真实views/resourceUniques，后者是各资源匿名UV之和，不能视为站点人数；无记录日为0。newContentLast7Days计三模型未删除新建记录，topArticles仅当前公开文章按viewCount/id取5条，返回当前url；recent.articles为最近编辑五篇未删除文章。lastBackupAt在G前null。
+
+RSS合并最近50条公开文章/日志，GUID为稳定resource:id，文本摘要XML转义；全部关闭仍是有效空feed。sitemap投影公开列表/详情与有公开文章的分类标签归档，只输出当前路径，不含搜索/预览/旧别名，单文档超过协议50000项明确503 SITEMAP_LIMIT，需后续拆分索引。/api/v1/og位于既有保留命名空间，不新增栏目保留路径，resource省略时站点卡片，article/project的id参数为公开slug、log为ID；只从公开详情取标题，不允许远程图片参数。响应PNG/no-store；关闭/未公开内容404，参数无效400。
+
+robots仍禁止普通/api抓取，但明确Allow: /api/v1/og，允许分享图读取。图片端点复用既有/api保留空间，D阶段合法的/og栏目和历史别名不受抢占。

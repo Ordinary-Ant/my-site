@@ -1,6 +1,6 @@
 # 10 · 开发状态台账
 
-更新：2026-10-11。A–D已完成，E–G待开始；D01–D08已验收。状态仅用待开始/开发中/待验证/已完成；已完成须有实际证据，阶段通过后本地提交，禁止自动push。
+更新：2026-10-11。A–E已完成，F–G待开始；D01–D08已验收。状态仅用待开始/开发中/待验证/已完成；已完成须有实际证据，阶段通过后本地提交，禁止自动push。
 
 | 编号 | 细功能 | 依赖 | 验收 | 状态 | 代码/文档入口（规划或现有） | 证据 | 提交 |
 |---|---|---|---|---|---|---|---|
@@ -27,17 +27,17 @@
 | C02 | 动态路由/唯一/历史别名 | B | 301直达当前、详情query保留、无抢占循环 | 已完成 | middleware、RouteAlias | [阶段C证据](verification/phase-c.md) | cc9fb5d |
 | C03 | 配置/开关中心/设置 | B | 已知嵌套合并/数组替换/null/拒绝未知 | 已完成 | module/settings service/UI | [阶段C证据](verification/phase-c.md) | cc9fb5d |
 | C04 | 导航/首页聚合/审计/撤销 | B,C01–03 | 开关导航首页联动、排序条数、审计可回溯和撤销 | 已完成 | home/module/audit | [阶段C证据](verification/phase-c.md) | cc9fb5d |
-| D01 | 日志CRUD/日历/图集 | C | 日期、类型、发布、软删、开关 | 已完成 | log API/UI/preview | [阶段D持续证据](verification/phase-d.md)，85全量PG/53unit/联合E2E9pass，规格质量复审通过 | 未提交（随D阶段） |
-| D02 | 作品CRUD/筛选/详情 | C | 类型、外链、图集、发布与开关 | 已完成 | project API/UI、project-editor/pages/card、cover-crop | 全量104PG/71unit，联合浏览器15pass12skip，各组规格质量批准，见[阶段D证据](verification/phase-d.md) | 未提交（随D阶段） |
-| D03 | 时间线/日期精度/排序/软删 | C | 当前/日期/同日期order/id，年/月/日保存 | 已完成 | timeline API/UI | 全部规格质量批准，5PG/11unit、三端及列表/角色/脚注唯一/与About实际同源开关联动通过，见阶段D证据 | 未提交（随D阶段） |
-| D04 | About/Profile/联系方式边界 | C | 区块开关、revision409、全站联系方式隐藏 | 已完成 | profile API/UI/DTO | 全部规格质量批准，114PG/111unit、联合25E2E及最终构建补验，真实上传/排序/恢复/隐私/同源联动/三角色通过，见阶段D证据 | 未提交（随D阶段） |
-| D05 | 分类标签管理与关系 | C | 分类标签CRUD、归属引用完整 | 已完成 | taxonomy service/API/manager、revision迁移 | 118unit/123PG、浏览器8pass10skip、规格质量复审批准，见阶段D及taxonomy后端证据 | 未提交（随D阶段） |
-| D06 | 导入导出/备份数据关系 | C | 冲突映射、事务失败边界、数据可恢复 | 已完成 | data service/validator、export/import APIs、data-manager/data-file | 最终127unit/138PG、data+roles5pass4skip、build/check通过，全部spec/quality批准，时间线/motion/生日校验与独立恢复备份均复审，见阶段D及data backend证据 | 未提交（随D阶段） |
-| D07 | 用户管理/停用/角色/会话撤销 | B,C | ADMIN管理、最后管理员保护、停用即时失效 | 已完成 | users API/UI/service | 132unit/147PG、users+roles5pass4skip18.1秒、build/check/verify通过，全部规格质量批准，见阶段D | 未提交（随D阶段） |
-| D08 | 站点设置/完整媒体库 | B,C | 全配置、目录/引用/确认/清理/审计 | 已完成 | settings共享定义、media folders/deduplicate API、media-browser/picker/upload-queue | 全部规格质量复审批准；143unit/156PG，整套浏览器54pass42skip，404补验4pass2skip，check/verify/build及预算通过，见阶段D最终验收 | 未提交（随D阶段） |
-| E01 | 搜索/SEO/RSS/sitemap | D | 全部公共过滤、当前路径、缓存失效 | 待开始 | search、metadata、feeds | 待补实际运行证据 | 未提交 |
-| E02 | 分类标签归档/阅读统计 | D | 当前路径、计数去重、开关公共过滤 | 待开始 | archives/stats | 待实现证据 | 未提交 |
-| E03 | metadata/JSON-LD/OG/分钟定时发布 | D | 未发布/软删不索引、图生成、调度鉴权失效 | 待开始 | SEO/publish job | 待实现证据 | 未提交 |
+| D01 | 日志CRUD/日历/图集 | C | 日期、类型、发布、软删、开关 | 已完成 | log API/UI/preview | [阶段D持续证据](verification/phase-d.md)，85全量PG/53unit/联合E2E9pass，规格质量复审通过 | 80347bc |
+| D02 | 作品CRUD/筛选/详情 | C | 类型、外链、图集、发布与开关 | 已完成 | project API/UI、project-editor/pages/card、cover-crop | 全量104PG/71unit，联合浏览器15pass12skip，各组规格质量批准，见[阶段D证据](verification/phase-d.md) | 80347bc |
+| D03 | 时间线/日期精度/排序/软删 | C | 当前/日期/同日期order/id，年/月/日保存 | 已完成 | timeline API/UI | 全部规格质量批准，5PG/11unit、三端及列表/角色/脚注唯一/与About实际同源开关联动通过，见阶段D证据 | 80347bc |
+| D04 | About/Profile/联系方式边界 | C | 区块开关、revision409、全站联系方式隐藏 | 已完成 | profile API/UI/DTO | 全部规格质量批准，114PG/111unit、联合25E2E及最终构建补验，真实上传/排序/恢复/隐私/同源联动/三角色通过，见阶段D证据 | 80347bc |
+| D05 | 分类标签管理与关系 | C | 分类标签CRUD、归属引用完整 | 已完成 | taxonomy service/API/manager、revision迁移 | 118unit/123PG、浏览器8pass10skip、规格质量复审批准，见阶段D及taxonomy后端证据 | 80347bc |
+| D06 | 导入导出/备份数据关系 | C | 冲突映射、事务失败边界、数据可恢复 | 已完成 | data service/validator、export/import APIs、data-manager/data-file | 最终127unit/138PG、data+roles5pass4skip、build/check通过，全部spec/quality批准，时间线/motion/生日校验与独立恢复备份均复审，见阶段D及data backend证据 | 80347bc |
+| D07 | 用户管理/停用/角色/会话撤销 | B,C | ADMIN管理、最后管理员保护、停用即时失效 | 已完成 | users API/UI/service | 132unit/147PG、users+roles5pass4skip18.1秒、build/check/verify通过，全部规格质量批准，见阶段D | 80347bc |
+| D08 | 站点设置/完整媒体库 | B,C | 全配置、目录/引用/确认/清理/审计 | 已完成 | settings共享定义、media folders/deduplicate API、media-browser/picker/upload-queue | 全部规格质量复审批准；143unit/156PG，整套浏览器54pass42skip，404补验4pass2skip，check/verify/build及预算通过，见阶段D最终验收 | 80347bc |
+| E01 | 搜索/SEO/RSS/sitemap | D | 全部公共过滤、当前路径、缓存失效 | 已完成 | search、metadata、feeds | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | 本阶段提交 |
+| E02 | 分类标签归档/阅读统计 | D | 当前路径、计数去重、开关公共过滤 | 已完成 | archives/stats | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | 本阶段提交 |
+| E03 | metadata/JSON-LD/OG/分钟定时发布 | D | 未发布/软删不索引、图生成、调度鉴权失效 | 已完成 | SEO/publish job | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | 本阶段提交 |
 | F01 | 动效v2/升级/后台预览 | E | 四预设none/tint，reduce/卸载/预览一致 | 待开始 | motion runtime/UI | 待补实际运行证据 | 未提交 |
 | F02 | 移动/平板/桌面视觉 | E | 移动首页横轨/导航4.5、平板单列、桌面中轴Logo | 待开始 | site/admin styles/screenshots | 待补实际运行证据 | 未提交 |
 | G01 | CI/安全依赖和会话清理 | F | 持续检查、审计例外、过期记录清理 | 待开始 | CI、cleanup jobs | 待补实际运行证据 | 未提交 |

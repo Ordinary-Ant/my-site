@@ -1,17 +1,17 @@
 # 11 · 开发交接与恢复
 
-更新：2026-10-11。A（66dca93）、B（c5fe0c6）、C（cc9fb5d）已验收并本地提交；D01–D08已验收，准备本地阶段提交，E–G待开始。分支codex/full-site，保留master，origin已配置，禁止自动push。一期尚未完成；D整阶段已通过，之后进入E。
+更新：2026-10-11。A（66dca93）、B（c5fe0c6）、C（cc9fb5d）已验收并本地提交；D01–D08已验收并本地提交80347bc；E开发中，F–G待开始。分支codex/full-site，保留master，origin已配置，禁止自动push。一期尚未完成；D整阶段已通过，之后进入E。
 
 ## 恢复顺序
 
-1. 读AGENTS.md，核对Git状态和最近提交；当前未提交变化均属于D实现，不覆盖/回退。
+1. 读AGENTS.md，核对Git状态和最近提交；当前未提交变化均属于E合同修订与实现，不覆盖/回退。
 2. 读README、10台账、12批准计划及当前阶段verification；09只是旧可行性快照。
 3. 检查Docker与实际端口。现有.env不可输出/覆盖/提交，不reset开发/生产库。
 4. 开发前登记，实际验收后填证据；公开生产发布最终确认。
 
 ## 环境与启动
 
-Node24.19/npm11.17，PostgreSQL16容器personal-site-db，卷personal-site_pgdata。2026-10-10 Windows excludedportrange含5341–5440，原5432无法绑定；已保留同卷重建映射15432。开发库4篇文章；开发与测试库现有7个迁移均已部署，未reset或修改.env。docker已在PATH，安装于用户AppData/Local/Programs/DockerDesktop。
+Node24.19/npm11.17，PostgreSQL16容器personal-site-db，卷personal-site_pgdata。2026-10-10 Windows excludedportrange含5341–5440，原5432无法绑定；已保留同卷重建映射15432。开发库4篇文章；开发与测试库现有8个迁移均已部署，未reset或修改.env。docker已在PATH，安装于用户AppData/Local/Programs/DockerDesktop。
 
 当前启动命令（进程环境覆盖，不覆盖.env）：
 
@@ -60,7 +60,7 @@ D07用户管理合同已补03/04/02：ADMIN权限、User revision、随机初始
 
 R2云ACL/CORS/公网直传、生产托管/域名/数据库和备份凭据未提供，G记录实际阻塞；B只证明本地协议与真实PG。真实分钟runner已在B验收，生产外部调度未配置。默认TRUST_PROXY=false，代理正确覆盖头后才开启。
 
-主题对比度、全站最终视觉、搜索/RSS/sitemap、动效、生产CSP、独立数据库/媒体备份恢复留E–G。最近gzip登录107.90KB/文章126.80KB（D08实测）；预算110/135KB。生产audit既有0漏洞，开发链5high待G复核，不force降级Next。D07首轮全PG曾有media-r2本地模拟协议测试fetch bad port失败，随后全147项通过；实际随机端口未保留，不推测具体值，仍须稳定测试端口分配。密钥、RT、rotationReply、导入凭证不能输出日志或Git。
+主题对比度、全站最终视觉、动效、生产CSP、独立数据库/媒体备份恢复留F–G；搜索/RSS/sitemap在E已实现待整阶段验收。最近gzip登录107.90KB/文章126.80KB（D08实测）；预算110/135KB。生产audit既有0漏洞，开发链5high待G复核，不force降级Next。D07首轮全PG曾有media-r2本地模拟协议测试fetch bad port失败，随后全147项通过；实际随机端口未保留，不推测具体值，仍须稳定测试端口分配。密钥、RT、rotationReply、导入凭证不能输出日志或Git。
 
 ## D阶段最终恢复点
 
@@ -68,4 +68,22 @@ D01–D08及全部规格/质量复审通过。最终143unit（47文件）、156�
 
 全套浏览器之后补修404推荐链接：模块关闭隐藏、连续改路由使用当前路径。单元RED→GREEN，重新生产build后modules+foundation实际4pass2skip（8.3秒）。gzip登录107902字节、文章126799字节，均低于110/135KB。未覆盖生产R2和部署，不据此声称一期完成。测试恢复备份无残留。
 
-下一步：本地D提交，记录hash；先修订E搜索/归档/匿名阅读统计/订阅SEO合同再开发。搜索全局分页不得先每表截断再合并；阅读统计不存IP，以签名匿名访客cookie和PG30分钟窗口为准；lastBackupAt无实际来源时为null。继续登记E功能及真实验收，不自动push。
+阶段D本地提交80347bc，未push。当前已开始修订E搜索/归档/匿名阅读统计/订阅SEO合同再开发。搜索全局分页不得先每表截断再合并；阅读统计不存IP，以签名匿名访客cookie和PG30分钟窗口为准；lastBackupAt无实际来源时为null。继续登记E功能及真实验收，不自动push。
+
+## E最新恢复点（2026-10-11）
+
+D提交80347bc，所有新增未提交内容属于E，禁止覆盖。E合同已修原03/05/06/02及12：正确全局SQL分页、公开日期过滤、稳定匿名身份30分钟窗口、北京日历日期、未验证备份null；旧score/session-only/IP+slug合同移除。迁移20261011053000_view_receipts已部署开发及_test两库，当前8迁移，未reset/覆盖.env。
+
+实现入口：services/search/public-content/seo/stats、visitor/search-display；公开search/views APIs、admin/stats，search页面、catchall归档，RSS/sitemap/robots/OG、JSON-LD/ViewCounter及Dashboard。搜索agent遇到账户使用额度限制后root承接实现；只读规格复审phase_e_contract_audit已批准，独立质量审查进行中。
+
+已核实152unit/51文件、167真实PG/26文件及check/生产build通过，verify通过，只有既有Markdown图片warning；联合search-seo+roles+modules浏览器6pass6skip17.5秒。全套102浏览器58passed/44skipped（2.7分钟）；复审补修后重新check/build与相关浏览器6passed/6skipped（17.1秒）。生产manifest gzip登录107916字节/107.92KB、文章127132字节/127.13KB。
+
+下一步等整套浏览器完成及规格/质量复审，修复确定缺口后再E阶段本地提交，随后F。PG测试与generate/build/browser保持串行，审查只读。R2/生产部署/备份凭据仍属G阻塞。
+
+复审补修：归档翻页保留pageSize、About metadata使用公开headline/avatar，新增两项单元测试实际RED→GREEN；日志/作品列表CollectionPage、时间线BreadcrumbList补齐，日志保持统计且不显示阅读量。补验真实页面结构化数据与日志展示通过。
+
+质量复审发现新/og会抢占D阶段合法栏目/历史别名，浏览器实际RED为图片响应text/html。修复使用/api/v1/og，旧/og路径与alias均保留；robots仅例外允许该公开图片，普通/api仍禁止。移除新增/og保留项，无需迁移用户路径。复审补验6pass6skip（16.7秒），规格/质量最终复审批准；最后robots小修后build/browser待root确认。
+
+## E阶段最终恢复点
+
+E01–E03整阶段通过：152unit/167真实PG、全102浏览器58pass44skip，复审后联合补验6pass6skip、最后robots修正4pass2skip（8秒），check/verify/build及107916/127132字节gzip均通过。规格/质量最终批准。分享图最终/api/v1/og，保留D阶段/og栏目/别名兼容。E本地提交后立即F01动效，F02三端视觉；F开始前登记开发中。生产R2/部署/备份凭据仍是G实际阻塞。

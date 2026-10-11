@@ -170,7 +170,7 @@
 | GET | `/api/v1/admin/settings` | 全部设置（按 group 分组） |
 | PATCH ★ | `/api/v1/admin/settings/:group` | 批量更新某组设置 |
 | GET ★ | `/api/v1/admin/settings/motion` | **动效配置**：返回 config + 4 个预设 + 性能预估（见 §5.8） |
-| PATCH ★ | `/api/v1/admin/settings/motion` | 保存动效配置（Zod + 交叉规则，可能带 `warnings`） |
+| PATCH ★ | `/api/v1/admin/settings/motion` | 保存动效配置（严格Zod + 交叉规则） |
 | GET | `/api/v1/admin/media` | 媒体列表 |
 | GET/POST | `/api/v1/admin/media/folders` | 全部目录汇总/新建持久空目录 |
 | POST | `/api/v1/admin/media/deduplicate` | 按hash/size/mimeType复用已验证媒体 |
@@ -823,7 +823,7 @@ intent JSON：`{originalName,mimeType,size,hash,alt?,folder?}`（hash为64位小
 ---
 
 ### 5.8 动效配置（version2）
-GET /api/v1/admin/settings/motion返回08的完整config、static/editorial/narrative/kinetic四预设及标注估算的体积信息。PATCH仅ADMIN，已知嵌套键合并，严格拒绝未知键；默认editorial+none。无background/text/micro/performance旧字段，无custom。公开GET /api/v1/site的motion只返回渲染配置。完整合法值/默认值/升级见[08](08-motion-system.md)。预算文章135KB、动效28KB、登录110KB gzip。respectReducedMotion固定true，decoration仅none/tint，无连续背景。
+GET /api/v1/admin/settings/motion返回08的完整config、presets对象（static/editorial/narrative/kinetic四完整模板）及performance估算标记、预算和是否需要库；不返回伪造体积。PATCH沿用键对象{ "motion.config": 部分配置 }，返回完整该组键对象；respectReducedMotion=false为422，其余非法字段400。PATCH仅ADMIN，已知嵌套键合并，严格拒绝未知键；默认editorial+none。无background/text/micro/performance旧字段，无custom。公开GET /api/v1/site的motion只返回渲染配置。完整合法值/默认值/升级见[08](08-motion-system.md)。预算文章135KB、动效28KB、登录110KB gzip。respectReducedMotion固定true，decoration仅none/tint，无连续背景。
 
 ### 5.9 草稿预览与slug检查
 POST /api/v1/admin/articles/:id/preview-token需content:write；POST /api/v1/admin/logs/:id/preview-token需content:read（ADMIN/EDITOR/VIEWER均可），两者POST均检查Origin、启用账号与AT对应会话。创建24h随机token，PreviewToken只保存哈希与内容类型；GET /preview/:token按凭据类型分发文章/日志，日志提供Markdown及图集。预览允许草稿、归档、未来内容及已关闭子类型，属于凭据授权的私有读取，与公开过滤不同；整个模块关闭或内容软删除时预览404，过期/缺失/未知类型凭据也404。页面no-store及noindex，不含公开导航或上下篇，不进RSS/sitemap/搜索。GET /api/v1/admin/articles/slug-available?slug=&excludeId=需content:read，仅给后台校验；最终写入仍由数据库唯一约束兜底。

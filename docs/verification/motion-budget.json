@@ -1,0 +1,30 @@
+{
+  "page": "motion",
+  "gzipBytes": 20986,
+  "gzipKB": 20.99,
+  "budgetKB": 28,
+  "passed": true,
+  "fallbackGzipBytes": 617,
+  "files": [
+    {
+      "file": "static/chunks/2424.d003a539cd4cfd4e.js",
+      "role": "runtime",
+      "gzipBytes": 2131
+    },
+    {
+      "file": "static/chunks/7715.fcdceb68f26b583e.js",
+      "role": "engine",
+      "gzipBytes": 858
+    },
+    {
+      "file": "static/chunks/app/(site)/layout-b9dc3b928b329041.js",
+      "role": "runtime",
+      "gzipBytes": 3892
+    },
+    {
+      "file": "static/chunks/14.ad5fae9e6708d3a4.js",
+      "role": "engine",
+      "gzipBytes": 13488
+    }
+  ]
+}

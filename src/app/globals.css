@@ -23,7 +23,7 @@
   --popover: #ffffff;
   --popover-foreground: #0a0a0a;
 
-  --primary: #4f46e5;
+  --primary: var(--site-brand-light, #4f46e5);
   --primary-foreground: #ffffff;
 
   --secondary: #f4f4f5;
@@ -46,7 +46,7 @@
   --radius: 12px;
 
   /* ---- 项目扩展令牌 ---- */
-  --brand: #4f46e5;
+  --brand: var(--site-brand-light, #4f46e5);
   --brand-hover: #4f46e5;
   --brand-soft: #eef2ff;
   --brand-border: #c7d2fe;
@@ -81,7 +81,7 @@
   --popover: #121215;
   --popover-foreground: #fafafa;
 
-  --primary: #818cf8;
+  --primary: var(--site-brand-dark, #818cf8);
   --primary-foreground: #0a0a0a;
 
   --secondary: #18181b;
@@ -100,7 +100,7 @@
   --input: #27272a;
   --ring: #818cf8;
 
-  --brand: #818cf8;
+  --brand: var(--site-brand-dark, #818cf8);
   --brand-hover: #a5b4fc;
   --brand-soft: #1e1b4b;
   --brand-border: #3730a3;

@@ -1,4 +1,4 @@
-/* 一期动效基础：默认内容可读，编排运行时在阶段 F 按需接入。 */
+/* 默认内容可读，JS仅编排离屏区块。 */
 .reveal {
   opacity: 1;
   transform: none;
@@ -6,19 +6,42 @@
 
 /* 静态淡色底只作用于当前站点容器，不创建全局连续背景。 */
 .site-motion[data-decoration='tint'] {
-  background: color-mix(in srgb, var(--brand) 6%, var(--background));
+  background: color-mix(in srgb, var(--brand) var(--motion-tint, 6%), var(--background));
 }
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .site-motion[data-card-hover='lift']:not([data-motion='off']) .motion-card {
+  .site-motion[data-card-hover='lift']:not([data-motion='off']) [data-motion='card'] {
     transition:
       transform 200ms ease,
       box-shadow 200ms ease;
   }
-  .site-motion[data-card-hover='lift']:not([data-motion='off']) .motion-card:hover {
+  .site-motion[data-card-hover='lift']:not([data-motion='off']) [data-motion='card']:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-card-hover);
   }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-motion:not([data-motion='off']) [data-motion='hero'] > * {
+    animation: hero-enter var(--motion-duration, 450ms) ease-out both;
+  }
+  .site-motion[data-link-hover='underline']:not([data-motion='off']) a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+/* 首屏只移动少量距离，透明度始终为1，失败或禁JS仍可读。 */
+@keyframes hero-enter {
+  from {
+    transform: translateY(6px);
+  }
+  to {
+    transform: none;
+  }
+}
+.site-motion [data-motion='card']:focus-within {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 /* 键盘焦点即时呈现，不能等待入场动画。 */
@@ -52,4 +75,13 @@
 .site-motion[data-motion='off'] .reveal {
   opacity: 1 !important;
   transform: none !important;
+}
+.motion-preferences {
+  /* 移动底栏含设备安全区，页尾控件必须完整露出。 */
+  padding-bottom: calc(5rem + var(--site-safe-bottom, env(safe-area-inset-bottom, 0px)));
+}
+@media (min-width: 768px) {
+  .motion-preferences {
+    padding-bottom: 1rem;
+  }
 }

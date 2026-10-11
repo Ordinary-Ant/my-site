@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from 'next-themes'
 import { siteConfig } from '@/config/site'
 import { getPublicSite } from '@/lib/services/public-site'
+import { accessibleBrand } from '@/lib/brand-colors'
 import { safeContentUrl } from '@/lib/markdown'
 import './globals.css'
 
@@ -65,15 +66,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     typeof data.theme.accent === 'string' && /^#[a-f0-9]{6}$/i.test(data.theme.accent)
       ? data.theme.accent
       : undefined
+  const brand = accent ? accessibleBrand(accent) : null
   const defaultTheme = ['system', 'light', 'dark'].includes(String(data.site.defaultTheme))
     ? String(data.site.defaultTheme)
     : 'system'
   return (
-    <html lang={data.site.locale || 'zh-CN'} suppressHydrationWarning>
-      <body
-        className="bg-background text-foreground min-h-dvh antialiased"
-        style={accent ? ({ '--brand': accent, '--primary': accent } as CSSProperties) : undefined}
-      >
+    <html
+      lang={data.site.locale || 'zh-CN'}
+      suppressHydrationWarning
+      style={
+        brand
+          ? ({
+              '--site-brand-light': brand.light,
+              '--site-brand-dark': brand.dark,
+            } as CSSProperties)
+          : undefined
+      }
+    >
+      <body className="bg-background text-foreground min-h-dvh antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme={defaultTheme}

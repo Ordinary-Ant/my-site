@@ -2,7 +2,7 @@ import 'server-only'
 import type { Module, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { MODULE_KEYS, type ModuleKey, type ModuleConfig } from '@/config/modules'
-import { DEFAULT_MOTION, motionSchema } from '@/config/motion'
+import { readMotionConfig } from '@/config/motion'
 import { siteConfig } from '@/config/site'
 import { ApiError } from '@/lib/api/errors'
 import { mergeModuleConfig } from '@/lib/validators/module'
@@ -110,7 +110,7 @@ export async function getPublicSite() {
     },
     seo: group('seo'),
     theme: group('theme'),
-    motion: motionSchema.parse(settings.motion?.['motion.config'] ?? DEFAULT_MOTION),
+    motion: readMotionConfig(settings.motion?.['motion.config']),
     modules,
     profile,
   }

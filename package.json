@@ -30,7 +30,7 @@
     "prepare": "husky",
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/measure-js.mjs && playwright test",
     "test:db": "tsx scripts/prepare-test-db.ts",
     "postinstall": "prisma generate"
   },

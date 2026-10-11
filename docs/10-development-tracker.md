@@ -1,6 +1,6 @@
 # 10 · 开发状态台账
 
-更新：2026-10-11。A–E已完成，F–G待开始；D01–D08已验收。状态仅用待开始/开发中/待验证/已完成；已完成须有实际证据，阶段通过后本地提交，禁止自动push。
+更新：2026-10-11。A–F已完成，G本地发布准备待开始；D01–D08已验收。状态仅用待开始/开发中/待验证/已完成；已完成须有实际证据，阶段通过后本地提交，禁止自动push。
 
 | 编号 | 细功能 | 依赖 | 验收 | 状态 | 代码/文档入口（规划或现有） | 证据 | 提交 |
 |---|---|---|---|---|---|---|---|
@@ -35,11 +35,11 @@
 | D06 | 导入导出/备份数据关系 | C | 冲突映射、事务失败边界、数据可恢复 | 已完成 | data service/validator、export/import APIs、data-manager/data-file | 最终127unit/138PG、data+roles5pass4skip、build/check通过，全部spec/quality批准，时间线/motion/生日校验与独立恢复备份均复审，见阶段D及data backend证据 | 80347bc |
 | D07 | 用户管理/停用/角色/会话撤销 | B,C | ADMIN管理、最后管理员保护、停用即时失效 | 已完成 | users API/UI/service | 132unit/147PG、users+roles5pass4skip18.1秒、build/check/verify通过，全部规格质量批准，见阶段D | 80347bc |
 | D08 | 站点设置/完整媒体库 | B,C | 全配置、目录/引用/确认/清理/审计 | 已完成 | settings共享定义、media folders/deduplicate API、media-browser/picker/upload-queue | 全部规格质量复审批准；143unit/156PG，整套浏览器54pass42skip，404补验4pass2skip，check/verify/build及预算通过，见阶段D最终验收 | 80347bc |
-| E01 | 搜索/SEO/RSS/sitemap | D | 全部公共过滤、当前路径、缓存失效 | 已完成 | search、metadata、feeds | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | 本阶段提交 |
-| E02 | 分类标签归档/阅读统计 | D | 当前路径、计数去重、开关公共过滤 | 已完成 | archives/stats | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | 本阶段提交 |
-| E03 | metadata/JSON-LD/OG/分钟定时发布 | D | 未发布/软删不索引、图生成、调度鉴权失效 | 已完成 | SEO/publish job | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | 本阶段提交 |
-| F01 | 动效v2/升级/后台预览 | E | 四预设none/tint，reduce/卸载/预览一致 | 待开始 | motion runtime/UI | 待补实际运行证据 | 未提交 |
-| F02 | 移动/平板/桌面视觉 | E | 移动首页横轨/导航4.5、平板单列、桌面中轴Logo | 待开始 | site/admin styles/screenshots | 待补实际运行证据 | 未提交 |
+| E01 | 搜索/SEO/RSS/sitemap | D | 全部公共过滤、当前路径、缓存失效 | 已完成 | search、metadata、feeds | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | bd11e90 |
+| E02 | 分类标签归档/阅读统计 | D | 当前路径、计数去重、开关公共过滤 | 已完成 | archives/stats | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | bd11e90 |
+| E03 | metadata/JSON-LD/OG/分钟定时发布 | D | 未发布/软删不索引、图生成、调度鉴权失效 | 已完成 | SEO/publish job | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | bd11e90 |
+| F01 | 动效v2/升级/后台预览 | E | 四预设none/tint，reduce/卸载/预览一致 | 已完成 | motion runtime/UI | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | 未提交 |
+| F02 | 移动/平板/桌面视觉 | E | 移动首页横轨/导航4.5、平板单列、桌面中轴Logo | 已完成 | site/admin styles/screenshots | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | 未提交 |
 | G01 | CI/安全依赖和会话清理 | F | 持续检查、审计例外、过期记录清理 | 待开始 | CI、cleanup jobs | 待补实际运行证据 | 未提交 |
 | G02 | 真实PG集成/三端E2E | F | 业务/权限/并发/缓存/媒体真实闭环 | 待开始 | tests、Playwright | 待补实际运行证据 | 未提交 |
 | G03 | gzip性能/可访问性 | F | 文章135/动效28/登录110KB、键盘/对比度 | 待开始 | performance evidence | 待补实际运行证据 | 未提交 |

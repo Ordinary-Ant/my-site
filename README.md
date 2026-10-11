@@ -1,6 +1,6 @@
 # Personal Site · 个人网站与私有后台
 
-当前为**一期阶段A–E已完成**。已有可构建工程与33个HTML设计源稿/45张截图；A本地基础验收已通过，B登录权限、文章编辑/预览/发布/阅读/恢复、Local媒体与分钟发布闭环通过，R2云验收留至G，C模块/路由/设置/首页/审计与隐私闭环已验收，D日志、作品、时间线、About、分类标签及数据导入导出已验收，用户管理已验收，完整设置媒体库已验收，E搜索、归档、统计与SEO已验收，F–G待开始；已批准范围与合同见[一期计划](docs/12-phase-one-plan.md)。预计45–65人日。
+当前为**一期阶段A–F已完成**。已有可构建工程与33个HTML设计源稿/45张截图；A本地基础验收已通过，B登录权限、文章编辑/预览/发布/阅读/恢复、Local媒体与分钟发布闭环通过，R2云验收留至G，C模块/路由/设置/首页/审计与隐私闭环已验收，D日志、作品、时间线、About、分类标签及数据导入导出已验收，用户管理已验收，完整设置媒体库已验收，E搜索、归档、统计与SEO已验收，F动效与三端视觉已验收，G本地发布准备待开始；已批准范围与合同见[一期计划](docs/12-phase-one-plan.md)。预计45–65人日。
 
 Next.js15.5 App Router / Node runtime middleware / TypeScript / Tailwind4 / Prisma6 / PostgreSQL16；开发与测试使用真实PostgreSQL，生产计划Vercel+托管Postgres+R2，公开生产发布最终确认。CSS首屏与Anime.js按需编排，动效version2四预设默认editorial无装饰，仅none/tint，不做连续背景。预算文章135KB/动效28KB/登录110KB gzip，需真实测量。
 

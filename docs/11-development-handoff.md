@@ -1,10 +1,10 @@
 # 11 · 开发交接与恢复
 
-更新：2026-10-11。A（66dca93）、B（c5fe0c6）、C（cc9fb5d）已验收并本地提交；D01–D08已验收并本地提交80347bc；E开发中，F–G待开始。分支codex/full-site，保留master，origin已配置，禁止自动push。一期尚未完成；D整阶段已通过，之后进入E。
+更新：2026-10-11。A（66dca93）、B（c5fe0c6）、C（cc9fb5d）、D（80347bc）、E（bd11e90）已验收并本地提交；F已验收待提交，G待开始。分支codex/full-site，保留master，origin已配置，禁止自动push。一期尚未完成。用户已明确先完成本地发布准备，生产配置稍后提供；云端验收独立记录为未验证。
 
 ## 恢复顺序
 
-1. 读AGENTS.md，核对Git状态和最近提交；当前未提交变化均属于E合同修订与实现，不覆盖/回退。
+1. 读AGENTS.md，核对Git状态和最近提交；当前未提交变化均属于F动效、视觉、相关截图与开发记录，不覆盖/回退。下方旧阶段记录为历史，以本文最新恢复点为准。
 2. 读README、10台账、12批准计划及当前阶段verification；09只是旧可行性快照。
 3. 检查Docker与实际端口。现有.env不可输出/覆盖/提交，不reset开发/生产库。
 4. 开发前登记，实际验收后填证据；公开生产发布最终确认。
@@ -32,7 +32,10 @@ $env:E2E_BASE_URL = 'http://localhost:3100'
 $env:NEXT_PUBLIC_SITE_URL = $env:E2E_BASE_URL
 npm run build
 npm test
+# PG夹具固定3000 Origin，不启动HTTP服务；避免继承浏览器3100参数。
+$env:NEXT_PUBLIC_SITE_URL = 'http://localhost:3000'
 npm run test:integration
+$env:NEXT_PUBLIC_SITE_URL = $env:E2E_BASE_URL
 npm run test:e2e
 ```
 
@@ -87,3 +90,17 @@ D提交80347bc，所有新增未提交内容属于E，禁止覆盖。E合同已�
 ## E阶段最终恢复点
 
 E01–E03整阶段通过：152unit/167真实PG、全102浏览器58pass44skip，复审后联合补验6pass6skip、最后robots修正4pass2skip（8秒），check/verify/build及107916/127132字节gzip均通过。规格/质量最终批准。分享图最终/api/v1/og，保留D阶段/og栏目/别名兼容。E本地提交后立即F01动效，F02三端视觉；F开始前登记开发中。生产R2/部署/备份凭据仍是G实际阻塞。
+
+E本地提交bd11e90，未推送。F01已登记开发中：root实现站点共享runtime/预览UI，phase_f_backend仅负责配置预设/旧版升级/service/API/unit/PG夹具；PG/build统一root串行执行。
+
+## F断电恢复点（2026-10-11）
+
+电脑死机后已核对Git、进程与Docker，任务文件完整；personal-site-db在15432健康，未动.env。旧构建缓存出现反序列化警告，Next已自行重建缓存；最新生产构建退出0。164unit/174真实PG此前通过，最后移动导航修复正在重新跑全套108浏览器场景，结果未出前不能标记完成。
+
+移动底栏原在backdrop-filter header内，实际定位偏离视口780px，几何回归测试已RED。最新修复把底栏作为header兄弟节点，保留原毛玻璃；偏好选择区预留底栏空间。最终构建gzip登录107969、文章128418、动效20927字节（含545字节CSS降级），均低于110/135/28KB。F最终只读审查进行中。通过后更新phase-f证据、台账、README/07/12并本地提交，再执行G本地健康、安全、备份恢复和性能验证。
+
+## F最终验收恢复点
+
+完整108浏览器62pass46skip（2.7分钟）；安全区34px补修先RED后GREEN，三端foundation+motion最终7pass2skip（10.4秒），规格质量复审批准。164unit/55文件、最后真实PG174/27文件全通过（37.24秒），生产build/check/verify通过。最新gzip以phase-f及motion-budget.json为准；CSS测量已包含motion-preferences安全区规则。
+
+PG误传3100 Origin的失败与恢复过程见phase-f.md；已核对原包保留在忽略目录/.test-backups/origin-failure-reviewed.json，不是待恢复包；原data-backend-test-backup.json已不存在。开发库/.env未动。恢复时继续遵守PG/build/browser串行；G只做本地准备，生产接入稍后。

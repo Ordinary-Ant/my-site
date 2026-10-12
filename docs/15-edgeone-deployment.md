@@ -4,14 +4,14 @@
 
 ## 当前部署前置条件
 
-逐步获取操作见[16 · 云资源获取步骤（新手版）](16-cloud-resources-guide.md)。用户先准备数据库/R2及本地凭据；其余配置按责任表推进。
+逐步获取操作见[16 · 云资源获取步骤（新手版）](16-cloud-resources-guide.md)。Supabase数据库已创建并读取两种URI模板，尚缺本地数据库密码及真实连接验证；用户无法开通R2，文件存储改用同项目Supabase Storage，其余配置按责任表推进。
 
 | 分类 | 条件 | 当前状态与完成标准 |
 |---|---|---|
 | 已具备 | EdgeOne账号、API Token、my-site Upload项目 | 已实际认证并创建项目，Token保持本地不入Git |
 | 已具备 | Git主分支与推送授权 | 本地main跟踪origin/main，远端HEAD为main；旧codex/full-site已通过GitHub改名，不强推 |
-| 待提供资源 | 云端PostgreSQL | 需要线上可连接的运行连接池和迁移连接、TLS及权限；现有本地Docker数据库不算已配置生产数据库 |
-| 待提供资源 | R2对象存储 | 公开媒体桶、私有临时桶、受限S3密钥、HTTPS公开媒体地址及CORS；本地.storage不可直接用作公网生产 |
+| 待验证资源 | 云端PostgreSQL | Supabase my-site Healthy，新加坡；6543事务/5432会话URI已写本地模板，密码未填，TLS/权限/迁移未验证 |
+| 待配置资源 | Supabase Storage | S3已启用、Endpoint/区域已读取，无桶/密钥；需公开媒体桶和私有临时桶、服务端凭据、驱动适配及真实直传/CORS验收 |
 | 待明确 | 网站HTTPS访问地址 | 首次测试可先核对平台分配域名是否可用；自定义域名若使用，需DNS/HTTPS及对应Origin/canonical配置，不能在生产使用localhost |
 | 待配置 | 独立应用与任务密钥 | JWT_SECRET与REVALIDATE_SECRET独立随机生成，管理员使用安全初始凭据；与开发环境隔离 |
 | 待完成验证 | Pages运行与媒体完整协议 | Node版本、Prisma引擎/TCP、middleware数据库访问、CSP nonce、登录权限、动态301、直传确认需实际云测 |
@@ -30,13 +30,13 @@
 - 本机Git直接连接github.com:443失败；沿用Windows已启用代理后ls-remote成功，首次远端没有分支。代理仅作为本次Git命令参数，不修改全局配置。
 - 本次npm run check退出0（已有Markdown img警告），npm test为58文件/172项通过。G性能和云端功能尚未验收，不据此标记阶段G完成。
 
-## 推荐资源组合（待用户确认）
+## 当前资源组合
 
 | 资源 | 建议 | 选择原因与验证边界 |
 |---|---|---|
 | 应用 | EdgeOne国际站my-site，CLI直接上传 | 先证明Node runtime、Prisma、middleware、CSP nonce和动态301兼容，再选择最终运行方式 |
 | 数据库 | Supabase托管PostgreSQL，新加坡ap-southeast-1 | 官方提供该区域与Prisma连接池；应用函数区域尽量靠近数据库。只使用数据库，沿用现有账户/会话系统 |
-| 媒体 | Cloudflare R2 | 沿用现有S3驱动，避免替换已验收媒体协议；需要独立公开桶和私有临时桶 |
+| 媒体 | 同项目Supabase Storage | 替代用户无法开通的R2；保留公开媒体/私有临时隔离，需适配S3 path style并真实验收 |
 | 调度 | Supabase Cron + pg_net + Vault | 支持分钟任务及HTTP调用；Vault保存独立Bearer密钥，每分钟调用publication，每日maintenance。配置与成功响应需真实验收 |
 | 备份 | 数据库独立备份 + 第三个私有对象桶或独立备份目的地 | 不把内容JSON导出或公开媒体桶当作完整备份；云恢复另做演练 |
 
@@ -48,9 +48,9 @@
 
 事务连接需按官方Prisma指南设置pgbouncer=true、限制单实例连接数，并验证交互事务、行锁、事务advisory lock、RT并发和共享限流。迁移连接使用适当DDL权限，运行账户最小权限；不要使用anon/service_role等HTTP API key代替PostgreSQL密码。
 
-### R2配置
+### Supabase Storage配置
 
-建议桶名my-site-media和my-site-upload-private；私有临时桶关闭所有匿名公开入口。公开媒体桶生产使用自定义域名，r2.dev仅用于开发验证。签名PUT仍需CORS，按实际站点Origin配置，不使用全来源通配。
+计划桶名my-site-media（公开读取）和my-site-upload-private（私有）。公开地址使用Supabase HTTPS对象地址，无需Cloudflare域名。S3 Endpoint已读取为https://yylauqjdozlbcewlwcmw.storage.supabase.co/storage/v1/s3，region为ap-southeast-1。当前无桶/密钥；创建服务端密钥和公开桶前按浏览器权限要求确认。Supabase S3密钥访问全部桶并绕过RLS，不能声称仅授权两桶，也不能把同项目第三桶当独立备份。S3驱动需forcePathStyle；PutBucketCors不支持，签名头/跨域/校验和实测后才验收。
 
 需要的配置键如下，全部填写到本地.env.edgeone.local，保留已配置Token；没有实际值时不要复制占位字符串进行部署：
 
@@ -61,7 +61,7 @@ DATABASE_URL=
 MIGRATION_DATABASE_URL=
 STORAGE_DRIVER=s3
 S3_ENDPOINT=
-S3_REGION=auto
+S3_REGION=ap-southeast-1
 S3_BUCKET=my-site-media
 S3_PRIVATE_BUCKET=my-site-upload-private
 S3_ACCESS_KEY_ID=
@@ -92,4 +92,4 @@ JWT_SECRET与REVALIDATE_SECRET必须独立生成且至少32位，不复用开发
 - [Supabase区域](https://supabase.com/docs/guides/platform/regions)
 - [Prisma与连接池](https://supabase.com/docs/guides/database/prisma)
 - [Supabase Cron](https://supabase.com/docs/guides/cron) / [pg_net与Vault](https://supabase.com/docs/guides/functions/schedule-functions)
-- [R2公开桶](https://developers.cloudflare.com/r2/buckets/public-buckets/) / [CORS](https://developers.cloudflare.com/r2/buckets/cors/)
+- [Supabase S3认证与权限](https://supabase.com/docs/guides/storage/s3/authentication) / [兼容范围](https://supabase.com/docs/guides/storage/s3/compatibility)

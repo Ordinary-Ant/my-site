@@ -10,7 +10,7 @@
 - my_site_runtime为独立LOGIN账户：NOSUPERUSER/NOCREATEDB/NOCREATEROLE/NOINHERIT/NOREPLICATION/NOBYPASSRLS。仅site USAGE、业务表SELECT/INSERT/UPDATE/DELETE及序列USAGE/SELECT；不授权迁移表。
 - 22张业务表启用RLS，site_runtime_access策略仅允许my_site_runtime读写。应用服务层仍是角色/会话授权边界，RLS不替代业务权限检查。
 - 实际验证：runtime schema CREATE=false、迁移表UPDATE=false，super/createDB/createRole/bypassRLS全部false；anon/authenticated schema USAGE=false。
-- 事务池实际执行事务锁、Setting写入/读取后故意回滚，回滚后探针记录0。未导入开发账户、Session或演示内容，当前生产用户0。
+- 事务池实际执行事务锁、Setting写入/读取后故意回滚，回滚后探针记录0。迁移时未导入开发账户、Session或演示内容，初始化前生产用户0；后续管理员初始化见下。
 - 本地DATABASE_URL已切独立运行账户及schema=site；MIGRATION_DATABASE_URL保留迁移账户与schema=site。开发.env保持原样。
 
 首次角色操作因把总表数23误当业务表数而被前置检查拒绝，未执行角色DDL；核对实际表名后改为22业务表再执行，事务完成。
@@ -38,4 +38,12 @@
 
 .env和.env.edgeone.local均被Git忽略，Git历史未跟踪两文件；本轮已跟踪文件扫描未发现实际云凭据。JWT_SECRET/REVALIDATE_SECRET已本地独立生成，未输出。提交时仅选择无实际凭据的代码与记录，不提交环境文件、备份或构建产物。
 
-待完成：管理员邮箱与安全初始化、公开站点地址、存储网络稳定及真实浏览器验证、Pages运行时/Prisma兼容、G性能、生产调度、独立备份恢复和监控。首次公开production仍需候选齐全后的最终确认。
+待完成：公开站点地址、存储网络稳定及真实浏览器验证、Pages运行时/Prisma兼容、G性能、生产调度、独立备份恢复和监控。首次公开production仍需候选齐全后的最终确认。
+
+## 生产管理员初始化（同日补验）
+
+用户已提供管理员邮箱，只保存在本地.env.edgeone.local的SEED_ADMIN_EMAIL，本文及Git不记录具体邮箱。初始密码本地随机生成，保存于SEED_ADMIN_PASSWORD；云端仅保存bcrypt成本12哈希。未使用默认开发账户或密码，已有账户冲突时拒绝覆盖。实际创建ADMIN/isActive=true，密码哈希比对通过，当前启用管理员1名。
+
+在真实PG17事务池/site schema上调用既有服务层，登录、RT轮转、AT对应会话鉴权、退出后访问拒绝全部通过，退出撤销探针会话，未输出AT/RT/密码。此为服务层云库实测，不等于Pages浏览器HTTPS Cookie或完整全站验收。限流与脱敏审计保留真实验证记录。
+
+首次登录后通过后台账户页面修改初始密码。SEED_ADMIN_*仅供本地初始化，不传入部署运行环境；发布时按所需环境键白名单提供运行配置，不上传.env.edgeone.local，也不将EdgeOne Token、迁移凭据或数据库管理员密码混入运行配置。

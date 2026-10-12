@@ -136,3 +136,7 @@ F已本地提交aa2775b，未push。G01/CSP nonce与健康/维护、G02整回归
 Storage两桶由用户创建，公开/私有标志正确，S3 path style实际RED→GREEN；首轮完整上传/读取/预检通过，后续私有REST拒绝验证通过，但复测出现ECONNRESET/TimeoutError，未判定稳定。probe每次UUID纯色PNG已清理，脚本scripts/verify-cloud-storage.mts只输出脱敏状态。证据verification/supabase-preparation.md。173unit、check/verify、15真实PG媒体测试通过；首次PG因Docker未启动失败，启动现有Desktop确认healthy后重跑成功。构建执行中，实际结果随后补记。G原未提交变化保留；网站URL/运行时/性能/调度/备份/监控和最终公开审批仍待完成，不自动生产部署。
 
 本轮生产构建退出0，check/verify退出0，仅既有Markdown img警告。构建使用显式本地15432/3100环境，不包含云凭据，不等于Pages云验收。
+
+## 生产管理员恢复点（2026-10-12）
+
+用户已提供邮箱并授权初始化。实际创建唯一启用ADMIN，随机初始密码仅存本地忽略文件.env.edgeone.local的SEED_ADMIN_PASSWORD，邮箱存SEED_ADMIN_EMAIL，不记入Git。bcrypt12比对通过，真实云PG17/site上既有服务层login/refresh/getSessionUser/logout后401全部通过，探针会话已撤销；不是Pages浏览器登录验收。不得覆盖既有管理员或把SEED_ADMIN_*、迁移密码、EdgeOne Token随运行配置上传；按白名单隔离发布。云存储网络稳定性、公开URL、平台运行时、G性能、调度/独立备份/监控及最终公开审批仍待完成。

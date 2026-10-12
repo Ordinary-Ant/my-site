@@ -13,7 +13,7 @@
 | 待验证资源 | 云端PostgreSQL | Supabase PG17.11，新加坡；两池真实连接、8迁移、独立site schema和最小运行角色/RLS已验证；完整业务与云备份未验收 |
 | 待配置资源 | Supabase Storage | 两桶及密钥已配置，公开/私有正确；path style已适配，已有上传/读取/预检成功，复测有网络超时，真实浏览器/生产Origin待验收 |
 | 待明确 | 网站HTTPS访问地址 | 首次测试可先核对平台分配域名是否可用；自定义域名若使用，需DNS/HTTPS及对应Origin/canonical配置，不能在生产使用localhost |
-| 待配置 | 独立应用与任务密钥 | JWT_SECRET与REVALIDATE_SECRET独立随机生成，管理员使用安全初始凭据；与开发环境隔离 |
+| 已本地配置 | 独立应用/任务密钥及管理员 | JWT/任务密钥已独立生成，管理员已安全初始化并通过云服务层登录/轮转/撤销；不上传初始化凭据，Pages浏览器仍待验收 |
 | 待完成验证 | Pages运行与媒体完整协议 | Node版本、Prisma引擎/TCP、middleware数据库访问、CSP nonce、登录权限、动态301、直传确认需实际云测 |
 | 待配置及验证 | 分钟调度、备份和监控 | publication每分钟、maintenance每日；独立数据库/媒体备份与恢复、健康告警，不以配置文件存在代替运行结果 |
 | 待完成验证 | 发布候选验收 | G阶段Lighthouse未完成，既有G变更尚未提交；完成相关回归与证据后形成发布候选 |

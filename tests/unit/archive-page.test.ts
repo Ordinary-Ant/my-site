@@ -1,9 +1,9 @@
 import { createElement } from 'react'
 import { expect, test } from 'vitest'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderServerMarkup } from '../render-server-markup'
 import { ArticleArchive } from '@/components/site/article-archive'
-test('归档分页保持pageSize，避免跳过未读条目', () => {
-  const html = renderToStaticMarkup(
+test('归档分页保持pageSize，避免跳过未读条目', async () => {
+  const html = await renderServerMarkup(
     createElement(ArticleArchive, {
       data: {
         title: '归档',

@@ -1,95 +1,37 @@
-# 15 · EdgeOne CLI部署准备
+# 15 · EdgeOne CLI生产部署
 
-更新：2026-10-12。用户再次确认应用部署到EdgeOne Pages国际站my-site；云服务器自建网站仅为备选，不作为当前实施方向。用户明确授权代码推送Git远程并将主分支改为main，本地与GitHub默认分支已同步改名，历史提交保持不变。公开生产发布仍需最终确认；资源建议尚未确认为采购决策。
+2026-10-13已公开交付：https://my-site-tgqonxxy.edgeone.dev，EdgeOne国际站my-site，当前部署dp2ry69pr5hy。实际云API、真实浏览器登录/CSP/CORS上传、三端首页、文章与开关/连续301闭环26项、三角色15项全部通过；临时探针已清理。Supabase PG17.11/8迁移与公开/私有Storage两桶已接入。分钟发布实际3次200，维护稳定版本连续5次200；每日维护及五分钟健康调度已配置，外部告警和自动独立备份尚未配置。
 
-## 当前部署前置条件
+## 当前资源与验收
 
-逐步获取操作见[16 · 云资源获取步骤（新手版）](16-cloud-resources-guide.md)。Supabase数据库已创建并读取两种URI模板，密码已本地填写并完成8项迁移与独立运行账户验证；用户无法开通R2，文件存储改用同项目Supabase Storage，其余配置按责任表推进。
+| 项目 | 当前状态 |
+|---|---|
+| 应用 | EdgeOne国际站my-site，Upload项目makers-qn9pobisbj7w，production dp2ry69pr5hy，平台Success且实际功能通过 |
+| 地址 | https://my-site-tgqonxxy.edgeone.dev；HTTPS已可用，自定义域名稍后绑定 |
+| Git | main为本地和GitHub默认分支；本次G提交及远端CI以verification/release-final.json为准，不强推、保留master |
+| 数据库 | Supabase PG17.11新加坡，site schema、8迁移、最小runtime角色/RLS；事务池运行、会话池迁移备份 |
+| 存储 | Supabase公开my-site-media/私有my-site-upload-private，S3 path style；真实CSP/CORS浏览器直传、确认、公开读取、清理通过 |
+| 安全 | HTTPS HttpOnly Cookie、Origin/CSP、三角色、停用/撤销、revision409和草稿隔离通过；服务器秘密只在平台环境，初始化密码仅本地 |
+| 调度 | Vault+pg_cron/pg_net，分钟发布3次200；每日维护已配置且手动5次200，五分钟健康轮询 |
+| 备份 | 独立本机PG17最终备份已隔离恢复；两桶空快照已保存；自动独立备份/保留策略与外部告警未配置 |
+| 性能 | gzip预算全部通过；移动首页99分/LCP2021ms，用户批准先交付保留待办；云延迟不等于本地Lighthouse |
 
-| 分类 | 条件 | 当前状态与完成标准 |
-|---|---|---|
-| 已具备 | EdgeOne账号、API Token、my-site Upload项目 | 已实际认证并创建项目，Token保持本地不入Git |
-| 已具备 | Git主分支与推送授权 | 本地main跟踪origin/main，远端HEAD为main；旧codex/full-site已通过GitHub改名，不强推 |
-| 待验证资源 | 云端PostgreSQL | Supabase PG17.11，新加坡；两池真实连接、8迁移、独立site schema和最小运行角色/RLS已验证；完整业务与云备份未验收 |
-| 待配置资源 | Supabase Storage | 两桶及密钥已配置，公开/私有正确；path style已适配，已有上传/读取/预检成功，复测有网络超时，真实浏览器/生产Origin待验收 |
-| 待明确 | 网站HTTPS访问地址 | 首次测试可先核对平台分配域名是否可用；自定义域名若使用，需DNS/HTTPS及对应Origin/canonical配置，不能在生产使用localhost |
-| 已本地配置 | 独立应用/任务密钥及管理员 | JWT/任务密钥已独立生成，管理员已安全初始化并通过云服务层登录/轮转/撤销；不上传初始化凭据，Pages浏览器仍待验收 |
-| 待完成验证 | Pages运行与媒体完整协议 | Node版本、Prisma引擎/TCP、middleware数据库访问、CSP nonce、登录权限、动态301、直传确认需实际云测 |
-| 待配置及验证 | 分钟调度、备份和监控 | publication每分钟、maintenance每日；独立数据库/媒体备份与恢复、健康告警，不以配置文件存在代替运行结果 |
-| 待完成验证 | 发布候选验收 | G阶段Lighthouse未完成，既有G变更尚未提交；完成相关回归与证据后形成发布候选 |
-| 唯一最终发布审批 | 首次公开production部署 | CLI1.6.41实际要求先有生产部署才能preview。资源和候选准备好后，请用户最终确认该次公开生产部署；不能通过占位生产版本绕过审批 |
+2026-10-13用户明确决定“先交付，保留性能待办”：移动首页Lighthouse Performance99，LCP三次中位2020.673ms，超过2000ms目标约21ms；仅暂缓该项，不修改目标、不标达标。文章/搜索移动LCP中位1874.945/1655.676ms；正确桌面配置三页Performance100。
 
-数据库、存储等付费资源若由助手创建，需先获得具体采购授权；这与最终公开发布审批是不同事项。当前用户授权的Git分支改名和代码推送无需再次审批。EdgeOne Token无需重发，其他凭据继续补充到本地.env.edgeone.local。若首次使用平台域名，只需先确认该项目域名可用性，不要求先购买自定义域名。
+## 构建与运行边界
 
-## 本次实际检查
+CLI1.6.41/adapter0.2.10-beta.9。edgeone.json配置构建Node24.18.0（24.19.0未预装）；实际云函数Node20.19，Prisma生成native+rhel-openssl-1.1.x。Node middleware正式CLI曾退出0却产物为空，现改Edge兼容nonce与同源Node路由查询。CLI原生fetch缺平台回源能力导致内部502，产物采用请求级hookCtx.fetch闭包并隔离webpack入口，实际VM并发及云连续301通过。详18，复现流程见14。
 
-- EdgeOne CLI 1.6.41已通过npm exec安装在npm缓存，未添加项目依赖或修改lock。
-- 从Git忽略的.env.edgeone.local读取Token，仅向国际站API认证，不打印Token、不放命令参数。国际站DescribePagesProjects响应HTTP200，首次查询Projects为空。
-- 实际执行CLI的my-site预览部署：自动创建Upload项目后退出1，错误为`Please create a production deployment first`。尚未构建/上传产物，没有生产部署或可访问预览URL。未用生产部署绕过此前的最终确认要求。
-- 检查CLI 1.6.41源码：preview在构建前检查既有UsedInProd部署；自动构建会读取当前目录.env并合并到构建环境。因此不能直接在含开发.env的仓库运行正式部署，必须先准备隔离的发布目录并检查产物。
-- 本机Git直接连接github.com:443失败；沿用Windows已启用代理后ls-remote成功，首次远端没有分支。代理仅作为本次Git命令参数，不修改全局配置。
-- 本次npm run check退出0（已有Markdown img警告），npm test为58文件/172项通过。G性能和云端功能尚未验收，不据此标记阶段G完成。
+最终产物2997文件/122071706字节，middleware161537字节；3处环境注入清洗，真实凭据匹配0、无.env/外部链接。14个运行变量经Production/Preview白名单配置，不包含CLI Token、迁移密码、初始化管理员。Upload项目没有Git自动部署关联。
 
-## 当前资源组合
+## 凭据配置规则
 
-| 资源 | 建议 | 选择原因与验证边界 |
-|---|---|---|
-| 应用 | EdgeOne国际站my-site，CLI直接上传 | 先证明Node runtime、Prisma、middleware、CSP nonce和动态301兼容，再选择最终运行方式 |
-| 数据库 | Supabase托管PostgreSQL，新加坡ap-southeast-1 | 官方提供该区域与Prisma连接池；应用函数区域尽量靠近数据库。只使用数据库，沿用现有账户/会话系统 |
-| 媒体 | 同项目Supabase Storage | 替代用户无法开通的R2；保留公开媒体/私有临时隔离，需适配S3 path style并真实验收 |
-| 调度 | Supabase Cron + pg_net + Vault | 支持分钟任务及HTTP调用；Vault保存独立Bearer密钥，每分钟调用publication，每日maintenance。配置与成功响应需真实验收 |
-| 备份 | 数据库独立备份 + 第三个私有对象桶或独立备份目的地 | 不把内容JSON导出或公开媒体桶当作完整备份；云恢复另做演练 |
+本地.env.edgeone.local已忽略，真实值不输出/提交：DATABASE_URL、MIGRATION_DATABASE_URL、JWT_SECRET、REVALIDATE_SECRET、STORAGE_DRIVER=s3、S3_ENDPOINT/REGION/BUCKET/PRIVATE_BUCKET/ACCESS_KEY_ID/SECRET_ACCESS_KEY/PUBLIC_BASE_URL、NEXT_PUBLIC_SITE_URL。EDGEONE_API_TOKEN仅用于CLI/API授权；SEED_ADMIN_*仅安全初始化，不上传服务器配置。Supabase S3密钥绕过RLS并访问全部桶，不应公开；同项目第三桶不构成独立备份。
 
-正式站点套餐需结合预算、暂停策略、备份保留和服务保障选择，不把免费试用当作生产可用性承诺，不自动创建付费资源。新加坡是当前建议，实际EdgeOne函数区域和目标访问地区仍需核对。
+## 历史故障与证据
 
-### 数据库配置
+部署尝试详verification/edgeone-deployment-attempts.json。首次未预装Node失败；随后缺RHEL Prisma引擎导致500/503；引擎修复后仅栏目内部请求502，最终平台fetch绑定修复。AbortSignal Controller兼容和URL转string未单独解决该故障，不当作根因。部署切换时探针失败已在稳定版本重测，不把瞬时失败伪装通过。
 
-创建独立站点项目，优先核对PostgreSQL版本与现有16基线。准备两种连接：函数运行时使用transaction pooler；迁移/备份使用direct或session pooler。当前Prisma6的schema只有DATABASE_URL，迁移通过独立进程环境覆盖，不假装已经接入DIRECT_URL。
+实际云证据：edgeone-cloud-api-smoke.json、edgeone-cloud-browser-smoke.json、edgeone-cloud-content-loop.json、edgeone-cloud-role-smoke.json、cloud-maintenance-repeated.json、cloud-job-configuration.json、cloud-release-restore.json、cloud-media-backup.json。临时文章/用户/媒体已按归属清理。
 
-事务连接需按官方Prisma指南设置pgbouncer=true、限制单实例连接数，并验证交互事务、行锁、事务advisory lock、RT并发和共享限流。迁移连接使用适当DDL权限，运行账户最小权限；不要使用anon/service_role等HTTP API key代替PostgreSQL密码。
-
-### Supabase Storage配置
-
-计划桶名my-site-media（公开读取）和my-site-upload-private（私有）。公开地址使用Supabase HTTPS对象地址，无需Cloudflare域名。S3 Endpoint已读取为https://yylauqjdozlbcewlwcmw.storage.supabase.co/storage/v1/s3，region为ap-southeast-1。两桶及密钥已由用户配置，已实际验证；详verification/supabase-preparation.md。Supabase S3密钥访问全部桶并绕过RLS，不能声称仅授权两桶，也不能把同项目第三桶当独立备份。S3驱动已加入forcePathStyle；PutBucketCors不支持，签名头/跨域/校验和实测后才验收。
-
-需要的配置键如下，全部填写到本地.env.edgeone.local，保留已配置Token；没有实际值时不要复制占位字符串进行部署：
-
-```dotenv
-# 已有：EDGEONE_API_TOKEN
-DATABASE_URL=
-# 本地操作用，迁移进程单独映射为DATABASE_URL，不传入公开前端
-MIGRATION_DATABASE_URL=
-STORAGE_DRIVER=s3
-S3_ENDPOINT=
-S3_REGION=ap-southeast-1
-S3_BUCKET=my-site-media
-S3_PRIVATE_BUCKET=my-site-upload-private
-S3_ACCESS_KEY_ID=
-S3_SECRET_ACCESS_KEY=
-S3_PUBLIC_BASE_URL=
-NEXT_PUBLIC_SITE_URL=
-JWT_SECRET=
-REVALIDATE_SECRET=
-```
-
-JWT_SECRET与REVALIDATE_SECRET必须独立生成且至少32位，不复用开发密钥。SEED_ADMIN_*由本地安全初始化过程提供，不上传默认密码或自动导入开发账户、Session、PreviewToken等记录。
-
-## 下一步与验收
-
-1. 用户创建并配置上述资源，或先明确替代资源；不在聊天发送凭据。
-2. 隔离发布目录不包含.env、Token、.storage、.backups、.test-backups等；审查CLI生成的服务端环境与公开资产，Token只用于CLI进程授权。禁止把本机Windows Prisma引擎直接作为Linux云端验收结果。
-3. 核对平台Node运行时与file-type>=22要求、Prisma引擎平台、Node middleware数据库连接；本地适配构建只能证明产物生成，不能代替云验收。
-4. 准备可审阅发布候选及数据库迁移计划；由于当前CLI要求先生产部署，首次公开生产部署另请最终确认。不得发布占位生产版本绕过确认。
-5. 首次部署后验证健康、登录三角色、会话轮转、文章发布阅读、媒体直传、连续改路由301保留query、开关与搜索SEO、HTTPS Cookie与CSP、真实分钟调度及恢复。随后才标记云端功能完成。
-
-如果Pages不能保持现有运行合同，采用Node24源站+EdgeOne加速作为备选，先记录架构变更再实施。
-
-## 官方参考
-
-- [CLI与Token部署](https://pages.edgeone.ai/zh/document/edgeone-cli)
-- [Next.js支持](https://pages.edgeone.ai/document/framework-nextjs)
-- [云函数限制与运行时](https://pages.edgeone.ai/document/cloud-functions)
-- [Supabase区域](https://supabase.com/docs/guides/platform/regions)
-- [Prisma与连接池](https://supabase.com/docs/guides/database/prisma)
-- [Supabase Cron](https://supabase.com/docs/guides/cron) / [pg_net与Vault](https://supabase.com/docs/guides/functions/schedule-functions)
-- [Supabase S3认证与权限](https://supabase.com/docs/guides/storage/s3/authentication) / [兼容范围](https://supabase.com/docs/guides/storage/s3/compatibility)
+官方参考：[CLI](https://pages.edgeone.ai/zh/document/edgeone-cli)、[Next.js](https://pages.edgeone.ai/document/framework-nextjs)、[构建版本](https://pages.edgeone.ai/document/build-guide)、[云函数](https://pages.edgeone.ai/document/cloud-functions)、[Supabase Cron](https://supabase.com/docs/guides/cron)、[S3权限](https://supabase.com/docs/guides/storage/s3/authentication)。

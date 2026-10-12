@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-12",
+  "source": "cloud-site-schema-backup",
+  "destination": "isolated-local-postgresql17",
+  "restoreExitCode": 0,
+  "counts": {
+    "tables": 23,
+    "migrations": 8,
+    "users": 1,
+    "media": 0
+  },
+  "firstAttempt": "Rejected missing my_site_runtime RLS policy role; preserved partial database",
+  "correction": "Created NOLOGIN role and fresh independent database; complete pg_restore passed",
+  "originalCloudModified": false,
+  "scheduled": false
+}

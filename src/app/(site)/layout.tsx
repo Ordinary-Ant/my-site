@@ -8,6 +8,14 @@ export const dynamic = 'force-dynamic'
 /** 页脚与导航复用已过滤的公开配置，不另读私密联系方式。 */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const data = await getPublicSite()
+  // 导航只传必要字段，避免两套导航重复序列化整份栏目配置。
+  const navigation = data.modules.map(({ key, route, navLabel, name, navVisible }) => ({
+    key,
+    route,
+    navLabel,
+    name,
+    navVisible,
+  }))
   const name = data.site.name || '个人网站'
   const logo = typeof data.site.logo === 'string' ? safeContentUrl(data.site.logo) : null
   const links = Array.isArray(data.site.footer.links)
@@ -39,11 +47,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
               )}
               <span className="max-w-32 truncate">{name}</span>
             </Link>
-            <SiteNavigation items={data.modules} />
+            <SiteNavigation items={navigation} />
           </div>
         </header>
         {/* 底部导航必须离开带backdrop-filter的header，才能固定于视口。 */}
-        <SiteNavigation items={data.modules} placement="bottom" />
+        <SiteNavigation items={navigation} placement="bottom" />
         <main className="flex-1">{children}</main>
         <footer className="bg-surface-subtle mt-16 border-t">
           <div className="container-page py-10">

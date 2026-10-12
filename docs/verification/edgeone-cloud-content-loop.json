@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-13",
+  "deployment": "dp2ry69pr5hy",
+  "checks": [
+    {
+      "path": "/api/v1/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/modules",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/articles",
+      "method": "POST",
+      "status": 201
+    },
+    {
+      "path": "/api/v1/articles/[probe-slug]",
+      "method": "GET",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs/preview-token",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "name": "private-preview-no-store-noindex",
+      "status": "PASS"
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs",
+      "method": "PATCH",
+      "status": 409,
+      "code": "REVISION_CONFLICT"
+    },
+    {
+      "path": "/api/v1/articles/[probe-slug]",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/modules/article",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/modules/article",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "name": "historical-path-301-detail-query",
+      "status": 301
+    },
+    {
+      "name": "historical-path-301-detail-query",
+      "status": 301
+    },
+    {
+      "path": "/api/v1/admin/modules/article",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/articles/[probe-slug]",
+      "method": "GET",
+      "status": 404,
+      "code": "MODULE_DISABLED"
+    },
+    {
+      "path": "/api/v1/site",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/modules/article",
+      "method": "PATCH",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/articles/[probe-slug]",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs",
+      "method": "DELETE",
+      "status": 204
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/articles/[probe-slug]",
+      "method": "GET",
+      "status": 404,
+      "code": "NOT_FOUND"
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs/restore",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/articles/[probe-slug]",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs",
+      "method": "DELETE",
+      "status": 204
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/articles/cmv5hp52a0005gk0azy44v3zs/purge",
+      "method": "DELETE",
+      "status": 204
+    },
+    {
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    }
+  ],
+  "completed": true,
+  "probeArticleRemaining": 0
+}

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-13",
+  "project": "my-site",
+  "attempts": [
+    {
+      "id": "dp2m2k8m9qsp",
+      "status": "Failed",
+      "reason": "Node24.19.0 not preinstalled"
+    },
+    {
+      "id": "dpp9zfl3eg6b",
+      "status": "Success",
+      "functionalAccepted": false,
+      "reason": "Missing rhel-openssl-1.1.x Prisma engine"
+    },
+    {
+      "id": "dp192qpgebax",
+      "status": "Success",
+      "functionalAccepted": false,
+      "reason": "Engine fixed; internal middleware lookup failed"
+    },
+    {
+      "id": "dpxmh4pp8iv4",
+      "status": "Success",
+      "functionalAccepted": false,
+      "reason": "Controller guard alone did not resolve lookup"
+    },
+    {
+      "id": "dp8uoototo19",
+      "status": "Success",
+      "functionalAccepted": false,
+      "reason": "URL string compatibility alone did not resolve lookup"
+    },
+    {
+      "id": "dpjpiq7ek4uu",
+      "status": "Success",
+      "functionalAccepted": false,
+      "reason": "Diagnostic confirmed internal HTTP_502 despite external endpoint200"
+    },
+    {
+      "id": "dp2ry69pr5hy",
+      "status": "Success",
+      "functionalAccepted": true,
+      "reason": "Request-scoped platform fetch and webpack isolation; real cloud closed loops passed"
+    }
+  ],
+  "publishedVerified": true,
+  "publicUrl": "https://my-site-tgqonxxy.edgeone.dev"
+}

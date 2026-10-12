@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderServerMarkup } from '../render-server-markup'
 import type { Module } from '@prisma/client'
 import { ApiError } from '@/lib/api/errors'
 import ContentPage, { generateMetadata } from '@/app/(site)/[...path]/page'
@@ -35,7 +35,7 @@ const props = (path = ['articles'], query: Record<string, string> = {}) => ({
   searchParams: Promise.resolve(query),
 })
 const render = async (path?: string[], query?: Record<string, string>) =>
-  renderToStaticMarkup(await ContentPage(props(path, query)))
+  await renderServerMarkup(await ContentPage(props(path, query)))
 let articleModule: Module
 
 beforeEach(() => {

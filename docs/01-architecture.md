@@ -13,7 +13,7 @@
                         └──────────────┬───────────────┘
                                        │ HTTPS
                         ┌──────────────▼───────────────┐
-                        │      CDN / Edge (Vercel)      │
+                        │      CDN / Edge (EdgeOne)      │
                         │  静态资源 · ISR 缓存 · 图片加速 │
                         └──────────────┬───────────────┘
                                        │
@@ -39,7 +39,7 @@
         ▼                         ▼                         ▼
   ┌───────────┐            ┌─────────────┐          ┌──────────────┐
   │ PostgreSQL│            │  对象存储    │          │  邮件服务(可选)│
-  │ Neon/自建  │            │ R2 / OSS / 本地│         │  Resend      │
+  │ Neon/自建  │            │ Supabase / 本地│         │  Resend      │
   └───────────┘            └─────────────┘          └──────────────┘
 ```
 
@@ -132,6 +132,8 @@
 
 service写库事务返回失效事件，由Next适配层执行revalidateTag；脚本通过受鉴权重验证入口处理，不能假设处于Next请求上下文。保存后5秒仅指新请求，已打开/预取页面需主动刷新。模块/设置公开读取no-store，避免CDN再叠加失效窗口；时间线同时失效profile/content，Profile失效content，分类/标签失效article/content，发布失效RSS/sitemap。
 
+RSC在同一请求内通过React cache复用getPublicSite读取；不跨请求保留配置，普通服务/API调用也不引入进程缓存。客户端导航只接收key/route/navLabel/name/navVisible，避免完整栏目配置重复进入RSC载荷。
+
 ### 缓存 tag 命名表
 
 | Tag | 覆盖内容 | 何时失效 |
@@ -153,13 +155,13 @@ service写库事务返回失效事件，由Next适配层执行revalidateTag；�
 
 ```
 浏览器 GET /articles/xxx
-  → Vercel Edge：命中 ISR 缓存？命中则直接返回（~30ms TTFB）
-  → 未命中：Node Runtime 执行 RSC
+  → EdgeOne转发动态请求（当前force-dynamic/no-store，不缓存私有内容）
+  → Node Runtime 执行 RSC
       → articleService.getBySlug(slug)
           → 校验模块开关（Module.enabled），关闭则 notFound()
           → prisma.article.findFirst({ where: { slug, status: 'PUBLISHED', publishedAt: { lte: new Date() }, deletedAt: null } })
           → 组装 DTO（含 tags / category / 上下篇 / 相关文章）
-      → 渲染 HTML + RSC Payload → 写入 ISR 缓存
+      → 渲染 HTML + RSC Payload → no-store响应
   → 浏览器逐步注水（Hydration），仅交互岛需要 JS
 ```
 
@@ -205,8 +207,8 @@ AT并非仅靠短过期撤销：每次管理数据访问在service校验sid对�
 ### 6.2 登录与原子刷新
 登录按IP/email双维度共享PostgreSQL限流，失败统一信息。刷新在事务中锁定/条件更新旧Session并建立后继；首次轮转写rotatedAt和successorId，10秒内重复旧RT返回同一加密保存的后继凭证，避免多标签误判。超过宽限旧RT重放撤销该用户全部会话并审计。加密回复只保留宽限所需时间且不得日志输出。登出/停用/改密码按会话撤销合同执行。
 
-### 6.3 Node runtime middleware与权威授权
-Next.js15.5配置middleware的runtime为nodejs；入口校验、动态栏目分发和UX重定向可使用Node能力，但不取代service授权。ADMIN、EDITOR、VIEWER均可进入其授权后台，不能入口统一拒绝VIEWER。每个RSC/REST/Server Action/脚本数据入口复用service权限检查。AT过期页面保留安全站内next，进入静默刷新恢复流程；API401由客户端刷新后最多重试一次，草稿不丢失。所有写请求验证Origin。
+### 6.3 Edge兼容middleware + Node路由服务与权威授权
+Next.js15.5使用middleware默认Edge运行时（不设置页面专用runtime字段）；每请求CSP与轻量登录判断用Web API，历史路径由同源Node路由查询服务读取PostgreSQL后交给middleware返回301。固定首页不查询别名；任何权威数据授权仍在service执行。详18-edgeone-runtime-adaptation.md。ADMIN、EDITOR、VIEWER均可进入其授权后台，不能入口统一拒绝VIEWER。每个RSC/REST/Server Action/脚本数据入口复用service权限检查。AT过期页面保留安全站内next，进入静默刷新恢复流程；API401由客户端刷新后最多重试一次，草稿不丢失。所有写请求验证Origin。
 
 
 
@@ -330,9 +332,9 @@ if (!mod.enabled) notFound()
 ---
 
 ## 8. 文件存储与上传
-本地LocalDriver仅开发部署（包含localhost的next start验收），文件落地私有`.storage/media`，经`GET /api/v1/media/:id`按已登记Media读取；公网生产拒绝Local写入，绝不写应用public目录。生产R2Driver公开桶S3_BUCKET与临时私有桶S3_PRIVATE_BUCKET必须不同，开发/预览/生产各自隔离桶与密钥。私有桶禁止公网访问，公开桶只存校验通过的media前缀；前缀命名本身不提供私有权限。开发POST /api/v1/admin/media/upload接收multipart；生产POST /api/v1/admin/media/upload-intent申请10分钟临时票据和限时直传凭证，浏览器直传私有桶，POST /api/v1/admin/media/confirm确认。
+本地LocalDriver仅开发部署（包含localhost的next start验收），文件落地私有`.storage/media`，经`GET /api/v1/media/:id`按已登记Media读取；公网生产拒绝Local写入，绝不写应用public目录。生产目标为Supabase Storage（现有R2Driver待S3适配），公开桶S3_BUCKET与临时私有桶S3_PRIVATE_BUCKET必须不同，开发/预览/生产各自隔离桶与密钥。私有桶禁止公网访问，公开桶只存校验通过的media前缀；前缀命名本身不提供私有权限。开发POST /api/v1/admin/media/upload接收multipart；生产POST /api/v1/admin/media/upload-intent申请10分钟临时票据和限时直传凭证，浏览器直传私有桶，POST /api/v1/admin/media/confirm确认。
 
-confirm必须核验用户归属、对象magic/真实MIME、实际大小、sha256和对象key，并原子消费票据；SVG/HTML等主动类型明确拒绝，避免脚本和外链执行。允许PNG/JPEG/WebP/GIF/AVIF、MP4/WebM、PDF，图片完整解码所有帧，动画最多500帧且全帧合计≤4000万像素；校验后的字节另写公开随机key，防止临时对象被覆盖的竞态。公开写入前独立提交COMPENSATE补偿票据，登记Media成功时在同一事务移除；DB回滚/进程中断/存储删除失败也保留公开key供清理。失败清理临时对象；清理失败保留UploadIntent供POST /api/v1/admin/media/cleanup重试并记录审计。图片10MB、视频50MB、文档20MB；生产文件不经过浏览器到Vercel函数的大请求体。删除前扫描所有正文、封面、图集、Profile与Setting引用，含软删内容，引用中拒绝删除。DB删除和持久清理队列原子提交；存储删除失败返回cleanupPending=true，保留key重试。
+confirm必须核验用户归属、对象magic/真实MIME、实际大小、sha256和对象key，并原子消费票据；SVG/HTML等主动类型明确拒绝，避免脚本和外链执行。允许PNG/JPEG/WebP/GIF/AVIF、MP4/WebM、PDF，图片完整解码所有帧，动画最多500帧且全帧合计≤4000万像素；校验后的字节另写公开随机key，防止临时对象被覆盖的竞态。公开写入前独立提交COMPENSATE补偿票据，登记Media成功时在同一事务移除；DB回滚/进程中断/存储删除失败也保留公开key供清理。失败清理临时对象；清理失败保留UploadIntent供POST /api/v1/admin/media/cleanup重试并记录审计。图片10MB、视频50MB、文档20MB；生产文件不经过浏览器到托管函数的大请求体。删除前扫描所有正文、封面、图集、Profile与Setting引用，含软删内容，引用中拒绝删除。DB删除和持久清理队列原子提交；存储删除失败返回cleanupPending=true，保留key重试。
 
 
 ## 9. 安全清单
@@ -359,9 +361,9 @@ X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=()
-Content-Security-Policy: default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline';
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-每请求随机值' 'strict-dynamic'; object-src 'none'; frame-ancestors 'none';
 ```
-（CSP 在 `next.config.ts` 的 `headers()` 中下发；`'unsafe-inline'` 为 Next.js 内联脚本必需，后续可用 nonce 收紧。）
+CSP由Edge兼容middleware生成每请求nonce并同时透传请求/响应，启动、主题和JSON-LD脚本带nonce；CSS保留inline以支持变量与编辑器。预览同样受保护。完整策略与本地/云端边界见13-local-release-readiness.md。
 
 ---
 
@@ -376,7 +378,7 @@ Content-Security-Policy: default-src 'self'; img-src 'self' data: https:; script
 | 首屏 JS（后台登录页） | ≤ 110KB gzip | 同 |
 | **动效相关 JS** | **≤ 28KB gzip**，static关闭时不下载库 | 同 |
 | 单页图片总重 | ≤ 800KB | ≤ 1.5MB |
-| Lighthouse Performance | ≥ 90 | ≥ 95 |
+| Lighthouse Performance | ≥ 85 | ≥ 95 |
 | Lighthouse A11y / Best Practices / SEO | ≥ 95 | ≥ 100 |
 
 > **动效预算单列一行**，因为它最容易失控：一个"顺手引入 Framer Motion 全家桶"就能吃掉全部预算。约束方式见 [08-motion-system.md §6](08-motion-system.md) —— 首屏CSS，离屏编排按需加载，移动降档，关闭时不下载库。CI 中构建后校验 chunk 体积，超过 28KB 直接失败。
@@ -404,8 +406,8 @@ JWT_REFRESH_TTL=7d
 
 # ---- 存储 ----
 STORAGE_DRIVER=local                 # local | s3
-S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com
-S3_REGION=auto
+S3_ENDPOINT=https://<project-ref>.storage.supabase.co/storage/v1/s3
+S3_REGION=ap-southeast-1
 S3_BUCKET=personal-site
 S3_PRIVATE_BUCKET=personal-site-private
 S3_ACCESS_KEY_ID=
@@ -427,30 +429,15 @@ REVALIDATE_SECRET=                   # 用于外部触发 /api/revalidate
 
 ## 12. 部署拓扑
 
-### 方案 A（推荐）· Vercel
+### 方案 A · EdgeOne国际站CLI托管（当前部署目标，待验收）
 
-```
-GitHub  main 分支 push
-   → Vercel构建（Node24+，与本地基线一致）
-   → Preview 部署（PR）/ Production 部署（main）
-   → Edge CDN 全球分发
-数据库   Neon Postgres（Serverless，免费额度 0.5GB 存储）
-存储     Cloudflare R2（免费 10GB + 零出口费）
-定时任务 外部分钟调度 → 受鉴权发布任务；备份用托管能力或独立任务环境
-域名     Vercel Domains + 自动 Let's Encrypt
-```
-**优点**：零运维、自动 HTTPS/CDN/预览环境。**代价**：绑定平台，Serverless 冷启动。
+my-site为直接上传Upload项目，CLI1.6.41已创建项目，但preview因无既有production部署退出。Supabase数据库8项迁移/独立运行角色已验证，Storage桶/密钥/驱动适配与分钟调度待配置。Node24基线、Node middleware访问Prisma、云引擎平台及运行时兼容必须真实验证；API Token认证通过不能代替全栈验收。
 
-### 方案 B · 自建 VPS（备选）
+资源建议为Supabase新加坡PostgreSQL（连接池运行、独立迁移连接）、同项目Supabase Storage公开媒体桶与私有临时桶、Supabase Cron + pg_net + Vault分钟调用。数据库项目已创建并读取连接模板，Storage尚无桶/密钥，详见15部署准备；不承诺免费额度或服务保障。隔离发布目录，禁止自动合并开发.env。用户已授权首次公开生产部署。
 
-```
-Nginx（TLS 终止 + 反向代理 + gzip/brotli）
-  → Next.js standalone 容器（Docker, node:24-alpine）
-  → Postgres 容器（挂载卷）
-  → MinIO 或本地磁盘存文件
-Certbot 自动续期 · docker compose 一键起停
-```
-**优点**：完全可控、成本固定。**代价**：需要自己管备份、监控、安全更新。
+### 方案 B · Node24源站 + EdgeOne加速（备选）
+
+若Pages不能保持现有Node middleware/数据库合同，应用运行在Node24服务器或容器，EdgeOne接入源站加速与防护；PostgreSQL与对象存储保持独立的接口边界，备份、监控及分钟调度需实际配置。现有项目未设置standalone产物，不能将此备选描述为已可一键部署。
 
 ### CI/CD 检查点（两方案通用）
 
@@ -468,9 +455,9 @@ lint → typecheck → unit test → build → e2e smoke → migrate deploy → 
 | 错误追踪 | Sentry（免费额度足够），捕获 RSC 与 Route Handler 异常 |
 | 结构化日志 | `pino` 输出 JSON：`{ level, time, requestId, userId, route, durationMs }` |
 | 请求 ID | middleware 注入 `x-request-id`，贯穿日志与错误上报 |
-| 性能 | Vercel Analytics + `useReportWebVitals` 打点 |
+| 性能 | Lighthouse实测；后续Web Vitals采集方案待配置，不能把未接入服务当作运行能力 |
 | 业务指标 | `AuditLog` 表 + 仪表盘聚合（发布数、访问量、模块开关历史） |
-| 健康检查 | `GET /api/health` → 检查 DB 连通性与版本 |
+| 健康检查 | `GET /api/health` → 应用版本与DB up/down，无缓存；故障503，不返回数据库版本/连接/原始异常 |
 
 ---
 
@@ -484,4 +471,4 @@ lint → typecheck → unit test → build → e2e smoke → migrate deploy → 
 ## 一期动态路由与公开边界
 公开查询统一检查模块及子类型开关、status=PUBLISHED、publishedAt<=now、deletedAt=null；所有首页/feed/详情/搜索/RSS/sitemap使用相同公开过滤器。
 
-Module.route数据库唯一。Node middleware运行时分发当前路径；RouteAlias永久保留历史路径，301直达当前路径，保留详情后缀/query；拒绝保留路径和子路径、模块路径嵌套、别名抢占/循环。关闭模块的历史地址也不可绕过开关。分钟调度触发到期发布和关联缓存失效。
+Module.route数据库唯一。Edge兼容middleware调用Node路由服务解析历史路径；RouteAlias永久保留历史路径，301直达当前路径，保留详情后缀/query；拒绝保留路径和子路径、模块路径嵌套、别名抢占/循环。关闭模块的历史地址也不可绕过开关。分钟调度触发到期发布和关联缓存失效。

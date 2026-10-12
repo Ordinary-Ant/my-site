@@ -1,0 +1,44 @@
+{
+  "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+  "runs": [
+    {
+      "name": "home",
+      "mode": "mobile",
+      "sample": 1,
+      "file": "home-mobile-prefetch-diagnostic-1.json",
+      "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+      "performance": 99,
+      "lcp": 2016.52,
+      "cls": 0,
+      "a11y": 100,
+      "bestPractices": 96,
+      "seo": 100
+    },
+    {
+      "name": "home",
+      "mode": "mobile",
+      "sample": 2,
+      "file": "home-mobile-prefetch-diagnostic-2.json",
+      "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+      "performance": 99,
+      "lcp": 2015.8508,
+      "cls": 0,
+      "a11y": 100,
+      "bestPractices": 96,
+      "seo": 100
+    },
+    {
+      "name": "home",
+      "mode": "mobile",
+      "sample": 3,
+      "file": "home-mobile-prefetch-diagnostic-3.json",
+      "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+      "performance": 99,
+      "lcp": 2048.4091000000003,
+      "cls": 0,
+      "a11y": 100,
+      "bestPractices": 96,
+      "seo": 100
+    }
+  ]
+}

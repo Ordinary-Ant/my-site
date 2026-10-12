@@ -8,7 +8,9 @@
 // ============================================================
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // 本地使用native；EdgeOne实际Node20.19云函数需要RHEL/OpenSSL1.1引擎。
+  binaryTargets = ["native", "rhel-openssl-1.1.x"]
 }
 
 datasource db {

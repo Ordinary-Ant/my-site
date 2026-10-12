@@ -1,8 +1,8 @@
 # Personal Site · 个人网站与私有后台
 
-当前为**一期阶段A–F已完成**。已有可构建工程与33个HTML设计源稿/45张截图；A本地基础验收已通过，B登录权限、文章编辑/预览/发布/阅读/恢复、Local媒体与分钟发布闭环通过，R2云验收留至G，C模块/路由/设置/首页/审计与隐私闭环已验收，D日志、作品、时间线、About、分类标签及数据导入导出已验收，用户管理已验收，完整设置媒体库已验收，E搜索、归档、统计与SEO已验收，F动效与三端视觉已验收，G本地发布准备待开始；已批准范围与合同见[一期计划](docs/12-phase-one-plan.md)。预计45–65人日。
+当前为**一期A–F已完成，G已公开交付并保留明确待办**。2026-10-13已公开交付：https://my-site-tgqonxxy.edgeone.dev，EdgeOne国际站my-site，当前部署dp2ry69pr5hy。实际云API、真实浏览器登录/CSP/CORS上传、三端首页、文章与开关/连续301闭环26项、三角色15项全部通过；临时探针已清理。Supabase PG17.11/8迁移与公开/私有Storage两桶已接入。分钟发布实际3次200，维护稳定版本连续5次200；每日维护及五分钟健康调度已配置，外部告警和自动独立备份尚未配置。 2026-10-13用户明确决定“先交付，保留性能待办”：移动首页Lighthouse Performance99，LCP三次中位2020.673ms，超过2000ms目标约21ms；仅暂缓该项，不修改目标、不标达标。文章/搜索移动LCP中位1874.945/1655.676ms；正确桌面配置三页Performance100。 规范与证据见[一期计划](docs/12-phase-one-plan.md)、[发布记录](docs/15-edgeone-deployment.md)。
 
-Next.js15.5 App Router / Node runtime middleware / TypeScript / Tailwind4 / Prisma6 / PostgreSQL16；开发与测试使用真实PostgreSQL，生产计划Vercel+托管Postgres+R2，公开生产发布最终确认。CSS首屏与Anime.js按需编排，动效version2四预设默认editorial无装饰，仅none/tint，不做连续背景。预算文章135KB/动效28KB/登录110KB gzip，需真实测量。
+Next.js15.5 App Router / Edge兼容middleware + Node路由服务 / TypeScript / Tailwind4 / Prisma6 / PostgreSQL16；开发与测试使用真实PostgreSQL，部署目标为EdgeOne国际站my-site，Supabase数据库迁移/独立运行角色已验证，Storage两桶与S3适配已有实测，完整云业务已实测通过，运行时适配与实际交付状态见[部署准备](docs/15-edgeone-deployment.md)，用户已授权公开生产发布。CSS首屏与Anime.js按需编排，动效version2四预设默认editorial无装饰，仅none/tint，不做连续背景。预算文章135KB/动效28KB/登录110KB gzip，需真实测量。
 
 ## 文档与优先级
 用户明确决策 > 修订一期权威规范 > 其他docs > 设计稿。视觉规范负责令牌，08负责动效合同，12负责一期范围；冲突修原文，不保留错误合同作为实施要求。
@@ -23,6 +23,7 @@ Next.js15.5 App Router / Node runtime middleware / TypeScript / Tailwind4 / Pris
 | [10功能台账](docs/10-development-tracker.md) | 细功能状态、依赖、证据、提交 |
 | [11交接](docs/11-development-handoff.md) | 环境启动、恢复与下一步 |
 | [12批准计划](docs/12-phase-one-plan.md) | 一期决策与范围 |
+| [13本地发布合同](docs/13-local-release-readiness.md) / [14操作手册](docs/14-release-runbook.md) | G本地安全、恢复与后续生产接入 |
 | [设计稿](design/README.md) / [评审看板](design/index.html) | 33源稿、45截图，静态意图，非实现证据 |
 
 ## 开发启动
@@ -44,7 +45,7 @@ npm run dev -- --port 3100
 ## 实施顺序
 A基础治理 → B文章闭环（含auth/权限/编辑器/媒体/预览/发布/阅读/软删）→ C模块闭环（开关/导航/首页/配置/动态改路由/审计/撤销）→ D完整内容系统 → E搜索SEO与定时 → F动效 → G发布准备。评论、注册、订阅、i18n、PWA为二期。
 
-新会话先读Git状态和最近提交、台账与交接。每阶段验收后本地提交；**禁止自动push；可逆部署验证在授权范围内执行，公开生产发布最终确认**。证据必须区分静态检查、真实PG、浏览器功能与视觉截图。
+新会话先读Git状态和最近提交、台账与交接。每阶段验收后本地提交；**仅明确授权后push；本次已授权推送origin的main，不强推或擅自合并master；用户已授权公开生产发布**。证据必须区分静态检查、真实PG、浏览器功能与视觉截图。
 
 ## 独立测试数据库与Node基线
 Node>=24 / npm>=11（.node-version为24.19.0），不再支持旧Node20基线。测试显式独立URL：

@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-12",
+  "mode": "read-only-local-production",
+  "cases": [
+    {
+      "width": 390,
+      "path": "/",
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "path": "/articles/why-i-choose-nextjs",
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "path": "/search",
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "path": "/logs",
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "path": "/portfolio",
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "path": "/timeline",
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "path": "/about",
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "path": "theme-and-search",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "/",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "/articles/why-i-choose-nextjs",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "/search",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "/logs",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "/portfolio",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "/timeline",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "/about",
+      "status": "PASS"
+    },
+    {
+      "width": 820,
+      "path": "theme-and-search",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "/",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "/articles/why-i-choose-nextjs",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "/search",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "/logs",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "/portfolio",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "/timeline",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "/about",
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "path": "theme-and-search",
+      "status": "PASS"
+    },
+    {
+      "js": false,
+      "path": "/articles/why-i-choose-nextjs",
+      "status": "PASS"
+    },
+    {
+      "js": false,
+      "path": "/about",
+      "status": "PASS"
+    },
+    {
+      "js": false,
+      "path": "/logs",
+      "status": "PASS"
+    }
+  ]
+}

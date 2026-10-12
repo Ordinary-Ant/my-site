@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderServerMarkup } from '../render-server-markup'
 import ContentPage, { generateMetadata } from '@/app/(site)/[...path]/page'
 import { AboutPage } from '@/components/site/about-page'
 const mocks = vi.hoisted(() => ({ module: vi.fn(), profile: vi.fn() }))
@@ -26,7 +26,7 @@ test('About自定义动态路径展示Hero，关闭全部区块不白屏且无�
     searchParams: Promise.resolve({}),
   })
   expect(element.type).toBe(AboutPage)
-  const html = renderToStaticMarkup(await AboutPage())
+  const html = await renderServerMarkup(await AboutPage())
   expect(html).toContain('真实姓名')
   expect(html).toContain('具体定位')
   expect(html).not.toContain('mailto:')

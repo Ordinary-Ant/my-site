@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from 'next-themes'
+import { headers } from 'next/headers'
 import { siteConfig } from '@/config/site'
 import { getPublicSite } from '@/lib/services/public-site'
 import { accessibleBrand } from '@/lib/brand-colors'
@@ -61,6 +62,7 @@ export const viewport: Viewport = {
   ],
 }
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined
   const data = await getPublicSite()
   const accent =
     typeof data.theme.accent === 'string' && /^#[a-f0-9]{6}$/i.test(data.theme.accent)
@@ -85,6 +87,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body className="bg-background text-foreground min-h-dvh antialiased">
         <ThemeProvider
+          nonce={nonce}
           attribute="class"
           defaultTheme={defaultTheme}
           enableSystem

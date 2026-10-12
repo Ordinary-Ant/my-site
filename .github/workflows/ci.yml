@@ -32,12 +32,18 @@ jobs:
       - run: npm run db:seed
       - run: npm run check
       - run: npm run verify
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm test
       - run: npm run test:db
       - run: npm run test:integration
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 动效体积证据
+          path: docs/verification/motion-budget.json
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

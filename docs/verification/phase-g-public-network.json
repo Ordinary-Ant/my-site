@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-12",
+  "scope": "before scrolling, new anonymous mobile context",
+  "results": [
+    {
+      "path": "/",
+      "scriptCount": 10,
+      "gzipBytes": 120566,
+      "adminPickerPresent": false,
+      "logCalendarPresent": false,
+      "files": [
+        {
+          "url": "/_next/static/chunks/webpack-a735df2fe121bcd8.js",
+          "gzipBytes": 2142
+        },
+        {
+          "url": "/_next/static/chunks/main-app-ac0869390d0d4258.js",
+          "gzipBytes": 227
+        },
+        {
+          "url": "/_next/static/chunks/2619-3c9e02e22d10480a.js",
+          "gzipBytes": 3388
+        },
+        {
+          "url": "/_next/static/chunks/app/(site)/layout-b9dc3b928b329041.js",
+          "gzipBytes": 3892
+        },
+        {
+          "url": "/_next/static/chunks/1356-853f784b705afa15.js",
+          "gzipBytes": 5200
+        },
+        {
+          "url": "/_next/static/chunks/app/(site)/%5B...path%5D/page-1d2ba7a0d6885986.js",
+          "gzipBytes": 2257
+        },
+        {
+          "url": "/_next/static/chunks/app/layout-8349dc00c359e3e3.js",
+          "gzipBytes": 1586
+        },
+        {
+          "url": "/_next/static/chunks/app/error-b5fbac4652be7c8f.js",
+          "gzipBytes": 906
+        },
+        {
+          "url": "/_next/static/chunks/1255-5cd2fe06309409a0.js",
+          "gzipBytes": 46609
+        },
+        {
+          "url": "/_next/static/chunks/4bd1b696-f785427dddbba9fb.js",
+          "gzipBytes": 54359
+        }
+      ]
+    },
+    {
+      "path": "/articles/why-i-choose-nextjs",
+      "scriptCount": 10,
+      "gzipBytes": 120566,
+      "adminPickerPresent": false,
+      "logCalendarPresent": false,
+      "files": [
+        {
+          "url": "/_next/static/chunks/webpack-a735df2fe121bcd8.js",
+          "gzipBytes": 2142
+        },
+        {
+          "url": "/_next/static/chunks/main-app-ac0869390d0d4258.js",
+          "gzipBytes": 227
+        },
+        {
+          "url": "/_next/static/chunks/2619-3c9e02e22d10480a.js",
+          "gzipBytes": 3388
+        },
+        {
+          "url": "/_next/static/chunks/1356-853f784b705afa15.js",
+          "gzipBytes": 5200
+        },
+        {
+          "url": "/_next/static/chunks/app/(site)/layout-b9dc3b928b329041.js",
+          "gzipBytes": 3892
+        },
+        {
+          "url": "/_next/static/chunks/app/(site)/%5B...path%5D/page-1d2ba7a0d6885986.js",
+          "gzipBytes": 2257
+        },
+        {
+          "url": "/_next/static/chunks/app/error-b5fbac4652be7c8f.js",
+          "gzipBytes": 906
+        },
+        {
+          "url": "/_next/static/chunks/app/layout-8349dc00c359e3e3.js",
+          "gzipBytes": 1586
+        },
+        {
+          "url": "/_next/static/chunks/1255-5cd2fe06309409a0.js",
+          "gzipBytes": 46609
+        },
+        {
+          "url": "/_next/static/chunks/4bd1b696-f785427dddbba9fb.js",
+          "gzipBytes": 54359
+        }
+      ]
+    }
+  ]
+}

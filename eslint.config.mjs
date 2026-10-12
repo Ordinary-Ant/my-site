@@ -20,6 +20,9 @@ const eslintConfig = [
       'test-results/**',
       'coverage/**',
       '.storage/**',
+      '.backups/**', // 隔离候选与备份不属于应用源码
+      '.test-backups/**',
+      '.restore-test/**',
       'next-env.d.ts',
       'design/**', // 设计稿是独立静态 HTML，不参与应用 lint
     ],

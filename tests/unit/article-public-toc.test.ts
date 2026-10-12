@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from 'vitest'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderServerMarkup } from '../render-server-markup'
 import { getPublicArticle } from '@/lib/services/article'
 import ContentPage from '@/app/(site)/[...path]/page'
 
@@ -56,7 +56,7 @@ it('公开目录在正文脱敏后生成，重名标题的锚点按渲染顺序�
 })
 
 it('阅读页每个脱敏目录链接都指向实际正文标题', async () => {
-  const html = renderToStaticMarkup(
+  const html = await renderServerMarkup(
     await ContentPage({
       params: Promise.resolve({ path: ['articles', 'contact-test'] }),
       searchParams: Promise.resolve({}),

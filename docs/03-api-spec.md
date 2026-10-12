@@ -921,3 +921,15 @@ GET /admin/stats需dashboard:read，三个角色当前有效会话均可读。�
 RSS合并最近50条公开文章/日志，GUID为稳定resource:id，文本摘要XML转义；全部关闭仍是有效空feed。sitemap投影公开列表/详情与有公开文章的分类标签归档，只输出当前路径，不含搜索/预览/旧别名，单文档超过协议50000项明确503 SITEMAP_LIMIT，需后续拆分索引。/api/v1/og位于既有保留命名空间，不新增栏目保留路径，resource省略时站点卡片，article/project的id参数为公开slug、log为ID；只从公开详情取标题，不允许远程图片参数。响应PNG/no-store；关闭/未公开内容404，参数无效400。
 
 robots仍禁止普通/api抓取，但明确Allow: /api/v1/og，允许分享图读取。图片端点复用既有/api保留空间，D阶段合法的/og栏目和历史别名不受抢占。
+# G本地运维接口（2026-10-11）
+
+GET /api/health公开、no-store：正常200 `{status:'ok',version:'0.1.0',database:'up'}`，故障503 `{status:'degraded',version:'0.1.0',database:'down'}`。version为应用版本；不返回SQL/数据库版本/连接信息。数据库探针限制statement timeout及事务等待。
+
+GET /api/v1/jobs/maintenance仅独立REVALIDATE_SECRET Bearer机器凭据可调用，不接受Cookie；未配置503，错误401。no-store，标准success.data返回skipped及各类清理计数，不返回记录或密钥。PG事务锁串行，删除已过期Session/PreviewToken/RateLimit与updatedAt超30天ViewReceipt；未过期旧RT摘要保留，rotationReply仅超过10000ms后清空（毫秒精度、严格小于），恰好10000ms宽限不受影响。建议外部每日调度；不能替代既有媒体对象失败清理或分钟发布。
+
+HTML CSP由Edge兼容middleware生成随机nonce，覆盖客户端x-nonce/CSP，Next/主题/JSON-LD用同一nonce；预览也受保护。策略及云端未验证边界见13/14，不把HTML响应头接口等同生产已发布。
+
+
+## EdgeOne公开路由查询
+
+GET /api/v1/route-redirect?path=<pathname>为公开只读Node入口，仅返回{target:null|string}（有意不使用业务DTO包装），Cache-Control:no-store。仅本地绝对pathname，长度≤2048，拒绝协议相对、反斜杠、query/hash、控制字符、无效编码和点段；输入400，数据库故障503。只暴露原本公开的重定向目标，不返回记录或凭据；middleware负责301和query保留，故障不伪装200。

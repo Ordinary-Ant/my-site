@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-13",
+  "deployment": "dp192qpgebax",
+  "checks": [
+    {
+      "path": "/api/v1/auth/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/auth/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/media/upload-intent",
+      "method": "POST",
+      "status": 201
+    },
+    {
+      "path": "/api/v1/admin/media/confirm",
+      "method": "POST",
+      "status": 201
+    },
+    {
+      "path": "public-media-probe",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/admin/media/b4d885c4-07fa-42df-b506-26c5a729d3d6",
+      "method": "DELETE",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/auth/me",
+      "method": "GET",
+      "status": 401,
+      "code": "UNAUTHORIZED"
+    }
+  ]
+}

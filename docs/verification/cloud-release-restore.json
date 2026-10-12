@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-13",
+  "kind": "release-cloud-site-schema-backup",
+  "destination": "independent-local-machine-git-ignored",
+  "dumpClientMajor": 17,
+  "bytes": 69400,
+  "sha256": "3f0408487fa80aacf0476e497c19436c204f5bdf3e93d23563b3f1b232924081",
+  "restoreVerified": true,
+  "scheduled": false,
+  "restoreTarget": "isolated-local-PG17-new-database",
+  "tables": 23,
+  "migrations": 8
+}

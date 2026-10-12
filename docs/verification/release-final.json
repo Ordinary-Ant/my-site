@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-13",
+  "publicUrl": "https://my-site-tgqonxxy.edgeone.dev",
+  "deploymentId": "dp2ry69pr5hy",
+  "branch": "main",
+  "userApprovedLcpDeferral": true,
+  "mobileHomeLcpMs": 2020.673,
+  "lcpTargetMs": 2000,
+  "lcpPassed": false,
+  "automaticIndependentBackupConfigured": false,
+  "externalAlertDestinationConfigured": false,
+  "reviewBlockingFindings": 0,
+  "remainingReviewP2": "Assert unique globalThis._ENTRIES rewrite for future CLI template changes",
+  "finalChecks": {
+    "unitFiles": 64,
+    "unitTestsPassed": 192,
+    "typecheck": "PASS",
+    "lintErrors": 0,
+    "lintExistingWarnings": 1,
+    "staticVerification": "PASS",
+    "productionAuditVulnerabilities": 0,
+    "diffWhitespace": "PASS",
+    "linuxFormalBuildExitCode": 0,
+    "actualCompiledMiddlewareConcurrentVm": "PASS",
+    "stagedCredentialScan": "PASS: zero actual credential matches"
+  },
+  "remoteCi": "pending push"
+}

@@ -1,0 +1,12 @@
+{
+  "name": "my-site",
+  "nodeVersion": "24.18.0",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "cloudFunctions": {
+    "regions": {
+      "overseas": ["ap-singapore"]
+    },
+    "maxDuration": 60
+  }
+}

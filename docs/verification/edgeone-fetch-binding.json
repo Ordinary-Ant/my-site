@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-13",
+  "externalLookupStatus": 200,
+  "internalLookupStatus": 502,
+  "internalFailurePhase": "HTTP_502",
+  "cli": "1.6.41",
+  "adapter": "0.2.10-beta.9",
+  "artifactPreparation": "request-scoped platform fetch + isolated Webpack self/chunk/entries",
+  "actualCompiledVm": {
+    "nativeFetchStatus": 502,
+    "platformFetch301": true,
+    "queryPreserved": true,
+    "concurrentFetchIsolation": true
+  },
+  "cloudAccepted": true,
+  "deploymentId": "dp2ry69pr5hy"
+}

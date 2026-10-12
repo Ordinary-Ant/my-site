@@ -1,5 +1,19 @@
 const matches = (path: string, root: string) =>
   path === root || (root !== '/' && path.startsWith(`${root}/`))
+/** 公开路由查询只接收pathname，拒绝外部地址、控制符与路径穿越。 */
+export function isRoutePath(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length > 2048 || !value.startsWith('/')) return false
+  try {
+    const decoded = decodeURIComponent(value)
+    return (
+      !decoded.startsWith('//') &&
+      !/[\\?#\u0000-\u0020\u007f]/.test(decoded) &&
+      !/(^|\/)\.{1,2}(\/|$)/.test(decoded)
+    )
+  } catch {
+    return false
+  }
+}
 /** 当前地址优先，自家地址回用不会构成重定向循环。 */
 export function resolveModuleRedirect(
   path: string,

@@ -1,6 +1,6 @@
 # 10 · 开发状态台账
 
-更新：2026-10-11。A–F已完成，G本地发布准备待开始；D01–D08已验收。状态仅用待开始/开发中/待验证/已完成；已完成须有实际证据，阶段通过后本地提交，禁止自动push。
+更新：2026-10-11。A–F已完成，G本地发布准备开发中；D01–D08已验收。状态仅用待开始/开发中/待验证/已完成；已完成须有实际证据，阶段通过后本地提交，仅明确授权后push（本次已授权origin/main）。
 
 | 编号 | 细功能 | 依赖 | 验收 | 状态 | 代码/文档入口（规划或现有） | 证据 | 提交 |
 |---|---|---|---|---|---|---|---|
@@ -38,12 +38,23 @@
 | E01 | 搜索/SEO/RSS/sitemap | D | 全部公共过滤、当前路径、缓存失效 | 已完成 | search、metadata、feeds | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | bd11e90 |
 | E02 | 分类标签归档/阅读统计 | D | 当前路径、计数去重、开关公共过滤 | 已完成 | archives/stats | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | bd11e90 |
 | E03 | metadata/JSON-LD/OG/分钟定时发布 | D | 未发布/软删不索引、图生成、调度鉴权失效 | 已完成 | SEO/publish job | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | bd11e90 |
-| F01 | 动效v2/升级/后台预览 | E | 四预设none/tint，reduce/卸载/预览一致 | 已完成 | motion runtime/UI | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | 未提交 |
-| F02 | 移动/平板/桌面视觉 | E | 移动首页横轨/导航4.5、平板单列、桌面中轴Logo | 已完成 | site/admin styles/screenshots | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | 未提交 |
-| G01 | CI/安全依赖和会话清理 | F | 持续检查、审计例外、过期记录清理 | 待开始 | CI、cleanup jobs | 待补实际运行证据 | 未提交 |
-| G02 | 真实PG集成/三端E2E | F | 业务/权限/并发/缓存/媒体真实闭环 | 待开始 | tests、Playwright | 待补实际运行证据 | 未提交 |
-| G03 | gzip性能/可访问性 | F | 文章135/动效28/登录110KB、键盘/对比度 | 待开始 | performance evidence | 待补实际运行证据 | 未提交 |
-| G04 | 备份恢复/健康监控/上线准备 | F | DB和媒体恢复演练、回滚文档、授权内可逆部署验证，缺凭据阻塞；公开生产发布最终确认 | 待开始 | ops/docs | 待补实际运行证据 | 未提交 |
+| F01 | 动效v2/升级/后台预览 | E | 四预设none/tint，reduce/卸载/预览一致 | 已完成 | motion runtime/UI | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | aa2775b |
+| F02 | 移动/平板/桌面视觉 | E | 移动首页横轨/导航4.5、平板单列、桌面中轴Logo | 已完成 | site/admin styles/screenshots | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | aa2775b |
+| G01 | CI/安全依赖和会话清理 | F | 安全门禁、过期清理、远端CI | 已完成（远端CI待本次push核对） | CI、csp/middleware、maintenance | 生产audit及最终检查见release-final；远端结果另记 | 本次交付提交 |
+| G02 | 真实PG集成/三端E2E | F | 权限/并发/缓存/媒体闭环 | 已完成 | tests、Playwright | 177真实PG；最新本地111浏览器65pass46skip；云端补验详JSON | 本次交付提交 |
+| G03 | gzip性能/可访问性 | F | 135/28/110KB、Lighthouse及LCP | 已交付，LCP待优化（用户批准） | performance evidence | gzip通过；移动首页99分/LCP2021ms，目标2000ms未达；正确桌面全100，见lighthouse/README | 本次交付提交 |
+| G04 | 本地备份恢复/健康/操作手册 | F | DB和媒体隔离恢复、健康最小状态、回滚文档 | 已完成 | backup、health、docs13/14 | 23表/8迁移/13外键/1媒体及完整内容哈希/损坏拒绝/原库未变实测，质量规格批准 | 未提交 |
+| G05 | EdgeOne/Supabase云部署与运维 | G01–04 | 实际云闭环、调度、备份恢复、CI | 已交付，自动备份/外部告警待配置 | docs/14/15/18、云证据 | dp2ry69pr5hy功能通过，分钟调度实测，独立手动备份恢复通过；CI本次push后核对 | 本次交付提交 |
 
 ## 环境事实与证据规则
 协调记录：本地PostgreSQL已healthy，开发/独立_test两库迁移通过，publication_backfill回填已发布空时间，seed连续执行两次无重复；check/verify/build通过，Vitest5项unit+3项真实PG integration通过，Playwright390/820/1440首页可读无溢出3项通过；干净安装后的最终检查已全通过，A验收完成；CI远端尚未运行。命令、退出码、截图、数据库结果由执行者核实后更新，禁止推测。09报告是修订前审查快照，不能用旧事实覆盖当前运行结果。每阶段结束更新11交接，记录未完成、风险、下一步与实际提交hash。
+
+## G交付与剩余事项（2026-10-13）
+
+2026-10-13已公开交付：https://my-site-tgqonxxy.edgeone.dev，EdgeOne国际站my-site，当前部署dp2ry69pr5hy。实际云API、真实浏览器登录/CSP/CORS上传、三端首页、文章与开关/连续301闭环26项、三角色15项全部通过；临时探针已清理。Supabase PG17.11/8迁移与公开/私有Storage两桶已接入。分钟发布实际3次200，维护稳定版本连续5次200；每日维护及五分钟健康调度已配置，外部告警和自动独立备份尚未配置。
+
+2026-10-13用户明确决定“先交付，保留性能待办”：移动首页Lighthouse Performance99，LCP三次中位2020.673ms，超过2000ms目标约21ms；仅暂缓该项，不修改目标、不标达标。文章/搜索移动LCP中位1874.945/1655.676ms；正确桌面配置三页Performance100。
+
+云端验收详verification/edgeone-cloud-*.json；云数据库最终备份及恢复详cloud-release-restore.json，两桶独立本机快照详cloud-media-backup.json。无内容样本的空桶快照不能冒充对象恢复演练；本地媒体恢复已有哈希证据。自动异地备份的目的地、加密/保留策略与告警接收人尚未配置；自定义域名稍后绑定。当前Upload项目不会因Git push自动部署。
+
+独立审查无阻塞问题；P2待办：prepare脚本对globalThis._ENTRIES移除增加唯一匹配断言及真实webpack夹具；当前实际产物VM并发隔离已通过。

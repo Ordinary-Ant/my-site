@@ -1,3 +1,4 @@
+import { ImageGallery } from './content-widgets'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ApiError } from '@/lib/api/errors'
@@ -5,7 +6,7 @@ import { getPublicProject, listPublicProjects } from '@/lib/services/project'
 import type { ModuleConfig } from '@/config/modules'
 import { PROJECT_TYPES, projectDate, projectLinks } from '@/lib/project-display'
 import { ProjectCard } from './project-card'
-import ImageGallery from './image-gallery'
+
 import { Markdown } from './markdown'
 import { ViewCounter } from './view-counter'
 import { JsonLd } from './json-ld'

@@ -88,6 +88,23 @@ test('搜索归档与SEO公共出口、匿名阅读上报形成真实闭环', as
       'href',
       testBaseURL + modules.find((m) => m.key === 'article')!.route + '/' + run,
     )
+    // 无JS也必须在head读到完整元数据，不能依赖水合移动流式标签。
+    const metadataContext = await browser.newContext({ javaScriptEnabled: false })
+    contexts.push(metadataContext)
+    const metadataPage = await metadataContext.newPage()
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await metadataPage.goto(
+        testBaseURL + modules.find((m) => m.key === 'article')!.route + '/' + run,
+      )
+      await expect(metadataPage.locator('head meta[name="description"]')).toHaveAttribute(
+        'content',
+        '真实搜索摘要',
+      )
+      await expect(metadataPage.locator('head link[rel="canonical"]')).toHaveAttribute(
+        'href',
+        testBaseURL + modules.find((m) => m.key === 'article')!.route + '/' + run,
+      )
+    }
     await page.getByRole('link', { name: '搜索验收分类', exact: true }).click()
     await expect(page.locator('h1')).toHaveText('搜索验收分类')
     expect((await page.request.get('/rss.xml')).headers()['cache-control']).toContain('no-store')

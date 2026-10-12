@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-13",
+  "kind": "linux-edgeone-candidate-scan",
+  "fileCount": 2997,
+  "bytes": 122071706,
+  "credentialMatches": 0,
+  "violations": [],
+  "formalBuildExitCode": 0,
+  "middlewareBytes": 161537,
+  "sanitizedEnvironmentObjects": 3,
+  "requestScopedPlatformFetch": true,
+  "rhelEngineIncluded": true,
+  "publicUrl": "https://my-site-tgqonxxy.edgeone.dev",
+  "notYetCloudAccepted": false,
+  "cloudAccepted": true,
+  "deploymentId": "dp2ry69pr5hy"
+}

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-12",
+  "scope": "laboratory Event Timing, not field INP",
+  "results": [
+    {
+      "width": 390,
+      "cpuSlowdown": 4,
+      "observedInteractions": 8,
+      "maximumEventDurationMs": 16,
+      "below16MsIfNoSamples": false,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "cpuSlowdown": 1,
+      "observedInteractions": 5,
+      "maximumEventDurationMs": 16,
+      "below16MsIfNoSamples": false,
+      "passed": true
+    }
+  ]
+}

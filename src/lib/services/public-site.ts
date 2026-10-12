@@ -1,4 +1,5 @@
 import 'server-only'
+import { cache } from 'react'
 import type { Module, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { MODULE_KEYS, type ModuleKey, type ModuleConfig } from '@/config/modules'
@@ -60,7 +61,8 @@ export async function applyPublicPrivacy<T>(
     ...contacts.map((c) => (typeof c.value === 'string' ? c.value : '')),
   ]) as T
 }
-export async function getPublicSite() {
+// 仅复用本次RSC请求的读取，不跨请求缓存，配置保存后仍立即生效。
+export const getPublicSite = cache(async () => {
   const [settings, modules, p] = await Promise.all([
     readKnownSettings(),
     listVisibleModules(),
@@ -116,7 +118,7 @@ export async function getPublicSite() {
   }
   if (contact) return result
   return scrubPublicContacts(result, blocked) as typeof result
-}
+})
 export async function getHomeFeed() {
   const site = await getPublicSite()
   const sections = []

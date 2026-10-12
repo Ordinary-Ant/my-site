@@ -32,7 +32,10 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "node scripts/measure-js.mjs && playwright test",
     "test:db": "tsx scripts/prepare-test-db.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "jobs:maintenance": "node scripts/run-maintenance-job.mjs",
+    "backup:local": "node scripts/local-backup.mjs backup",
+    "restore:local": "node scripts/local-backup.mjs restore"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1147.0",

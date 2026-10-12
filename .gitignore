@@ -5,7 +5,10 @@ node_modules/
 
 # next.js
 .next/
+.edgeone/
 /.test-backups/
+/.backups/
+/.restore-test/
 out/
 build/
 dist/
@@ -15,9 +18,7 @@ next-env.d.ts
 *.tsbuildinfo
 
 # env —— 绝不提交
-.env
-.env.local
-.env*.local
+.env*
 !.env.example
 
 # database

@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-13",
+  "checks": [
+    {
+      "name": "real-browser-login",
+      "status": "PASS"
+    },
+    {
+      "name": "real-browser-CSP-CORS-direct-upload-confirm",
+      "status": 201,
+      "mediaRegistered": true
+    },
+    {
+      "name": "home-layout",
+      "width": 390,
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "name": "home-layout",
+      "width": 820,
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "name": "home-layout",
+      "width": 1440,
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "name": "browser-probe-cleanup",
+      "status": 200
+    }
+  ],
+  "consolePageErrors": 0
+}

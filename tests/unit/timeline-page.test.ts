@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderServerMarkup } from '../render-server-markup'
 import ContentPage from '@/app/(site)/[...path]/page'
 import { TimelineIndex } from '@/components/site/timeline-pages'
 const mocks = vi.hoisted(() => ({ module: vi.fn(), list: vi.fn() }))
@@ -53,7 +53,7 @@ test('自定义栏目路径分发时间线，年精度与原生折叠保留完�
     searchParams: Promise.resolve({ type: 'WORK' }),
   })
   expect(element.type).toBe(TimelineIndex)
-  const result = renderToStaticMarkup(await TimelineIndex(element.props))
+  const result = await renderServerMarkup(await TimelineIndex(element.props))
   expect(result).toContain('2023 年')
   expect(result).toContain('<details')
   expect(result).toContain('完整职业故事')

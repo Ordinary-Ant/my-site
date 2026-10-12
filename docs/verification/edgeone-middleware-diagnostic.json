@@ -1,0 +1,21 @@
+{
+  "kind": "isolated-compiler-diagnostic",
+  "formalCliBuild": false,
+  "cloudAcceptance": false,
+  "matchingBinary": "0.25.5",
+  "codeBytes": 0,
+  "errors": [
+    "Failed to transform source code: Error: Build failed with 17 errors:\nnode_modules/next/dist/compiled/jsonwebtoken/index.js:11:935: ERROR: Could not resolve \"buffer\"\nnode_modules/next/dist/compiled/jsonwebtoken/index.js:11:985: ERROR: Could not resolve \"crypto\"\nnode_modules/next/dist/compiled/jsonwebtoken/index.js:11:1104: ERROR: Could not resolve \"stream\"\nnode_modules/next/dist/compiled/jsonwebtoken/index.js:11:1154: ERROR: Could not resolve \"util\"\nnode_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:2:240842: ERROR: Could not resolve \"url\"\n..."
+  ],
+  "warnings": [],
+  "date": "2026-10-12",
+  "adapterVersion": "0.2.10-beta.9",
+  "cliVersion": "1.6.41",
+  "inputSha256": "b6177c743a0fd3833fdebc44df3d4a120389074d00f729f4e7d3ca3deb903d69",
+  "initialAttempts": [
+    "Direct ESM: __filename undefined",
+    "Existing binary: host 0.25.5 vs binary 0.19.12",
+    "Matching binary first attempt: spawn EBUSY"
+  ],
+  "finding": "Browser-platform transform fails to resolve Node builtins; 17 compile errors; zero output. Diagnostic only, not formal CLI/Linux/cloud acceptance."
+}

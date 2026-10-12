@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-13",
+  "jobs": [
+    {
+      "jobname": "my-site-health",
+      "schedule": "*/5 * * * *",
+      "active": true
+    },
+    {
+      "jobname": "my-site-maintenance",
+      "schedule": "15 19 * * *",
+      "active": true
+    },
+    {
+      "jobname": "my-site-publication",
+      "schedule": "* * * * *",
+      "active": true
+    }
+  ],
+  "credentialsInVault": true,
+  "secretValuesInCronCommands": false,
+  "executionVerified": true,
+  "timezone": "UTC; maintenance 19:15 = Asia/Shanghai next day 03:15",
+  "healthMonitoring": "HTTP status retained in pg_net response table; external alert destination not configured",
+  "publicationHttp200Samples": 3,
+  "maintenanceHttpStatus": 200,
+  "externalAlertDestinationConfigured": false,
+  "runtimePrivilegeChecks": {
+    "vaultSchemaUsage": false,
+    "vaultDecryptedSecretSelect": false,
+    "cronSchemaUsage": false,
+    "cronTableSelectGrantWithoutSchemaAccess": true,
+    "netSchemaUsage": true,
+    "netPrivilegeNote": "Supabase extension-managed PUBLIC usage grant remains; no Vault secret access"
+  },
+  "maintenanceStableHttp200Samples": 5,
+  "dailyScheduledFirstExecutionVerified": false
+}

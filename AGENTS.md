@@ -5,11 +5,11 @@
 - 用户明确决策 > 已修订一期权威规范（docs/12-phase-one-plan.md、docs/08-motion-system.md、docs/设计规范.md）> 其他docs > HTML/截图。冲突必须修订原文，不能仅追加注释保留错误合同。
 - 新会话/恢复先读Git状态和最近提交，再读README、台账、交接及当前阶段规范；确认未提交变化归属，不覆盖他人工作。
 - 功能状态、依赖、验收、代码入口、证据、提交记入docs/10-development-tracker.md；构建、文件存在、Schema有效不能代替功能验收。
-- 阶段验收后再本地提交；仅在用户明确授权时push。本次用户已授权推送origin，并明确将主分支改为main；本地及GitHub默认分支均使用main，禁止强推、覆盖远端历史或擅自合并master。授权范围内执行可逆部署验证，公开生产发布需最终确认。提交和必要代码注释用简短中文。
+- 阶段验收后再本地提交；仅在用户明确授权时push。本次用户已授权推送origin，并明确将主分支改为main；本地及GitHub默认分支均使用main，禁止强推、覆盖远端历史或擅自合并master。2026-10-12用户明确要求继续执行到部署发布完成，已包含最终公开发布授权，不重复索要确认；实际验收仍须通过，不上传凭据文件。2026-10-13用户明确允许先交付并推送main，移动首页LCP约2021ms保留待办，不声称达到2000ms目标。提交和必要代码注释用简短中文。
 
 ## 工程合同
 
-- Next.js15.5 / Node runtime middleware；service为权威授权，所有数据入口检查权限、用户启用、AT sid对应会话。
+- Next.js15.5 / Edge兼容middleware + Node路由服务；service为权威授权，所有数据入口检查权限、用户启用、AT sid对应会话。
 - ADMIN/EDITOR/VIEWER按权限矩阵访问；RT在PostgreSQL原子轮转，10秒宽限复用同一后继凭证；超时旧token重放撤销该用户全部会话。
 - 真实PostgreSQL迁移及集成测试，共享PostgreSQL限流；禁止内存Map作为生产限流合同。
 - 公开过滤模块/类型开关、PUBLISHED、publishedAt<=now、deletedAt为空；时间线保留日期精度，当前项/日期/同日期order/id排序；revision写冲突409。

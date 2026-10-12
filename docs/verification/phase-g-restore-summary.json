@@ -1,0 +1,11 @@
+{
+  "verifiedAt": "2026-10-11T06:16:04.707Z",
+  "tables": 23,
+  "migrations": 8,
+  "validatedForeignKeys": 13,
+  "mediaFiles": 1,
+  "allTableContentHashesMatch": true,
+  "sourceDatabaseUnchanged": true,
+  "sourceMediaMatchesBackup": true,
+  "corruptionRejectedBeforeDatabaseCreation": true
+}

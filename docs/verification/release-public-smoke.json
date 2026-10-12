@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-13",
+  "deploymentId": "dp2ry69pr5hy",
+  "checks": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "csp": false
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "csp": true
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "csp": true
+    },
+    {
+      "path": "/articles",
+      "status": 200,
+      "csp": true
+    },
+    {
+      "path": "/search",
+      "status": 200,
+      "csp": true
+    },
+    {
+      "path": "/rss.xml",
+      "status": 200,
+      "csp": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "csp": true
+    },
+    {
+      "path": "/api/v1/route-redirect?path=%2Farticles",
+      "status": 200,
+      "csp": false
+    }
+  ],
+  "passed": true
+}

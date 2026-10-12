@@ -4,10 +4,7 @@ import type { NextConfig } from 'next'
  * 安全响应头
  * 见 docs/01-architecture.md §9
  *
- * ⚠ 'unsafe-inline' 是必需的：
- *   1. Next.js 会内联一部分启动脚本
- *   2. 动效系统通过内联 <style> 注入 CSS 变量（见 docs/08-motion-system.md §9）
- * 后续若要用 nonce 收紧，需要同时改掉动效注入方式。
+ * CSP由Edge兼容middleware生成每请求nonce；此处维护其他固定响应头。
  */
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -23,6 +20,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // 首份HTML完整输出head元数据，兼容无JS读取与分享/SEO检测。
+  htmlLimitedBots: /.*/,
 
   // 后台 / API 不参与静态优化，避免被 CDN 缓存
   // （per-route 的 Cache-Control 在 Route Handler 内设置）

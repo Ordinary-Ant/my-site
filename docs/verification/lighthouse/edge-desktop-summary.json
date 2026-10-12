@@ -1,0 +1,44 @@
+{
+  "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+  "runs": [
+    {
+      "name": "home",
+      "mode": "desktop",
+      "sample": 1,
+      "file": "home-desktop-edge-desktop-config-1.json",
+      "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+      "performance": 100,
+      "lcp": 459.374,
+      "cls": 0,
+      "a11y": 100,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    {
+      "name": "article",
+      "mode": "desktop",
+      "sample": 1,
+      "file": "article-desktop-edge-desktop-config-1.json",
+      "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+      "performance": 100,
+      "lcp": 424.5104,
+      "cls": 0,
+      "a11y": 100,
+      "bestPractices": 100,
+      "seo": 100
+    },
+    {
+      "name": "search",
+      "mode": "desktop",
+      "sample": 1,
+      "file": "search-desktop-edge-desktop-config-1.json",
+      "buildId": "e6cUP4N0FoXaF2z1RHuM5",
+      "performance": 100,
+      "lcp": 441.6156,
+      "cls": 0,
+      "a11y": 100,
+      "bestPractices": 100,
+      "seo": 66
+    }
+  ]
+}

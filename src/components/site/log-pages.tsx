@@ -1,13 +1,16 @@
+import {
+  ImageGallery,
+  LogCalendar,
+  ReadingActions,
+  LogView,
+  LogMore,
+  LogNavigation,
+} from './content-widgets'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getPublicLog, listPublicLogs, getLogCalendar } from '@/lib/services/log'
 import { Markdown } from './markdown'
-import ImageGallery from './image-gallery'
-import { LogCalendar } from './log-calendar'
-import { ReadingActions } from './reading-actions'
-import { LogView } from './log-view'
-import { LogMore } from './log-more'
-import { LogNavigation } from './log-navigation'
+
 import { chinaToday, LOG_TYPES, MOODS, WEATHER } from '@/lib/log-display'
 import { safeContentUrl } from '@/lib/markdown'
 import type { ModuleConfig } from '@/config/modules'
@@ -16,6 +19,7 @@ import { notFound } from 'next/navigation'
 import { ViewCounter } from './view-counter'
 import { JsonLd } from './json-ld'
 import { absolutePublicUrl } from '@/lib/seo'
+
 type PublicLog = Awaited<ReturnType<typeof getPublicLog>>
 type SiteModule = { name: string; description: string | null; route: string; config: ModuleConfig }
 export async function logOr404(id: string) {

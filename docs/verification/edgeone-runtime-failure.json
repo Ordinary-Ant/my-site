@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-13",
+  "deployment": "dpp9zfl3eg6b",
+  "platformStatus": "Success",
+  "applicationVerified": false,
+  "health": 503,
+  "home": 500,
+  "login": 500,
+  "runtime": "Nodejs20.19",
+  "error": "PrismaClientInitializationError",
+  "reason": "Query Engine rhel-openssl-1.1.x missing; generated for debian-openssl-3.0.x",
+  "source": "Authenticated EdgeOne console SSR request log",
+  "fix": "Prisma generator binaryTargets native + rhel-openssl-1.1.x",
+  "verification": "pending next deployment"
+}

@@ -32,7 +32,17 @@ export function apiHandler(callback: (request: Request) => Promise<Response> | R
       const failure = error
       const known = failure instanceof ApiError
       const validation = failure instanceof z.ZodError
-      if (!known && !validation) console.error({ code: 'INTERNAL_ERROR', requestId })
+      if (!known && !validation) {
+        const database = failure instanceof Prisma.PrismaClientKnownRequestError ? failure : null
+        const sqlState = database?.meta?.code
+        // 只允许固定格式的诊断码；不记录异常message、SQL、连接串或其他meta。
+        console.error({
+          code: 'INTERNAL_ERROR',
+          requestId,
+          ...(database && /^P\d{4}$/.test(database.code) ? { databaseCode: database.code } : {}),
+          ...(typeof sqlState === 'string' && /^[0-9A-Z]{5}$/.test(sqlState) ? { sqlState } : {}),
+        })
+      }
       response = NextResponse.json(
         {
           success: false,

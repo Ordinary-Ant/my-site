@@ -1,3 +1,4 @@
+import { ProfileContact } from './content-widgets'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getPublicProfile } from '@/lib/services/profile'
@@ -8,8 +9,8 @@ import type { ProfileCard, ProfileSkill, ProfileSocial } from '@/lib/profile-dra
 import type { TimelineItem } from '@/lib/timeline-display'
 import { Markdown } from './markdown'
 import { TimelineCard } from './timeline-card'
-import { ProfileContact } from './profile-contact'
-import { ProfileIcon } from '@/components/admin/profile-icons'
+
+import { ProfileIcon } from '@/components/shared/profile-icon'
 import { JsonLd } from './json-ld'
 
 type ProfileView = {

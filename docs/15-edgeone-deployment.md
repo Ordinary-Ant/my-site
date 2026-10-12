@@ -4,14 +4,14 @@
 
 ## 当前部署前置条件
 
-逐步获取操作见[16 · 云资源获取步骤（新手版）](16-cloud-resources-guide.md)。Supabase数据库已创建并读取两种URI模板，尚缺本地数据库密码及真实连接验证；用户无法开通R2，文件存储改用同项目Supabase Storage，其余配置按责任表推进。
+逐步获取操作见[16 · 云资源获取步骤（新手版）](16-cloud-resources-guide.md)。Supabase数据库已创建并读取两种URI模板，密码已本地填写并完成8项迁移与独立运行账户验证；用户无法开通R2，文件存储改用同项目Supabase Storage，其余配置按责任表推进。
 
 | 分类 | 条件 | 当前状态与完成标准 |
 |---|---|---|
 | 已具备 | EdgeOne账号、API Token、my-site Upload项目 | 已实际认证并创建项目，Token保持本地不入Git |
 | 已具备 | Git主分支与推送授权 | 本地main跟踪origin/main，远端HEAD为main；旧codex/full-site已通过GitHub改名，不强推 |
-| 待验证资源 | 云端PostgreSQL | Supabase my-site Healthy，新加坡；6543事务/5432会话URI已写本地模板，密码未填，TLS/权限/迁移未验证 |
-| 待配置资源 | Supabase Storage | S3已启用、Endpoint/区域已读取，无桶/密钥；需公开媒体桶和私有临时桶、服务端凭据、驱动适配及真实直传/CORS验收 |
+| 待验证资源 | 云端PostgreSQL | Supabase PG17.11，新加坡；两池真实连接、8迁移、独立site schema和最小运行角色/RLS已验证；完整业务与云备份未验收 |
+| 待配置资源 | Supabase Storage | 两桶及密钥已配置，公开/私有正确；path style已适配，已有上传/读取/预检成功，复测有网络超时，真实浏览器/生产Origin待验收 |
 | 待明确 | 网站HTTPS访问地址 | 首次测试可先核对平台分配域名是否可用；自定义域名若使用，需DNS/HTTPS及对应Origin/canonical配置，不能在生产使用localhost |
 | 待配置 | 独立应用与任务密钥 | JWT_SECRET与REVALIDATE_SECRET独立随机生成，管理员使用安全初始凭据；与开发环境隔离 |
 | 待完成验证 | Pages运行与媒体完整协议 | Node版本、Prisma引擎/TCP、middleware数据库访问、CSP nonce、登录权限、动态301、直传确认需实际云测 |
@@ -50,7 +50,7 @@
 
 ### Supabase Storage配置
 
-计划桶名my-site-media（公开读取）和my-site-upload-private（私有）。公开地址使用Supabase HTTPS对象地址，无需Cloudflare域名。S3 Endpoint已读取为https://yylauqjdozlbcewlwcmw.storage.supabase.co/storage/v1/s3，region为ap-southeast-1。当前无桶/密钥；创建服务端密钥和公开桶前按浏览器权限要求确认。Supabase S3密钥访问全部桶并绕过RLS，不能声称仅授权两桶，也不能把同项目第三桶当独立备份。S3驱动需forcePathStyle；PutBucketCors不支持，签名头/跨域/校验和实测后才验收。
+计划桶名my-site-media（公开读取）和my-site-upload-private（私有）。公开地址使用Supabase HTTPS对象地址，无需Cloudflare域名。S3 Endpoint已读取为https://yylauqjdozlbcewlwcmw.storage.supabase.co/storage/v1/s3，region为ap-southeast-1。两桶及密钥已由用户配置，已实际验证；详verification/supabase-preparation.md。Supabase S3密钥访问全部桶并绕过RLS，不能声称仅授权两桶，也不能把同项目第三桶当独立备份。S3驱动已加入forcePathStyle；PutBucketCors不支持，签名头/跨域/校验和实测后才验收。
 
 需要的配置键如下，全部填写到本地.env.edgeone.local，保留已配置Token；没有实际值时不要复制占位字符串进行部署：
 

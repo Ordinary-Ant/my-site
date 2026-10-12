@@ -1,10 +1,10 @@
 # 11 · 开发交接与恢复
 
-更新：2026-10-11。A（66dca93）、B（c5fe0c6）、C（cc9fb5d）、D（80347bc）、E（bd11e90）已验收并本地提交；F已验收待提交，G待开始。分支codex/full-site，保留master，origin已配置，禁止自动push。一期尚未完成。用户已明确先完成本地发布准备，生产配置稍后提供；云端验收独立记录为未验证。
+更新：2026-10-12。A（66dca93）、B（c5fe0c6）、C（cc9fb5d）、D（80347bc）、E（bd11e90）、F（aa2775b）已验收并本地提交；G本地安全/恢复/回归已实现，性能待验证，未整阶段提交。分支main，保留master，origin已配置，本次用户已授权push，凭据文件禁止提交或推送。一期尚未完成。用户已明确先完成本地发布准备，生产配置稍后提供；云端验收独立记录为未验证。
 
 ## 恢复顺序
 
-1. 读AGENTS.md，核对Git状态和最近提交；当前未提交变化均属于F动效、视觉、相关截图与开发记录，不覆盖/回退。下方旧阶段记录为历史，以本文最新恢复点为准。
+1. 读AGENTS.md，核对Git状态和最近提交；当前未提交变化均属于G安全/健康/维护/备份/CI、相关回归截图与开发记录，不覆盖/回退。下方旧阶段记录为历史，以本文最新恢复点为准。
 2. 读README、10台账、12批准计划及当前阶段verification；09只是旧可行性快照。
 3. 检查Docker与实际端口。现有.env不可输出/覆盖/提交，不reset开发/生产库。
 4. 开发前登记，实际验收后填证据；公开生产发布最终确认。
@@ -104,3 +104,35 @@ E本地提交bd11e90，未推送。F01已登记开发中：root实现站点共�
 完整108浏览器62pass46skip（2.7分钟）；安全区34px补修先RED后GREEN，三端foundation+motion最终7pass2skip（10.4秒），规格质量复审批准。164unit/55文件、最后真实PG174/27文件全通过（37.24秒），生产build/check/verify通过。最新gzip以phase-f及motion-budget.json为准；CSS测量已包含motion-preferences安全区规则。
 
 PG误传3100 Origin的失败与恢复过程见phase-f.md；已核对原包保留在忽略目录/.test-backups/origin-failure-reviewed.json，不是待恢复包；原data-backend-test-backup.json已不存在。开发库/.env未动。恢复时继续遵守PG/build/browser串行；G只做本地准备，生产接入稍后。
+
+## G最新恢复点（2026-10-11 17:50）
+
+F已本地提交aa2775b，未push。G01/CSP nonce与健康/维护、G02整回归、G04本地独立恢复已实现且真实验证；G03 Lighthouse尚未测，不能标G整体完成/提交。合同13、操作14、verification/phase-g.md及backup/restore-summary已建立，逐项细节以这些证据为准。
+
+最后172unit、177真实PG、check/verify/生产build通过；加入CSP后的111浏览器65pass46skip（2.9分钟），最后维护10秒边界修正新增真实PG RED→GREEN并重新构建。23表/8迁移/13外键/1媒体恢复及内容哈希/损坏拒绝/源未变实测通过。生产audit0，开发链braces公告5high例外详phase-g，不force降级。规格复审批准，质量复审已批准（性能仍待验证）。
+
+下一步：完成Lighthouse移动/桌面首页、文章和搜索的Performance/A11y/Best Practices/SEO。CLI13.5.0可用，但自动审批拒绝npm run start两次（含只监听localhost），返回仅“blocked by policy”；未绕过、未测分数。待允许启动本地生产服务后再实测，修复失败项并复审，阶段全部通过后本地提交。生产R2/托管/域名/备份按用户决定稍后提供，不再次索要凭据。
+
+演练隔离库phase_g_local_20261011_restore_test与.backups/.restore-test包保留；损坏副本仅供拒绝证明，新演练换新名。用户.env未输出/覆盖/提交，测试库恢复保护包无未处理残留，origin-failure-reviewed.json为已核对历史留存。
+
+## EdgeOne与Git最新接入（2026-10-12）
+
+用户授权国际站my-site及push origin/codex/full-site；A–F提交aa2775b已推送，不强推、不合并master。Token只从.env.edgeone.local读取，已Git忽略。CLI1.6.41通过认证并创建Upload项目；实际preview退出1，要求先有production部署，未构建/上传/发布。用户暂无数据库/对象存储，要求资源建议；详15，下一步准备Supabase新加坡PG与R2，不自动采购或使用开发配置。G既有变更仍留本地，Lighthouse仍待验证，不标G整体完成。最新check退出0（既有img警告）、58文件172unit通过；Git通过Windows现有代理连接，不改全局代理。
+
+部署准备文档与AGENTS授权规则已独立提交19adbf7并推送；git ls-remote核对远端codex/full-site与本地HEAD完全相同。该提交不代表G阶段验收，G代码/回归证据及其余文档修订仍未提交。
+
+2026-10-12用户再次确认EdgeOne Pages部署，要求主分支main。已通过GitHub Rename Branch将远端codex/full-site改为main，本地branch -m main并fetch/prune、设置origin/main上游；ls-remote --symref证实远端HEAD=main且提交仍19adbf7，历史未改。旧远端分支名已消失，master本地历史保留。缺资源/验证/最终审批清单见15；本次不部署生产、不触碰G未提交代码。
+
+## Supabase资源读取恢复点（2026-10-12）
+
+用户已登录IAB，实际读取my-site/yylauqjdozlbcewlwcmw：Free、Healthy、新加坡ap-southeast-1。Connect事务6543/会话5432均为aws-0-ap-southeast-1.pooler.supabase.com，用户名postgres.yylauqjdozlbcewlwcmw。两份占位URI已补入忽略文件.env.edgeone.local，保留原Token；数据库密码尚未填写，未连接/迁移云数据库。不得打印密码或将占位串当可部署值。
+
+用户无法开通R2，改用同项目Supabase Storage，详细步骤见16。Storage当前无桶，S3协议已启用、region ap-southeast-1、Endpoint已确认，无access keys。未创建桶/密钥。下一步用户本地填SUPABASE_DATABASE_PASSWORD；具体权限确认后创建公开my-site-media、私有my-site-upload-private及服务端S3密钥。需先适配forcePathStyle并实测checksum/CORS/确认/删除保护，不能仅换凭据就声明完成；同项目第三桶不是独立备份。生产公开发布仍最终确认，G原变更保持未提交。
+
+## Supabase接入执行恢复点（2026-10-12）
+
+用户“都已填写”，随后强调任何密码文件不得推远程。两池已真实连接PG17.11，8迁移部署到site（22业务+1迁移表），runtime独立账号无DDL/迁移表修改/bypassRLS，22业务表RLS，anon/authenticated无schema权限；事务池锁/写/读/回滚实测通过。仅.env.edgeone.local更新URI、JWT和任务密钥，本地.env保留，真实凭据不输出/不提交。未初始化生产管理员或演示内容，管理员邮箱已询问待回复。
+
+Storage两桶由用户创建，公开/私有标志正确，S3 path style实际RED→GREEN；首轮完整上传/读取/预检通过，后续私有REST拒绝验证通过，但复测出现ECONNRESET/TimeoutError，未判定稳定。probe每次UUID纯色PNG已清理，脚本scripts/verify-cloud-storage.mts只输出脱敏状态。证据verification/supabase-preparation.md。173unit、check/verify、15真实PG媒体测试通过；首次PG因Docker未启动失败，启动现有Desktop确认healthy后重跑成功。构建执行中，实际结果随后补记。G原未提交变化保留；网站URL/运行时/性能/调度/备份/监控和最终公开审批仍待完成，不自动生产部署。
+
+本轮生产构建退出0，check/verify退出0，仅既有Markdown img警告。构建使用显式本地15432/3100环境，不包含云凭据，不等于Pages云验收。

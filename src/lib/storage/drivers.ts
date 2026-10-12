@@ -17,11 +17,11 @@ export interface StorageDriver {
   get(key: string, maxBytes: number): Promise<Buffer>
   remove(key: string): Promise<void>
 }
-/** localhost生产构建验收属于本地开发；公网生产必须使用R2。 */
+/** localhost生产构建验收属于本地开发；公网生产必须使用对象存储。 */
 export function assertLocalAllowed() {
   const host = new URL(env.NEXT_PUBLIC_SITE_URL).hostname
   if (env.NODE_ENV === 'production' && !['localhost', '127.0.0.1', '[::1]'].includes(host))
-    throw new ApiError(503, 'LOCAL_STORAGE_DISABLED', '公网生产必须使用 R2 存储')
+    throw new ApiError(503, 'LOCAL_STORAGE_DISABLED', '公网生产必须使用对象存储')
 }
 export class LocalDriver implements StorageDriver {
   private path(key: string) {
@@ -59,12 +59,14 @@ export class R2Driver implements StorageDriver {
   constructor() {
     assertS3Configured()
     if (!env.S3_PUBLIC_BASE_URL)
-      throw new ApiError(503, 'STORAGE_UNCONFIGURED', 'R2缺少公开地址配置')
+      throw new ApiError(503, 'STORAGE_UNCONFIGURED', '对象存储缺少公开地址配置')
     this.bucket = env.S3_BUCKET!
     this.privateBucket = env.S3_PRIVATE_BUCKET!
     if (this.privateBucket === this.bucket)
-      throw new ApiError(503, 'STORAGE_UNCONFIGURED', 'R2临时桶必须与公开桶隔离')
+      throw new ApiError(503, 'STORAGE_UNCONFIGURED', '临时桶必须与公开桶隔离')
     this.client = new S3Client({
+      // Supabase要求桶名置于路径；保留原类名以兼容既有S3调用入口。
+      forcePathStyle: true,
       endpoint: env.S3_ENDPOINT,
       region: env.S3_REGION || 'auto',
       credentials: {

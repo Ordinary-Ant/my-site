@@ -14,9 +14,9 @@ MIGRATION_DATABASE_URL="postgresql://postgres.yylauqjdozlbcewlwcmw:[YOUR-PASSWOR
 SUPABASE_DATABASE_PASSWORD=""
 ```
 
-两份模板已补到Git忽略的根目录.env.edgeone.local，保留原Token。仍含密码占位符，尚不能连接数据库。
+用户已填写本地密码，开发者已编码URI并验证两种连接。8项迁移已部署至独立site schema；本地DATABASE_URL已改为独立运行角色，MIGRATION_DATABASE_URL保留迁移角色，两者均含schema=site。上方只是原控制台模板，不要再覆盖已完成的本地配置。
 
-用户现在只需：
+首次配置或重设密码时的操作（当前已完成）：
 
 1. 用编辑器打开.env.edgeone.local。
 2. 在SUPABASE_DATABASE_PASSWORD引号中填写**创建项目时保存的数据库密码**并保存。它不是GitHub或Supabase登录密码。
@@ -30,9 +30,9 @@ SUPABASE_DATABASE_PASSWORD=""
 
 ## 二、文件存储使用Supabase Storage
 
-实际检查：Storage没有桶；Storage → S3协议开关已启用，Endpoint和Region已确认，尚无Access keys。
+用户已配置两桶及S3密钥。实际读取my-site-media公开、my-site-upload-private私有，S3 HeadBucket均成功。当前进展和不稳定复测见verification/supabase-preparation.md。
 
-| 计划桶名 | 可见性 | 用途 |
+| 已配置桶名 | 可见性 | 用途 |
 |---|---|---|
 | my-site-media | 公开读取 | 仅存服务端验证后的网站图片、视频、PDF |
 | my-site-upload-private | 始终私有 | 签名直传临时文件，不能直接成为公开媒体 |
@@ -59,7 +59,7 @@ S3_SECRET_ACCESS_KEY=""
 S3_PUBLIC_BASE_URL=https://yylauqjdozlbcewlwcmw.supabase.co/storage/v1/object/public/my-site-media
 ```
 
-代码仍需适配forcePathStyle与提供商提示，实测签名PUT、SHA256、CORS、临时私有、服务端确认和删除保护。Supabase不支持S3 PutBucketCors接口，不照搬R2 CORS JSON教程；实际网站Origin/签名头须浏览器实测，不能认定只换密钥即可部署。
+forcePathStyle及通用错误提示已适配，单元RED→GREEN；签名上传/读取/临时私有/本地预检已有真实成功，但复测有网络重置与超时，完整云业务及生产Origin尚未验收。Supabase不支持S3 PutBucketCors接口，不照搬R2 CORS JSON教程；实际网站Origin/签名头须浏览器实测，不能认定只换密钥即可部署。
 
 参考：[S3认证与权限](https://supabase.com/docs/guides/storage/s3/authentication)、[兼容范围](https://supabase.com/docs/guides/storage/s3/compatibility)、[公开地址](https://supabase.com/docs/guides/storage/serving/downloads)。
 
@@ -69,8 +69,8 @@ S3_PUBLIC_BASE_URL=https://yylauqjdozlbcewlwcmw.supabase.co/storage/v1/object/pu
 
 | 未完成项 | 用户需要做什么 | 开发者后续工作 |
 |---|---|---|
-| 数据库密码 | 填本地文件 | 编码URI、验证连接、运行角色及迁移 |
-| 桶与S3密钥 | 按上文操作或确认助手执行具体操作 | 驱动适配、真实直传/确认/引用保护验收 |
+| 数据库 | 本地密码已填写 | 两池/8迁移/运行角色已验证，完整云业务待验收 |
+| 桶与S3密钥 | 已配置，保留本地凭据 | S3适配及协议实测已有成功，网络稳定/完整云业务待验收 |
 | 管理员 | 告知管理员邮箱 | 安全初始化，不用开发默认凭据 |
 | JWT/任务密钥 | 无需自行生成 | 本地生成独立随机值 |
 | 分钟发布/每日维护 | 无需先开新调度平台 | 验证Supabase Cron/pg_net/Vault与实际HTTP结果 |
@@ -80,4 +80,4 @@ S3_PUBLIC_BASE_URL=https://yylauqjdozlbcewlwcmw.supabase.co/storage/v1/object/pu
 
 同项目第三个私有桶不能代替独立备份。S3无版本控制，删除不能依赖版本恢复；Free数据库无自动备份，数据库备份也不包含媒体文件。[备份说明](https://supabase.com/docs/guides/platform/backups)
 
-当前仅完成控制台读取和本地模板，不创建桶/密钥、不修改云数据库、不公开部署。恢复状态见11交接。
+当前已验证凭据、部署8项云迁移并配置独立运行角色与RLS；未初始化管理员/演示内容，未公开部署。凭据文件永不提交。恢复状态见11交接，真实证据见verification/supabase-preparation.md。

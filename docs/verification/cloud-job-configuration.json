@@ -34,5 +34,8 @@
     "netPrivilegeNote": "Supabase extension-managed PUBLIC usage grant remains; no Vault secret access"
   },
   "maintenanceStableHttp200Samples": 5,
-  "dailyScheduledFirstExecutionVerified": false
+  "dailyScheduledFirstExecutionVerified": false,
+  "dailyScheduledDispatchVerified": true,
+  "dailyScheduledHttpResponseVerified": false,
+  "dailyScheduledHttpNote": "2026-10-13 03:15 Asia/Shanghai dispatch succeeded; response beyond pg_net retention at verification"
 }

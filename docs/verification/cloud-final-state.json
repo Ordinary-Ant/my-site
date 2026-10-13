@@ -7,11 +7,11 @@
   "modules": 6,
   "recentJobExecutions": [
     {
-      "jobname": "my-site-health",
+      "jobname": "my-site-publication",
       "status": "succeeded"
     },
     {
-      "jobname": "my-site-publication",
+      "jobname": "my-site-health",
       "status": "succeeded"
     },
     {

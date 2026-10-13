@@ -40,20 +40,20 @@
 | E03 | metadata/JSON-LD/OG/分钟定时发布 | D | 未发布/软删不索引、图生成、调度鉴权失效 | 已完成 | SEO/publish job | 152unit/167真实PG、全102浏览器58pass44skip及补验6pass6skip，规格/质量批准，见[阶段E证据](verification/phase-e.md) | bd11e90 |
 | F01 | 动效v2/升级/后台预览 | E | 四预设none/tint，reduce/卸载/预览一致 | 已完成 | motion runtime/UI | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | aa2775b |
 | F02 | 移动/平板/桌面视觉 | E | 移动首页横轨/导航4.5、平板单列、桌面中轴Logo | 已完成 | site/admin styles/screenshots | 164unit/174PG、整套浏览器62pass46skip，安全区补验7pass2skip；规格质量通过，见[阶段F证据](verification/phase-f.md) | aa2775b |
-| G01 | CI/安全依赖和会话清理 | F | 安全门禁、过期清理、远端CI | 已完成（远端CI待本次push核对） | CI、csp/middleware、maintenance | 生产audit及最终检查见release-final；远端结果另记 | ae15613 |
+| G01 | CI/安全依赖和会话清理 | F | 安全门禁、过期清理、远端CI | 已完成 | CI、csp/middleware、maintenance | 生产audit及最终检查见release-final；远端CI38410370425全部通过 | ae15613 |
 | G02 | 真实PG集成/三端E2E | F | 权限/并发/缓存/媒体闭环 | 已完成 | tests、Playwright | 177真实PG；最新本地111浏览器65pass46skip；云端补验详JSON | ae15613 |
 | G03 | gzip性能/可访问性 | F | 135/28/110KB、Lighthouse及LCP | 已交付，LCP待优化（用户批准） | performance evidence | gzip通过；移动首页99分/LCP2021ms，目标2000ms未达；正确桌面全100，见lighthouse/README | ae15613 |
-| G04 | 本地备份恢复/健康/操作手册 | F | DB和媒体隔离恢复、健康最小状态、回滚文档 | 已完成 | backup、health、docs13/14 | 23表/8迁移/13外键/1媒体及完整内容哈希/损坏拒绝/原库未变实测，质量规格批准 | 未提交 |
-| G05 | EdgeOne/Supabase云部署与运维 | G01–04 | 实际云闭环、调度、备份恢复、CI | 已交付，自动备份/外部告警待配置 | docs/14/15/18、云证据 | dp2ry69pr5hy功能通过，分钟调度实测，独立手动备份恢复通过；CI本次push后核对 | ae15613 |
+| G04 | 本地备份恢复/健康/操作手册 | F | DB和媒体隔离恢复、健康最小状态、回滚文档 | 已完成 | backup、health、docs13/14 | 23表/8迁移/13外键/1媒体及完整内容哈希/损坏拒绝/原库未变实测，质量规格批准 | ae15613 |
+| G05 | EdgeOne/Supabase云部署与运维 | G01–04 | 实际云闭环、调度、备份恢复、CI | 已交付，自动备份/外部告警待配置 | docs/14/15/18、云证据 | dp2ry69pr5hy功能通过，分钟调度实测，独立手动备份恢复通过；远端CI全部通过 | ae15613 |
 
 ## 环境事实与证据规则
 
-### G06 · 新环境CI测试库初始化（本地已验证，远端待验证，2026-10-13）
+### G06 · 新环境CI测试库初始化（已完成，2026-10-13）
 
 - 依赖：G01/G02；触发：main ae15613远端CI的全新测试库没有种子数据，27项失败、7项跳过，不能记为通过。
 - 验收：独立新建`*_test`库执行test:db后具备栏目、Profile、设置与分类标签；真实PG全量通过，并核对GitHub CI。
 - 入口：scripts/prepare-test-db.ts、tests/integration/foundation.test.ts；先在全新独立库记录失败，再修复初始化，禁止改开发/生产库及放宽业务断言。
-- 结果：Docker恢复后在新建personal_site_release_ci_test真实复现栏目为空的RED；迁移后对同一目标库seed，基础2项GREEN，全量28文件178项PG通过。未改应用运行逻辑、不放宽业务断言；第一次数据库不可达仅属环境失败。修复提交后核对远端CI，不将首轮失败算通过。
+- 结果：Docker恢复后在新建personal_site_release_ci_test真实复现栏目为空的RED；迁移后对同一目标库seed，基础2项GREEN，全量28文件178项PG通过。未改应用运行逻辑、不放宽业务断言；第一次数据库不可达仅属环境失败。修复提交ae89eb9已推送，远端CI38410370425：192unit/178PG、生产build、E2E65pass46skip全部通过；独立审查通过，不将首轮失败算通过。
 
 协调记录：本地PostgreSQL已healthy，开发/独立_test两库迁移通过，publication_backfill回填已发布空时间，seed连续执行两次无重复；check/verify/build通过，Vitest5项unit+3项真实PG integration通过，Playwright390/820/1440首页可读无溢出3项通过；干净安装后的最终检查已全通过，A验收完成；CI远端尚未运行。命令、退出码、截图、数据库结果由执行者核实后更新，禁止推测。09报告是修订前审查快照，不能用旧事实覆盖当前运行结果。每阶段结束更新11交接，记录未完成、风险、下一步与实际提交hash。
 

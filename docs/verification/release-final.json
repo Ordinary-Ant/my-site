@@ -39,9 +39,25 @@
       "fullIntegrationFiles": 28,
       "fullIntegrationPassed": 178
     },
-    "status": "pending fixed commit push"
+    "status": "success",
+    "verifiedRun": {
+      "id": 38410370425,
+      "jobId": 115340778942,
+      "commit": "ae89eb98a25d8924030722613a4871c722c0eb13",
+      "url": "https://github.com/Ordinary-Ant/my-site/actions/runs/38410370425",
+      "conclusion": "success",
+      "unitTestsPassed": 192,
+      "integrationTestsPassed": 178,
+      "e2ePassed": 65,
+      "e2eSkipped": 46,
+      "productionBuild": "PASS",
+      "productionAudit": "PASS"
+    }
   },
   "applicationCommit": "ae156139229c11c05c6e24f49026c03fdded1b99",
-  "originMainVerified": "ae156139229c11c05c6e24f49026c03fdded1b99",
-  "remoteDefaultBranch": "main"
+  "remoteDefaultBranch": "main",
+  "originMainVerifiedAtCiAcceptance": "ae89eb98a25d8924030722613a4871c722c0eb13",
+  "ciFixCommit": "ae89eb98a25d8924030722613a4871c722c0eb13",
+  "ciFixIndependentReview": "PASS: test database isolation, captured seed output, unchanged business assertions",
+  "finalDocumentationOnlyCommit": "Records verification results; no application changes; skip duplicate CI after verified source commit"
 }

@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-13",
+  "jobs": [
+    {
+      "jobname": "my-site-health",
+      "schedule": "*/5 * * * *",
+      "active": true,
+      "status": "succeeded",
+      "start_time": "2026-10-13T14:05:00.023Z"
+    },
+    {
+      "jobname": "my-site-maintenance",
+      "schedule": "15 19 * * *",
+      "active": true,
+      "status": "succeeded",
+      "start_time": "2026-10-12T19:15:00.025Z"
+    },
+    {
+      "jobname": "my-site-publication",
+      "schedule": "* * * * *",
+      "active": true,
+      "status": "succeeded",
+      "start_time": "2026-10-13T14:06:00.013Z"
+    }
+  ],
+  "note": "Cron succeeded verifies scheduler dispatch; retained HTTP response evidence is recorded separately, not inferred from dispatch success"
+}

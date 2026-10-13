@@ -1,0 +1,276 @@
+{
+  "date": "2026-10-13",
+  "kind": "Git-formatted-Lighthouse-file-SHA256",
+  "note": "SHA256 of repository report bytes; all original capture hashes referenced by historical summary.json matched. Measured values are unchanged.",
+  "originalCaptureHashDifferences": 0,
+  "files": [
+    {
+      "file": "article-desktop-edge-1.json",
+      "sha256": "bd0ab31f9109bb44aa7ad437b31fd9f46a5e53e48fa1b04cb24391c2897ce854"
+    },
+    {
+      "file": "article-desktop-edge-desktop-config-1.json",
+      "sha256": "2e20213496cecebe18e392dcf0f802814d317429db573e76838c19c7dc2ea2ce"
+    },
+    {
+      "file": "article-desktop-final.json",
+      "sha256": "fd2add4027c8add0acee14d0cf671d9057387bd791ed84f3c3e99605f285e80c"
+    },
+    {
+      "file": "article-desktop-fixed.json",
+      "sha256": "1ac0b526f74ca232a24b76a2a3ae2098ae27fdf00a9e688685b447237307613e"
+    },
+    {
+      "file": "article-desktop-optimized.json",
+      "sha256": "083c67783503d83112291cb6bd4879af9eb4e848709417139aa98014dadf07c1"
+    },
+    {
+      "file": "article-desktop-retry.json",
+      "sha256": "4d8f803797143029c61de9eb0bb9b82bb74dca8058dbbd35bc9bcaf9d60cefa7"
+    },
+    {
+      "file": "article-desktop-split.json",
+      "sha256": "ef86995f046a950f57caabe2b3bcf7d19ec2c74c6cef3d583b35fc853749d036"
+    },
+    {
+      "file": "article-desktop.json",
+      "sha256": "679de6f07d1a2199a562ea33ac7bb3dc8154cc59e21a239168f11087b74d8ae1"
+    },
+    {
+      "file": "article-mobile-confirm.json",
+      "sha256": "34fc5d8e27facd66cdb4c085861cb22a16fafa31f1d1af99e295c3df955f9e2d"
+    },
+    {
+      "file": "article-mobile-edge-1.json",
+      "sha256": "977554975fa2eba2e66baf44402ea2070bdd96c71cab2727ce54b7dd4cb5d8b2"
+    },
+    {
+      "file": "article-mobile-edge-2.json",
+      "sha256": "986263a32d23ea27333c68d4226e43bbd333f2d96079aa67e2cb50a3cad8a475"
+    },
+    {
+      "file": "article-mobile-edge-3.json",
+      "sha256": "cad17166d6965382dae58f60e48d96e9c535e324696a4905d853565bb3ffe5be"
+    },
+    {
+      "file": "article-mobile-final-2.json",
+      "sha256": "3975705c2ed8a572b979abd094e6ca363126f1cbd4106548aa608951dcb8e37f"
+    },
+    {
+      "file": "article-mobile-final-3.json",
+      "sha256": "552c69c2ce5e576782f8f3cdacf98aa1cad2c656006d760bd9da922c3d0c6f67"
+    },
+    {
+      "file": "article-mobile-final.json",
+      "sha256": "c5a4dd9aec868247342f28d93e3d4cc11cbafa705c691438947b996ccb84b1d3"
+    },
+    {
+      "file": "article-mobile-fixed-2.json",
+      "sha256": "5c5d0ca961c3cefdd8aa0ab70c2092a3dd0745b067db0971358f0808bbb755e2"
+    },
+    {
+      "file": "article-mobile-fixed-3.json",
+      "sha256": "9c3f6941d32d61aa51392212761c6fdda1b844916592def238fb748817b4b16e"
+    },
+    {
+      "file": "article-mobile-fixed.json",
+      "sha256": "e8433c2f6e2455c8dea31524f5d6bea9b6b7f9725f1aaa6cd745230b20d59800"
+    },
+    {
+      "file": "article-mobile-optimized.json",
+      "sha256": "df592dfffea81848e91b60b2c4727b2c7f0fa75db9e7dde9f452b65bc04f9f8a"
+    },
+    {
+      "file": "article-mobile-retry.json",
+      "sha256": "df4bead807c5cf51028343ad3fd17af52b1269d81643a8a775796ae7c87db2b5"
+    },
+    {
+      "file": "article-mobile-split-2.json",
+      "sha256": "9aa5f23c4cbb894890ddff9cee8455ac9bcb082d7984566c66438bc67e113ee2"
+    },
+    {
+      "file": "article-mobile-split-3.json",
+      "sha256": "e9b6f91578d32d12be7ee31d980a60c83a3a790ed9e28ec7ae8776e9c4b77e68"
+    },
+    {
+      "file": "article-mobile-split.json",
+      "sha256": "4d069858566afefb3a2bbcc273e7f18cb21390d21695d47bc0daf05c6636c45c"
+    },
+    {
+      "file": "article-mobile.json",
+      "sha256": "662c61870afff109c06247cb7f72a2e28a1e5ad3431ade2eef1925efa3e890c3"
+    },
+    {
+      "file": "home-desktop-edge-1.json",
+      "sha256": "9ceece14a2ee87d94410a098b60a78e3c14d70a069860b3df77b99409e0c1f08"
+    },
+    {
+      "file": "home-desktop-edge-desktop-config-1.json",
+      "sha256": "3d8f6e429745cc432ab828ee2c8bf744be9a8bc9390c5747a063fdffd3ae5d16"
+    },
+    {
+      "file": "home-desktop-final.json",
+      "sha256": "0e26a93b031562c3e36554dcc01c452078c8154ab9a690e5de8fb5917502cb75"
+    },
+    {
+      "file": "home-desktop-fixed.json",
+      "sha256": "e32a38e3cbe0abca6d0e6566d3b8fae76c70901bef91084f882fef097f386de4"
+    },
+    {
+      "file": "home-desktop-optimized.json",
+      "sha256": "e7dc97bb751403c7004aa07df95767e3fe614e116da15be0df3fb874c61c1bda"
+    },
+    {
+      "file": "home-desktop-split.json",
+      "sha256": "5ac3f83ea926a305375dfbdf8fe6ba6fb9ae77e207c8fa6a6e8f533ab59887b7"
+    },
+    {
+      "file": "home-desktop.json",
+      "sha256": "e9608affddf4ecfcf9dc49242d81dfda88b02ac764b53fea04af8440a3ca1e85"
+    },
+    {
+      "file": "home-mobile-edge-1.json",
+      "sha256": "8e45634d77bfd043b4f962b8bc69b0d0eefe0150ad41687892c7463b8ff664e5"
+    },
+    {
+      "file": "home-mobile-edge-2.json",
+      "sha256": "c4e42d4ce8442aff17f8bda87f2061870aa74cd2a43a4332f92da6a9dec5c11a"
+    },
+    {
+      "file": "home-mobile-edge-3.json",
+      "sha256": "52f0cbfdbb6313d43de71425cca55d525456f46714831f6b4e0d51b910523219"
+    },
+    {
+      "file": "home-mobile-final-2.json",
+      "sha256": "241a94b2bb3f603b8490639c7dba6803c3dbb9c7d3e668ab98bd490ed1765832"
+    },
+    {
+      "file": "home-mobile-final-3.json",
+      "sha256": "d859f01788a5dc8192d65e364da731c8ef1e1a07f261e7b6c341acd98b25f6cf"
+    },
+    {
+      "file": "home-mobile-final.json",
+      "sha256": "48da89f5110ea0cf4e65b7bec8bdb0e80f37f3977441d50f1b7fc8b589770c09"
+    },
+    {
+      "file": "home-mobile-fixed-2.json",
+      "sha256": "923ed6d566861d52e9c8b83fc0fe85c4c123f0c8218915ec1288f522f6a9e457"
+    },
+    {
+      "file": "home-mobile-fixed-3.json",
+      "sha256": "00f20bf951be9586b2af2e96e041fe855b19ef109af02858319055eaf8c9abdd"
+    },
+    {
+      "file": "home-mobile-fixed.json",
+      "sha256": "61ac419be96a8c2e271490de61a33edd2633c1bd653beeaf6afaccffd86de87b"
+    },
+    {
+      "file": "home-mobile-optimized.json",
+      "sha256": "adca395e2bbd10ffe88da269965f7637e2b7444701f1b8c8fcc59b42ae4dbebe"
+    },
+    {
+      "file": "home-mobile-prefetch-diagnostic-1.json",
+      "sha256": "ebace889bba7f54ed00dd304c5842dd9b7246229c6ab617c98fbd58d72241c59"
+    },
+    {
+      "file": "home-mobile-prefetch-diagnostic-2.json",
+      "sha256": "272cee72d67d216e94b2db877463432471b09ab05c474fc8a1c87c29fa1fedad"
+    },
+    {
+      "file": "home-mobile-prefetch-diagnostic-3.json",
+      "sha256": "307f763139f185512f1c04a46ccd49148f5bce3b388c1c44df0debef719d5869"
+    },
+    {
+      "file": "home-mobile-split-2.json",
+      "sha256": "0034887b08bab1a32378d3d7ed0a3b588d3e4142531bc2df058b0255b44d346f"
+    },
+    {
+      "file": "home-mobile-split-3.json",
+      "sha256": "61f60ac1196f693f2540e381636eb18740fd8fbef49a162bc6ad5e8d46ec7ee9"
+    },
+    {
+      "file": "home-mobile-split.json",
+      "sha256": "972ea6d4e7b137f4b4631ebe8d3bbcd3562ef31dae2945191931083a7c8e2b28"
+    },
+    {
+      "file": "home-mobile.json",
+      "sha256": "064222eb5018e76ff009d4e33b70da16993ca4001f994667cab250bc69916643"
+    },
+    {
+      "file": "search-desktop-edge-1.json",
+      "sha256": "40835c8976ab035b9f3ec6ae193e283bbdb60d6788d9a57827095a37937a080e"
+    },
+    {
+      "file": "search-desktop-edge-desktop-config-1.json",
+      "sha256": "f17cdce7a629bc9b5963860a43a0631441be53e9fdd05f21052661d200d80b91"
+    },
+    {
+      "file": "search-desktop-final.json",
+      "sha256": "285f96db0609faa616c748c8d1e6904f31ae7ca43ff11045fce5a55837fe04ed"
+    },
+    {
+      "file": "search-desktop-fixed.json",
+      "sha256": "9e539a561887997ea2522cc5d1a508b3506cb716f0bad43a8af25d164e9d4bda"
+    },
+    {
+      "file": "search-desktop-optimized.json",
+      "sha256": "239ecf39368385929e1a0e739ad11bcf87db39b25db63244e75f46594756ca00"
+    },
+    {
+      "file": "search-desktop-split.json",
+      "sha256": "87634ef7a55a7cf3d6b0abaa06b2c4540ac35ba2954023fb51a36e8494f0185f"
+    },
+    {
+      "file": "search-desktop.json",
+      "sha256": "5828194b76867fa13235a10b1179fc009fbd4746af4edb126bb2d832c6c6c8ad"
+    },
+    {
+      "file": "search-mobile-edge-1.json",
+      "sha256": "d9e9027b50bbe5f0142d16eb318e193ac952478ff2760bb18ace8dd2c3e56803"
+    },
+    {
+      "file": "search-mobile-edge-2.json",
+      "sha256": "1b29043b1b5f24cf12004a5142c1006b3d402387755adc16932983aa7beaa7e0"
+    },
+    {
+      "file": "search-mobile-edge-3.json",
+      "sha256": "52c06f259543c68a1f149bc0b185eb3ee8849fac73e121561d3956c586d958ec"
+    },
+    {
+      "file": "search-mobile-final-2.json",
+      "sha256": "c39e0f10d49fbf8f6b3a09dd4731a0b7da6e52d9fd34c0f547de8ee822bc0fd8"
+    },
+    {
+      "file": "search-mobile-final-3.json",
+      "sha256": "e56a3c0b0ec3dd11b8350a0befd8362647c0ed078805b839756761c2b114e4fe"
+    },
+    {
+      "file": "search-mobile-final.json",
+      "sha256": "f1d7bb548a413ed0656f7fd9e02ed8a4d8d532b7bc9b91c6d791e6387d061331"
+    },
+    {
+      "file": "search-mobile-fixed.json",
+      "sha256": "97015c2ad9aae5ef857be4113896d638bc9da4661fdfde1c6a05eb08792be633"
+    },
+    {
+      "file": "search-mobile-optimized.json",
+      "sha256": "d229a07b2d6559694372a8fcb551dcfff931403033f1aeedc2a435f5ea775af9"
+    },
+    {
+      "file": "search-mobile-split-2.json",
+      "sha256": "d12750f667f6950048ec8c8e3c60da05441b52655858706e6015ad548c9fd730"
+    },
+    {
+      "file": "search-mobile-split-3.json",
+      "sha256": "dff3baedfc35704435ce7c241416fb2a66385ce18ab225b0a504912aa6f9042d"
+    },
+    {
+      "file": "search-mobile-split.json",
+      "sha256": "144857cbed45cd552a4e95bfa3f2fe72f6277f5a70f5cc582168ff3ec4e66f63"
+    },
+    {
+      "file": "search-mobile.json",
+      "sha256": "3ef5284ca58c2f808bbc4e3e5037ff077dcd80aa401ce70c3d26a076fc3576aa"
+    }
+  ]
+}

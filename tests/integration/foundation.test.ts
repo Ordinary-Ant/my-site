@@ -4,6 +4,15 @@ import { PrismaClient } from '@prisma/client'
 const db = new PrismaClient()
 afterAll(() => db.$disconnect())
 
+test('全新测试库准备后具备公共业务依赖，不依赖曾经手工运行seed', async () => {
+  expect((await db.module.findMany()).map((m) => m.key)).toEqual(
+    expect.arrayContaining(['home', 'article', 'log', 'portfolio', 'timeline', 'about']),
+  )
+  expect(await db.profile.findUnique({ where: { id: 'default' } })).not.toBeNull()
+  expect(await db.setting.findUnique({ where: { key: 'motion.config' } })).not.toBeNull()
+  expect(await db.tag.findUnique({ where: { slug: 'performance' } })).not.toBeNull()
+})
+
 test('真实 PostgreSQL 迁移具备并发控制与路径约束', async () => {
   const tables = await db.$queryRaw<
     { name: string }[]

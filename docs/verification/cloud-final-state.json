@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-13",
+  "articles": 0,
+  "users": 1,
+  "media": 0,
+  "pendingUploadIntents": 0,
+  "modules": 6,
+  "recentJobExecutions": [
+    {
+      "jobname": "my-site-health",
+      "status": "succeeded"
+    },
+    {
+      "jobname": "my-site-publication",
+      "status": "succeeded"
+    },
+    {
+      "jobname": "my-site-publication",
+      "status": "succeeded"
+    },
+    {
+      "jobname": "my-site-publication",
+      "status": "succeeded"
+    },
+    {
+      "jobname": "my-site-publication",
+      "status": "succeeded"
+    },
+    {
+      "jobname": "my-site-publication",
+      "status": "succeeded"
+    }
+  ],
+  "recentHttpStatuses": [
+    {
+      "status_code": 200,
+      "timed_out": false
+    },
+    {
+      "status_code": 200,
+      "timed_out": false
+    },
+    {
+      "status_code": 200,
+      "timed_out": false
+    },
+    {
+      "status_code": 200,
+      "timed_out": false
+    },
+    {
+      "status_code": 200,
+      "timed_out": false
+    },
+    {
+      "status_code": 200,
+      "timed_out": false
+    }
+  ]
+}

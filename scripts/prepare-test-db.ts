@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { PrismaClient } from '@prisma/client'
 
-/** 创建隔离测试库并部署迁移，不重置开发库。 */
+/** 创建隔离测试库、部署迁移并初始化测试基线，不重置开发库。 */
 for (const file of ['.env.local', '.env']) {
   if (existsSync(file)) {
     process.loadEnvFile(file)
@@ -32,4 +32,13 @@ const cli = spawnSync(
   { stdio: 'inherit', env: { ...process.env, DATABASE_URL: target.toString() } },
 )
 if (cli.status !== 0) process.exit(cli.status ?? 1)
-console.log('独立测试库迁移完成；运行集成测试前设置 TEST_DATABASE_URL。')
+// 集成测试依赖栏目、设置和Profile；仅迁移的空库不能代表可用测试环境。
+const seed = spawnSync(process.execPath, ['node_modules/prisma/build/index.js', 'db', 'seed'], {
+  stdio: 'pipe',
+  env: { ...process.env, DATABASE_URL: target.toString() },
+})
+if (seed.status !== 0) {
+  console.error('独立测试库种子初始化失败；未输出账户或连接信息。')
+  process.exit(seed.status ?? 1)
+}
+console.log('独立测试库迁移和种子完成；运行集成测试前设置 TEST_DATABASE_URL。')

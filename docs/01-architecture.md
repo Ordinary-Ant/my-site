@@ -429,15 +429,15 @@ REVALIDATE_SECRET=                   # 用于外部触发 /api/revalidate
 
 ## 12. 部署拓扑
 
-### 方案 A · EdgeOne国际站CLI托管（当前部署目标，待验收）
+### 方案 A · EdgeOne国际站CLI托管（已部署并通过云功能验收）
 
-my-site为直接上传Upload项目，CLI1.6.41已创建项目，但preview因无既有production部署退出。Supabase数据库8项迁移/独立运行角色已验证，Storage桶/密钥/驱动适配与分钟调度待配置。Node24基线、Node middleware访问Prisma、云引擎平台及运行时兼容必须真实验证；API Token认证通过不能代替全栈验收。
+my-site为直接上传Upload项目，CLI1.6.41、production dp2ry69pr5hy已上线。正式Linux构建后清洗环境并适配每请求平台fetch；Edge兼容middleware处理nonce/301，Node服务执行数据库查询及权威授权。构建Node24.18.0，实际函数Node20.19与Prisma RHEL/OpenSSL1.1引擎；真实登录、媒体、三角色、发布和多次改路径已通过，不能以API Token或构建成功代替这些验收。
 
-资源建议为Supabase新加坡PostgreSQL（连接池运行、独立迁移连接）、同项目Supabase Storage公开媒体桶与私有临时桶、Supabase Cron + pg_net + Vault分钟调用。数据库项目已创建并读取连接模板，Storage尚无桶/密钥，详见15部署准备；不承诺免费额度或服务保障。隔离发布目录，禁止自动合并开发.env。用户已授权首次公开生产部署。
+当前资源为Supabase新加坡PG17.11（事务池运行、独立迁移连接）、公开媒体/私有临时Storage两桶、Cron+pg_net+Vault分钟发布、每日维护及五分钟健康检查。8迁移、运行最小权限和独立本机备份恢复已验证；自动独立备份及外部告警尚未配置，不承诺免费额度服务保障。发布目录隔离.env，不上传初始化/迁移/CLI凭据，详15。
 
 ### 方案 B · Node24源站 + EdgeOne加速（备选）
 
-若Pages不能保持现有Node middleware/数据库合同，应用运行在Node24服务器或容器，EdgeOne接入源站加速与防护；PostgreSQL与对象存储保持独立的接口边界，备份、监控及分钟调度需实际配置。现有项目未设置standalone产物，不能将此备选描述为已可一键部署。
+若未来Pages不能保持现有路由/数据库合同，应用运行在Node24服务器或容器，EdgeOne接入源站加速与防护；PostgreSQL与对象存储保持独立的接口边界，备份、监控及分钟调度需实际配置。现有项目未设置standalone产物，不能将此备选描述为已可一键部署。
 
 ### CI/CD 检查点（两方案通用）
 

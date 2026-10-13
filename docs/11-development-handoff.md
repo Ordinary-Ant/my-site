@@ -10,7 +10,7 @@ A–F已提交；本次G源代码、合同与脱敏证据一并提交main并推�
 
 ## 已验证与边界
 
-最新本地生产包完整E2E：65pass/46skip（共111）；177真实PG为服务读取去重改动后的结果。后续EdgeOne兼容守卫及安全诊断通过单元、正式隔离Linux构建及实际云闭环，未声称再次执行Windows完整E2E。当前localhost:3100服务使用独立personal_site_test库；不要在服务运行时覆盖.next。
+最新本地生产包完整E2E：65pass/46skip（共111）；177真实PG为服务读取去重改动后的结果。后续EdgeOne兼容守卫及安全诊断通过单元、正式隔离Linux构建及实际云闭环，未声称再次执行Windows完整E2E。此前localhost:3100服务使用独立personal_site_test库；2026-10-13续验时Docker已关闭，恢复后原数据库容器healthy。重新开网站前确认当前监听；运行中不要覆盖.next。
 
 正式CLI1.6.41、适配器0.2.10-beta.9；构建配置Node24.18.0，实际云函数Node20.19，Prisma生成native+rhel-openssl-1.1.x。CLI构建退出0仍须检查非空middleware、环境清洗、请求级平台fetch绑定和凭据扫描。详18及14。
 
@@ -33,3 +33,8 @@ npm run dev -- --port 3100
 ```
 
 首次环境按README迁移与seed；已有库先检查迁移状态，不reset。历史自动审批拒绝启动服务，仅用户手工启动，未绕过。测试固定启动文件.backups/start-e2e.cmd连接_test库，不能当作开发库入口。
+
+
+## 远端CI首次执行与修复
+
+main ae15613已推送，首轮run38282781294单元192通过，但真实PG因全新测试库仅迁移未seed，27失败/7skip。prepare-test-db现对已校验的*_test目标迁移后seed，捕获种子输出不暴露账户；新独立库基础回归RED→GREEN，全量178PG通过。应用运行代码未变，线上dp2ry69pr5hy无需因测试工具修改重发；远端完整结果待修复推送后核对。

@@ -24,5 +24,24 @@
     "actualCompiledMiddlewareConcurrentVm": "PASS",
     "stagedCredentialScan": "PASS: zero actual credential matches"
   },
-  "remoteCi": "pending push"
+  "remoteCi": {
+    "firstRun": {
+      "id": 38282781294,
+      "commit": "ae156139229c11c05c6e24f49026c03fdded1b99",
+      "conclusion": "failure",
+      "cause": "Fresh isolated test database migrated without seed; 27 integration failures and 7 skips"
+    },
+    "fix": "Seed only validated *_test target after migration; capture seed output",
+    "localRegression": {
+      "freshDatabase": "personal_site_release_ci_test",
+      "red": "Expected required modules; received empty list",
+      "greenFoundationTests": 2,
+      "fullIntegrationFiles": 28,
+      "fullIntegrationPassed": 178
+    },
+    "status": "pending fixed commit push"
+  },
+  "applicationCommit": "ae156139229c11c05c6e24f49026c03fdded1b99",
+  "originMainVerified": "ae156139229c11c05c6e24f49026c03fdded1b99",
+  "remoteDefaultBranch": "main"
 }

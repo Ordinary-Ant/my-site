@@ -11,5 +11,6 @@
   "reason": "Query Engine rhel-openssl-1.1.x missing; generated for debian-openssl-3.0.x",
   "source": "Authenticated EdgeOne console SSR request log",
   "fix": "Prisma generator binaryTargets native + rhel-openssl-1.1.x",
-  "verification": "pending next deployment"
+  "verification": "Resolved: actual cloud health/login/media/content/roles passed",
+  "resolvedDeployment": "dp2ry69pr5hy"
 }
